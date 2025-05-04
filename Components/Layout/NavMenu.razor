@@ -1,0 +1,65 @@
+﻿@inherits NavMenuBase
+
+<style>
+    .mud-item {
+        margin-left: 10px;
+        margin-right: 10px;
+    }
+</style>
+
+<MudNavMenu>
+    <MudGrid>
+        <MudItem xs="12" Style="margin-left: 10px; margin-right: 10px;">
+            <MudText Align="Align.Left" Typo="Typo.h6" Style="margin-top:10px">Termo para pesquisa</MudText>
+            <MudTextField @bind-Value="_wordKey" Label="Palavra chave" Variant="Variant.Outlined"></MudTextField>
+        </MudItem>
+
+        <MudItem xs="12" Style="margin-left: 10px; margin-right: 10px;">
+            <MudText Align="Align.Left" Style="margin-bottom:5px" Typo="Typo.h6">Tipo de Prova</MudText>
+            <MudSelect T="string"
+                       Variant="Variant.Outlined"
+                       MultiSelection="true"
+                       SelectAll="true"
+                       SelectAllText="Selecionar todos os tipos"
+                       @bind-SelectedValues="_questionTypeSelected"
+                       AdornmentIcon="@Icons.Material.Filled.Search">
+                @foreach (var type in _questionType)
+                {
+                    <MudSelectItem T="string" Value="@type">@type</MudSelectItem>
+                }
+            </MudSelect>
+        </MudItem>
+
+        <MudItem xs="12" Style="margin-left: 10px; margin-right: 10px;">
+            <MudText Align="Align.Left" Style="margin-bottom:5px" Typo="Typo.h6">Área do conhecimento</MudText>
+            <MudSelect T="string"
+                       Variant="Variant.Outlined"
+                       MultiSelection="true"
+                       SelectAll="true"
+                       SelectAllText="Todas as áreas"
+                       @bind-SelectedValues="_mainAreaSelected"
+                       AdornmentIcon="@Icons.Material.Filled.Search">
+                @foreach (var type in _mainArea)
+                {
+                    <MudSelectItem T="string" Value="@type">@type</MudSelectItem>
+                }
+            </MudSelect>
+        </MudItem>
+
+        <MudItem xs="12" Style="margin-left: 10px; margin-right: 10px;">
+            <MudText Align="Align.Left" Style="margin-bottom:5px" Typo="Typo.h6">Subárea</MudText>
+            <MudSelect T="string"
+                       Variant="Variant.Outlined"
+                       MultiSelection="true"
+                       SelectAll="true"
+                       SelectAllText="Todas as subáreas"
+                       @bind-SelectedValues="_subAreaSelected"
+                       AdornmentIcon="@Icons.Material.Filled.Search">
+                @foreach (var type in _subArea)
+                {
+                    <MudSelectItem T="string" Value="@type">@type</MudSelectItem>
+                }
+            </MudSelect>
+        </MudItem>
+    </MudGrid>
+</MudNavMenu>
