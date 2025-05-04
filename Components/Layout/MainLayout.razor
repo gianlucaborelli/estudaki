@@ -7,6 +7,7 @@
 <MudLayout>
     <MudAppBar Elevation="1">
         <MudIconButton Icon="@Icons.Material.Filled.Menu" Color="Color.Inherit" Edge="Edge.Start" OnClick="@((e) => DrawerToggle())" />
+        <MudSpacer />
         <MudText Typo="Typo.h5" Align="Align.Center" Class="ml-3" >EstudAKI</MudText>
         <MudSpacer />
         <MudIconButton Icon="@(DarkLightModeButtonIcon)" Color="Color.Inherit" OnClick="@DarkModeToggle" />        
@@ -15,9 +16,16 @@
         <NavMenu />
     </MudDrawer>
     <MudMainContent Class="pt-20 pa-10">
-        <AdsComponent Slot="6528932050" Style="display:block; text-align:center;" />
-        @Body
-        <AdsComponent Slot="1855189877" Style="display:block; text-align:center;" />
+        <MudGrid>
+            <MudItem xs="12" md="9">
+                <AdsComponent Slot="6528932050" Style="display:block; text-align:center;" />
+                @Body
+                <AdsComponent Slot="1855189877" Style="display:block; text-align:center;" />
+            </MudItem>
+            <MudItem xs="12" md="3">
+                <AdsComponent Slot="7046445993" />
+            </MudItem>
+        </MudGrid>
     </MudMainContent>
 </MudLayout>
 
