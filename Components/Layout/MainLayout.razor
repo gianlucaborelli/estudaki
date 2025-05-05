@@ -8,11 +8,15 @@
     <MudAppBar Elevation="1">
         <MudIconButton Icon="@Icons.Material.Filled.Menu" Color="Color.Inherit" Edge="Edge.Start" OnClick="@((e) => DrawerToggle())" />
         <MudSpacer />
-        <MudText Typo="Typo.h5" Align="Align.Center" Class="ml-3" >EstudAKI</MudText>
+        <MudText Typo="Typo.h5" Align="Align.Center" Class="ml-3" >EstudaKi</MudText>
         <MudSpacer />
         <MudIconButton Icon="@(DarkLightModeButtonIcon)" Color="Color.Inherit" OnClick="@DarkModeToggle" />        
     </MudAppBar>
-    <MudDrawer id="nav-drawer" @bind-Open="_drawerOpen" ClipMode="DrawerClipMode.Always" Elevation="1" Width="20vw">
+    <MudBreakpointProvider OnBreakpointChanged="OnBreakpointChanged" />
+    <MudDrawer @bind-Open="_drawerOpen"
+               Width="@_drawerWidth"
+               ClipMode="DrawerClipMode.Always"
+               Elevation="1">
         <NavMenu />
     </MudDrawer>
     <MudMainContent Class="pt-20 pa-10">
@@ -28,7 +32,6 @@
         </MudGrid>
     </MudMainContent>
 </MudLayout>
-
 
 <div id="blazor-error-ui" data-nosnippet>
     An unhandled error has occurred.

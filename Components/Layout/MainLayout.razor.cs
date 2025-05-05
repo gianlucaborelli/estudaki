@@ -9,6 +9,22 @@ namespace ProvaOnline.Components.Layout
         protected bool _isDarkMode = true;
         protected MudTheme? _theme = null;
 
+        protected Breakpoint _currentBreakpoint;
+        protected string _drawerWidth = "260px";
+        protected void OnBreakpointChanged(Breakpoint breakpoint)
+        {
+            _currentBreakpoint = breakpoint;
+
+            _drawerWidth = breakpoint switch
+            {
+                Breakpoint.Xs => "280px",
+                Breakpoint.Sm => "280px",
+                Breakpoint.Md => "340px",
+                Breakpoint.Lg => "380px",
+                _ => "400px"
+            };
+        }
+
         protected override void OnInitialized()
         {
             base.OnInitialized();

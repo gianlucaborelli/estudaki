@@ -1,59 +1,68 @@
 ﻿@page "/"
+@using MudBlazor
 
-<PageTitle>Home</PageTitle>
+<PageTitle>EstudaKi</PageTitle>
 
-<MudText Typo="Typo.h3" GutterBottom="true">Hello, world!</MudText>
-<MudText Class="mb-8">Welcome to your new app, powered by MudBlazor and the .NET 9 Template!</MudText>
+<MudContainer MaxWidth="MaxWidth.Large" Class="mt-10">
 
-<MudAlert Severity="Severity.Normal" ContentAlignment="HorizontalAlignment.Start">
-    You can find documentation and examples on our website here:
-    <MudLink Href="https://mudblazor.com" Target="_blank" Typo="Typo.body2" Color="Color.Primary">
-        <b>www.mudblazor.com</b>
-    </MudLink>
-</MudAlert>
+    <MudText Typo="Typo.h4" Align="Align.Center" GutterBottom="true" Color="Color.Primary">
+        Comece agora. O <b>EstudaKi</b> é um ambiente de estudo livre para você praticar questões e ganhar confiança nas principais provas do país.
+    </MudText>
+    <MudText Typo="Typo.subtitle1" Align="Align.Center" Class="mb-6">
+        Explore questões de vestibulares, concursos públicos e do exame da OAB, sem precisar de cadastro.
+    </MudText>
 
-<br />
-<MudText Typo="Typo.h5" GutterBottom="true">Interactivity in this Template</MudText>
-<br />
-<MudText Typo="Typo.body2">
-    When you opt for the "Global" Interactivity Location, <br />
-    the render modes are defined in App.razor and consequently apply to all child components.<br />
-    In this case, providers are globally set in the MainLayout.<br />
-    <br />
-    On the other hand, if you choose the "Per page/component" Interactivity Location,<br />
-    it is necessary to include the <br />
-    <br />
-    &lt;MudPopoverProvider /&gt; <br />
-    &lt;MudDialogProvider /&gt; <br />
-    &lt;MudSnackbarProvider /&gt; <br />
-    <br />
-    components on every interactive page.<br />
-    <br />
-    If a render mode is not specified for a page, it defaults to Server-Side Rendering (SSR),<br />
-    similar to this page. While MudBlazor allows pages to be rendered in SSR,<br />
-    please note that interactive features, such as buttons and dropdown menus, will not be functional.
-</MudText>
+    <MudDivider Class="my-8" />
 
-<br />
-<MudText Typo="Typo.h5" GutterBottom="true">What's New in Blazor with the Release of .NET 9</MudText>
-<br />
+    <MudGrid GutterSize="3">
+        <MudItem xs="12" sm="4">
 
-<MudText Typo="Typo.h6" GutterBottom="true">Prerendering</MudText>
-<MudText Typo="Typo.body2" GutterBottom="true">
-    If you're exploring the features of .NET 9 Blazor,<br /> you might be pleasantly surprised to learn that each page is prerendered on the server,<br /> regardless of the selected render mode.<br /><br />
-    This means that you'll need to inject all necessary services on the server,<br /> even when opting for the wasm (WebAssembly) render mode.<br /><br />
-    This prerendering functionality is crucial to ensuring that WebAssembly mode feels fast and responsive,<br /> especially when it comes to initial page load times.<br /><br />
-    For more information on how to detect prerendering and leverage the RenderContext, you can refer to the following link:
-    <MudLink Href="https://github.com/dotnet/aspnetcore/issues/51468#issuecomment-1783568121" Target="_blank" Typo="Typo.body2" Color="Color.Primary">
-        More details
-    </MudLink>
-</MudText>
+            <MudText Typo="Typo.h6" Color="Color.Primary">Acesso Livre</MudText>
+            <MudText Typo="Typo.body2">
+                Não precisa criar conta. Comece a estudar agora mesmo.
+            </MudText>
 
-<br />
-<MudText Typo="Typo.h6" GutterBottom="true">InteractiveAuto</MudText>
-<MudText Typo="Typo.body2">
-    A discussion on how to achieve this can be found here:
-    <MudLink Href="https://github.com/dotnet/aspnetcore/issues/51468#issue-1950424116" Target="_blank" Typo="Typo.body2" Color="Color.Primary">
-        More details
-    </MudLink>
-</MudText>
+        </MudItem>
+        <MudItem xs="12" sm="4">
+
+            <MudText Typo="Typo.h6" Color="Color.Primary">Diversas áreas</MudText>
+            <MudText Typo="Typo.body2">
+                Questões de vestibulares, concursos públicos e exame da OAB organizadas por tema.
+            </MudText>
+
+        </MudItem>
+        <MudItem xs="12" sm="4">
+
+            <MudText Typo="Typo.h6" Color="Color.Primary">Novidades em breve</MudText>
+            <MudText Typo="Typo.body2">
+                Em breve você poderá montar simulados e deixar comentários nas questões.
+            </MudText>
+
+        </MudItem>
+    </MudGrid>
+
+    <MudDivider Class="my-8" />
+
+    <MudText Typo="Typo.h5" GutterBottom="true" Color="Color.Primary">Perguntas Frequentes</MudText>
+
+    <MudExpansionPanels Elevation="1">
+        <MudExpansionPanel Text="Preciso criar uma conta para usar?">
+            Não! Todo o conteúdo está disponível gratuitamente e sem necessidade de login.
+        </MudExpansionPanel>
+        <MudExpansionPanel Text="Quais tipos de prova estão disponíveis?">
+            Você encontrará questões de vestibulares (como ENEM e Fuvest), concursos públicos e da 1ª fase da OAB.
+        </MudExpansionPanel>
+        <MudExpansionPanel Text="Já posso montar simulados personalizados?">
+            Ainda não, mas essa funcionalidade será lançada em breve.
+        </MudExpansionPanel>
+        <MudExpansionPanel Text="Posso comentar as questões?">
+            Ainda não é possível, mas essa é outra funcionalidade planejada para as próximas atualizações.
+        </MudExpansionPanel>
+    </MudExpansionPanels>
+
+    <MudDivider Class="my-8" />
+
+    <MudText Typo="Typo.subtitle2" Align="Align.Center" Color="Color.Secondary" Class="mt-6">
+        © 2025 estudaki. Todos os direitos reservados.
+    </MudText>
+</MudContainer>
