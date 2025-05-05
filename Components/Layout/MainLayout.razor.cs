@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Components;
+using Microsoft.JSInterop;
 using MudBlazor;
 
 namespace ProvaOnline.Components.Layout
@@ -11,6 +12,8 @@ namespace ProvaOnline.Components.Layout
 
         protected Breakpoint _currentBreakpoint;
         protected string _drawerWidth = "260px";
+
+        [Inject] private IJSRuntime JS { get; set; } = default!;
         protected void OnBreakpointChanged(Breakpoint breakpoint)
         {
             _currentBreakpoint = breakpoint;
@@ -23,6 +26,16 @@ namespace ProvaOnline.Components.Layout
                 Breakpoint.Lg => "380px",
                 _ => "400px"
             };
+        }
+
+        protected override async Task OnAfterRenderAsync(bool firstRender)
+        {
+            if (firstRender)
+            {
+                bool prefersDark = await JS.InvokeAsync<bool>("getPreferredColorScheme");
+                _isDarkMode = prefersDark;
+                StateHasChanged();
+            }
         }
 
         protected override void OnInitialized()
