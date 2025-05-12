@@ -4,6 +4,8 @@ using ProvaOnline.Data.Context;
 using ProvaOnline.Helper;
 using ProvaOnline.Helpers;
 using ProvaOnline.Models;
+using System.Runtime.Intrinsics.X86;
+using ZstdSharp.Unsafe;
 
 namespace ProvaOnline.Data
 {
@@ -21,10 +23,61 @@ namespace ProvaOnline.Data
             await _collection.InsertOneAsync(question);
         }
 
-        public async Task<QuestionDocument?> GetByIdAsync(string id)
+        public async Task<List<QuestionDocument>> GetAllAsync()
         {
-            return await _collection.Find(q => q.Id == id).FirstOrDefaultAsync();
+            try
+            {
+                return await _collection.Find(_ => true).ToListAsync();
+            }
+            catch (Exception ex)
+            {
+                // Log the exception (ex) here if needed
+                throw;
+            }
         }
+
+        public async Task<QuestionDocument?> GetByIdAsync(ObjectId id)
+        {
+            return await _collection.Find(q => q._id == id).FirstOrDefaultAsync();
+        }
+
+        public async Task<List<string>> GetDistinctPropertyValuesAsync(string nomePropriedade)
+        {
+            var valoresDistintos = await _collection
+                .DistinctAsync<string>(nomePropriedade, FilterDefinition<QuestionDocument>.Empty);
+            return await valoresDistintos.ToListAsync();
+        }
+
+        public async Task<FilterParameters> QueryDistinctPropertiesAsync(FilterParameters filterParameters)
+        {
+            var builder = Builders<QuestionDocument>.Filter;
+            var filters = new List<FilterDefinition<QuestionDocument>>();
+
+            if (filterParameters.TypeQuestions is { Length: > 0 })
+                filters.Add(builder.In("QuestionType", filterParameters.TypeQuestions));
+
+            if (filterParameters.MainAreas is { Length: > 0 })
+                filters.Add(builder.In("MainArea", filterParameters.MainAreas));
+
+            if (filterParameters.SubAreas is { Length: > 0 })
+                filters.Add(builder.In("SubAreas", filterParameters.SubAreas));
+
+            var combinedFilter = filters.Any() ? builder.And(filters) : builder.Empty;
+
+            var typeQuestionsTask = _collection.DistinctAsync<string>("QuestionType", combinedFilter);
+            var mainAreasTask = _collection.DistinctAsync<string>("MainArea", combinedFilter);
+            var subAreasTask = _collection.DistinctAsync<string>("SubAreas", combinedFilter);
+
+            await Task.WhenAll(typeQuestionsTask, mainAreasTask, subAreasTask);
+
+            return new FilterParameters
+            {
+                TypeQuestions = [.. (await typeQuestionsTask.Result.ToListAsync())],
+                MainAreas = [.. (await mainAreasTask.Result.ToListAsync())],
+                SubAreas = [.. (await subAreasTask.Result.ToListAsync())]
+            };
+        }
+
 
         public async Task<PageResult<QuestionDocument>> SearchQuestionsPaginatedAsync(SearchFilter filter)
         {
@@ -62,6 +115,24 @@ namespace ProvaOnline.Data
                 PageSize = filter.PageSize,
                 TotalItems = totalItems
             };
+        }
+
+        public async Task UpdateMany(List<QuestionDocument> questions)
+        {
+            var operations = questions.Select(question =>
+                 new ReplaceOneModel<QuestionDocument>(
+                     Builders<QuestionDocument>.Filter.Eq(q => q._id, question._id),
+                     question
+                 )
+                 {
+                     IsUpsert = false // true se quiser criar caso não exista
+                 }
+             ).ToList();
+
+            if (operations.Count > 0)
+            {
+                await _collection.BulkWriteAsync(operations);
+            }
         }
     }
 }

@@ -13,7 +13,7 @@ namespace ProvaOnline.Models
         /// </summary>
         [BsonId]
         [BsonRepresentation(BsonType.ObjectId)]
-        public string Id { get; set; }
+        public ObjectId _id { get; set; }      
 
         /// <summary>
         /// Data de criação do documento.
@@ -26,6 +26,11 @@ namespace ProvaOnline.Models
         public bool IsPublished { get; set; } = false;
 
         /// <summary>
+        /// Indica se a questão foi anulada.
+        /// </summary>
+        public bool? IsNullified { get; set; } = false;
+            
+        /// <summary>
         /// Edital do Exame.
         /// </summary>
         public PublicNotice? PublicNotice { get; set; }
@@ -35,20 +40,14 @@ namespace ProvaOnline.Models
         /// </summary>
         public int QuestionNumber { get; set; }
 
+        public string QuestionType { get; set; }
+
         /// <summary>
         /// Texto da questão.
         /// </summary>
         public string QuestionBody { get; set; }
-
-        /// <summary>
-        /// Texto de suporte para a questão, quando existir.
-        /// </summary>
-        public string? SupportQuestian { get; set; }
-
-        /// <summary>
-        /// Imagem de suporte para a questão, quando existir,
-        /// </summary>
-        public SupportImage? SupportImage { get; set; }
+        
+        public List<QuestionSupport> Supports { get; set; } = new List<QuestionSupport>();
 
         /// <summary>
         /// Alternativas de resposta para a questão.
@@ -58,7 +57,7 @@ namespace ProvaOnline.Models
         /// <summary>
         /// Principal área de conhecimento da questão.
         /// </summary>
-        public string MainArea { get; set; }
+        public required string MainArea { get; set; }
 
         /// <summary>
         /// Subáreas de conhecimento da questão.

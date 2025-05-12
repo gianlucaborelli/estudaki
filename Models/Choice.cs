@@ -1,4 +1,6 @@
-﻿namespace ProvaOnline.Models
+﻿using MongoDB.Bson.Serialization.Attributes;
+
+namespace ProvaOnline.Models
 {
     public class Choice
     {
@@ -15,7 +17,8 @@
         /// <summary>
         /// Imagem de apoio a opção de resposta, pode ser nula quando a resposta for baseada em texto.
         /// </summary>
-        public SupportImage? SupportImage { get; set; }
+        [BsonIgnoreIfNull]
+        public ImageSupport? SupportImage { get; set; }
 
         /// <summary>
         /// Define se a resposta é correta ou não, de acordo com o gabarito ofícial.

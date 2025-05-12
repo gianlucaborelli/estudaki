@@ -15,7 +15,16 @@ namespace ProvaOnline.Data.Context
 
         public IMongoCollection<T> GetCollection<T>(string name)
         {
-            return _database.GetCollection<T>(name);
+            try
+            {
+                return _database.GetCollection<T>(name);
+            }
+            catch (Exception ex)
+            {
+                // Log the exception (ex) here if needed
+                throw;
+
+            }
         }
     }
 }

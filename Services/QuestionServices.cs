@@ -1,4 +1,5 @@
-﻿using ProvaOnline.Data;
+﻿using MongoDB.Bson;
+using ProvaOnline.Data;
 using ProvaOnline.Helper;
 using ProvaOnline.Helpers;
 using ProvaOnline.Models;
@@ -14,9 +15,16 @@ namespace ProvaOnline.Services
             _questionRepository = questionRepository;
         }
 
-        public Task<QuestionDocument> GetQuestionById(string id)
+        public Task<QuestionDocument?> GetQuestionById(string id)
         {
-            throw new NotImplementedException();
+            var objectId = ObjectId.TryParse(id, out var parsedId) ? parsedId : ObjectId.Empty;
+            return _questionRepository.GetByIdAsync(objectId);
+        }
+
+        public async Task<FilterParameters> LoadFilterParameters(FilterParameters filterParameters)
+        {
+            var result = await _questionRepository.QueryDistinctPropertiesAsync(filterParameters);
+            return result;
         }
 
         public async Task<PageResult<QuestionDocument>> SearchQuestionsPaginatedAsync(SearchFilter filterParameters)

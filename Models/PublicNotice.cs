@@ -13,6 +13,11 @@
         public int Year { get; set; }
 
         /// <summary>
+        /// Indica qual é a fase do exame.
+        /// </summary>
+        public string? ExamPhase { get; set; }
+
+        /// <summary>
         /// Nome da Banca Examinadora.
         /// </summary>
         public string ExamBoard { get; set; }
