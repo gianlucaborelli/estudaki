@@ -1,10 +1,13 @@
 ﻿<!DOCTYPE html>
-<html lang="en">
+<html lang="pt-br">
 
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <base href="/" />  
+    <base href="/" />
+    <title>EstudaKi</title>
+    <meta name="description" content="EstudaKi é um ambiente de estudo gratuito para praticar questões de vestibulares, concursos públicos e da OAB. Comece a estudar agora, sem cadastro.">
+    <link rel="canonical" href="https://estudaki.com.br/" />
     <link href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700&display=swap" rel="stylesheet" />
     <link href="_content/CodeBeam.MudBlazor.Extensions/MudExtensions.min.css" rel="stylesheet" />
     <script src="_content/CodeBeam.MudBlazor.Extensions/MudExtensions.min.js"></script>
@@ -32,11 +35,13 @@
 
     @* Microsoft Analytics clarity.microsoft.com*@
     <script type="text/javascript">
+        if (!window.location.host.includes('localhost')) {
         (function(c,l,a,r,i,t,y){
             c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};
             t=l.createElement(r);t.async=1;t.src="https://www.clarity.ms/tag/"+i;
             y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);
         })(window, document, "clarity", "script", "rimtkk5bm6");
+        }
     </script>
 </head>
 
