@@ -4,6 +4,7 @@ using MudExtensions.Services;
 using ProvaOnline.Components;
 using ProvaOnline.Data;
 using ProvaOnline.Data.Context;
+using ProvaOnline.Models.DTO;
 using ProvaOnline.Services;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -14,6 +15,7 @@ builder.Services.AddMudExtensions();
 builder.Services.AddSingleton<IMongoContext, MongoContext>();
 builder.Services.AddScoped<IQuestionRepository, QuestionRepository>();
 builder.Services.AddTransient<IQuestionServices, QuestionServices>();
+builder.Services.AddScoped<SearchService>();
 
 // Add services to the container.
 builder.Services.AddRazorComponents()

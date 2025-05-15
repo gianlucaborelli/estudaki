@@ -2,6 +2,7 @@
 using ProvaOnline.Helper;
 using ProvaOnline.Helpers;
 using ProvaOnline.Models;
+using ProvaOnline.Services;
 
 namespace ProvaOnline.Data
 {
@@ -12,6 +13,6 @@ namespace ProvaOnline.Data
         Task<FilterParameters> QueryDistinctPropertiesAsync(FilterParameters filterParameters);
         Task UpdateMany(List<QuestionDocument> question);
         Task<QuestionDocument?> GetByIdAsync(ObjectId id);
-        Task<PageResult<QuestionDocument>> SearchQuestionsPaginatedAsync(SearchFilter filter);
+        Task<PageResult<QuestionDocument>> SearchQuestionsPaginatedAsync(SearchService searchService);
     }
 }

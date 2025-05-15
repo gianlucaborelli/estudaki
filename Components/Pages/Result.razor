@@ -1,3 +1,32 @@
-﻿@inherits ResultBase
+﻿@page "/result"
+@using ProvaOnline.Components.Elements
+@using ProvaOnline.Models
+@inherits ResultBase
 
-<MudPagination Color="Color.Primary" Count="4" @bind-Selected="@_selected" ShowFirstButton="true" ShowLastButton="true" Class="mt-4" />
+<MudGrid>
+    <MudItem xs="12"
+             Style="margin-left: 10px; margin-right: 10px;display: flex; justify-content:center">
+        <MudPagination Color="Color.Primary"
+                       Count="@_totalPages" @bind-Selected="@_currentPage"
+                       ShowFirstButton="true"
+                       ShowLastButton="true"
+                       Class="mt-4" />
+    </MudItem>
+
+    @foreach (QuestionDocument question in _questions)
+    {
+        
+        <MudItem xs="12">
+            <QuestionComponent Value="question" />            
+        </MudItem>
+    }
+
+    <MudItem xs="12"
+             Style="margin-left: 10px; margin-right: 10px;display: flex; justify-content:center">
+        <MudPagination Color="Color.Primary"
+                       Count="@_totalPages" @bind-Selected="@_currentPage"
+                       ShowFirstButton="true"
+                       ShowLastButton="true"
+                       Class="mt-4" />
+    </MudItem>
+</MudGrid>

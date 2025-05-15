@@ -4,6 +4,7 @@ using ProvaOnline.Data.Context;
 using ProvaOnline.Helper;
 using ProvaOnline.Helpers;
 using ProvaOnline.Models;
+using ProvaOnline.Services;
 using System.Runtime.Intrinsics.X86;
 using ZstdSharp.Unsafe;
 
@@ -79,23 +80,21 @@ namespace ProvaOnline.Data
         }
 
 
-        public async Task<PageResult<QuestionDocument>> SearchQuestionsPaginatedAsync(SearchFilter filter)
+        public async Task<PageResult<QuestionDocument>> SearchQuestionsPaginatedAsync(SearchService searchService)
         {
             var filterBuilder = Builders<QuestionDocument>.Filter;
             var filters = new List<FilterDefinition<QuestionDocument>>();
 
             // Dynamic filters
-            if (!string.IsNullOrWhiteSpace(filter.MainArea))
-                filters.Add(filterBuilder.Eq(q => q.MainArea, filter.MainArea));
+            if (searchService.SearchParameters.MainAreas is { Length: > 0 })
+                filters.Add(filterBuilder.In(q => q.MainArea, searchService.SearchParameters.MainAreas));
 
-            if (!string.IsNullOrWhiteSpace(filter.SubArea))
-                filters.Add(filterBuilder.AnyEq(q => q.SubAreas, filter.SubArea));
+            if (searchService.SearchParameters.SubAreas is { Length: > 0 })
+                filters.Add(filterBuilder.ElemMatch(q => q.SubAreas, sa => searchService.SearchParameters.SubAreas.Contains(sa)));
 
-            if (!string.IsNullOrWhiteSpace(filter.Keyword))
-                filters.Add(filterBuilder.Regex(q => q.QuestionBody, new BsonRegularExpression(filter.Keyword, "i")));
 
-            if (!string.IsNullOrWhiteSpace(filter.ExamBoardName))
-                filters.Add(filterBuilder.Eq("PublicNotice.ExamBoard", filter.ExamBoardName));
+            if (!string.IsNullOrWhiteSpace(searchService.SearchParameters.WordKey))
+                filters.Add(filterBuilder.Regex(q => q.QuestionBody, new BsonRegularExpression(searchService.SearchParameters.WordKey, "i")));
 
             var finalFilter = filters.Any() ? filterBuilder.And(filters) : filterBuilder.Empty;
 
@@ -104,15 +103,15 @@ namespace ProvaOnline.Data
 
             // Paginated items
             var items = await _collection.Find(finalFilter)
-                .Skip((filter.PageNumber - 1) * filter.PageSize)
-                .Limit(filter.PageSize)
+                .Skip((searchService.PageNumber - 1) * searchService.PageSize)
+                .Limit(searchService.PageSize)
                 .ToListAsync();
 
             return new PageResult<QuestionDocument>
             {
                 Items = items,
-                PageNumber = filter.PageNumber,
-                PageSize = filter.PageSize,
+                PageNumber = searchService.PageNumber,
+                PageSize = searchService.PageSize,
                 TotalItems = totalItems
             };
         }

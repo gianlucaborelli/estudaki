@@ -27,9 +27,9 @@ namespace ProvaOnline.Services
             return result;
         }
 
-        public async Task<PageResult<QuestionDocument>> SearchQuestionsPaginatedAsync(SearchFilter filterParameters)
+        public async Task<PageResult<QuestionDocument>> SearchQuestionsPaginatedAsync(SearchService searchService)
         {
-            return await _questionRepository.SearchQuestionsPaginatedAsync(filterParameters);
+            return await _questionRepository.SearchQuestionsPaginatedAsync(searchService);
         }
     }
 }

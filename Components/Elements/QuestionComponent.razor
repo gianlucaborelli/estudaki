@@ -1,0 +1,46 @@
+﻿<MudCard Outlined="true">
+    <MudCardHeader>
+        <CardHeaderContent>
+            <MudText Typo="Typo.h6">@Value.PublicNotice.ExamBoard - @Value.PublicNotice.Position  @Value.PublicNotice.ExamPhase @Value.PublicNotice.Year</MudText>
+        </CardHeaderContent>
+    </MudCardHeader>
+    <MudCardContent>
+        <MudText Align="Align.Justify">@Value.QuestionBody</MudText>
+        <MudRadioGroup T="string" ValueChanged="@(() => _showAnswers = true)">
+            @foreach (var choice in Value.Choices )
+            {
+                string choiceClass = "choice";
+
+                if (_showAnswers)
+                {
+                    if (choice.IsCorrect)
+                        choiceClass += " correct";
+                    else
+                        choiceClass += " incorrect";
+                }
+
+                <div class="@choiceClass">
+                    <MudRadio T="string" 
+                              Value="@choice.Text" 
+                              Color="Color.Primary">
+                        <MudText Typo="Typo.body2" Align="Align.Justify">@choice.Text</MudText>
+                    </MudRadio>
+                </div>
+            }
+        </MudRadioGroup>
+    </MudCardContent>
+    <MudCardActions>
+        <MudButton Variant="Variant.Outlined"
+        Color="Color.Primary"
+        OnClick="@(() => _showAnswers = !_showAnswers)">
+            @if (_showAnswers)
+            {
+                @:Ocultar resposta
+            }
+            else
+            {
+                @:Verificar resposta
+            }
+        </MudButton>
+    </MudCardActions>
+</MudCard>

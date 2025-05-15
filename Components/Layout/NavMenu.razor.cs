@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Components;
 using MudBlazor;
 using ProvaOnline.Helpers;
+using ProvaOnline.Models.DTO;
 using ProvaOnline.Services;
 
 namespace ProvaOnline.Components.Layout
@@ -28,6 +29,12 @@ namespace ProvaOnline.Components.Layout
         [Inject]
         protected ISnackbar Snackbar { get; set; } = default!;
 
+        [Inject]
+        protected NavigationManager _navigationManager { get; set; } = default!;
+
+        [Inject]
+        protected SearchService _searchParameters { get; set; } = default!;
+
         private async Task GetFilterParameters()
         {
             var filterParameters = new FilterParameters
@@ -50,6 +57,21 @@ namespace ProvaOnline.Components.Layout
         protected async Task LoadingFilterParameters()
         {
             await GetFilterParameters();
+        }
+
+        protected void SearchQuestions()
+        {
+            var searchParameters = new SearchParameters
+            {
+                WordKey = _wordKey,
+                TypeQuestions = _questionTypeSelected?.ToArray() ?? Array.Empty<string>(),
+                MainAreas = _mainAreaSelected?.ToArray() ?? Array.Empty<string>(),
+                SubAreas = _subAreaSelected?.ToArray() ?? Array.Empty<string>()
+            };
+
+            var searchId = Guid.NewGuid();
+            _searchParameters.SearchParameters = searchParameters;
+            _navigationManager.NavigateTo($"/result?searchId={searchId}");
         }
     }
 }
