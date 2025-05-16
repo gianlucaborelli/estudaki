@@ -47,6 +47,9 @@ namespace ProvaOnline.Models
         /// </summary>
         public string QuestionBody { get; set; }
 
+        /// <summary>
+        /// Texto ou Imagem de apoio a questão.
+        /// </summary>
         public List<QuestionSupport> Supports { get; set; } = new List<QuestionSupport>();
 
         /// <summary>

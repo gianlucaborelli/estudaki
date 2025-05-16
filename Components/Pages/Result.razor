@@ -3,9 +3,10 @@
 @using ProvaOnline.Models
 @inherits ResultBase
 
+
 <MudGrid>
     <MudItem xs="12"
-             Style="margin-left: 10px; margin-right: 10px;display: flex; justify-content:center">
+             Style="display: flex; justify-content:center">
         <MudPagination Color="Color.Primary"
                        Count="@_totalPages" @bind-Selected="@_currentPage"
                        ShowFirstButton="true"
@@ -15,14 +16,13 @@
 
     @foreach (QuestionDocument question in _questions)
     {
-        
-        <MudItem xs="12">
-            <QuestionComponent Value="question" />            
+        <MudItem >
+            <QuestionComponent Value="question" />
         </MudItem>
     }
 
     <MudItem xs="12"
-             Style="margin-left: 10px; margin-right: 10px;display: flex; justify-content:center">
+             Style="display: flex; justify-content:center">
         <MudPagination Color="Color.Primary"
                        Count="@_totalPages" @bind-Selected="@_currentPage"
                        ShowFirstButton="true"
