@@ -32,8 +32,7 @@ namespace ProvaOnline.Components.Layout
         [Inject]
         protected NavigationManager _navigationManager { get; set; } = default!;
 
-        [Inject]
-        protected SearchService _searchParameters { get; set; } = default!;
+        protected SearchParameters _searchParameters { get; set; } = new();
 
         private async Task GetFilterParameters()
         {
@@ -43,7 +42,7 @@ namespace ProvaOnline.Components.Layout
                 MainAreas = _mainAreaSelected?.ToArray() ?? Array.Empty<string>(),
                 SubAreas = _subAreaSelected?.ToArray() ?? Array.Empty<string>()
             };
-            filterParameters = await _questionService.LoadFilterParameters(filterParameters);
+            filterParameters = await _questionService.FindFilterParametersAsync(filterParameters);
             _questionType = filterParameters.TypeQuestions.ToArray();
             _mainArea = filterParameters.MainAreas.ToArray();
             _subArea = filterParameters.SubAreas.ToArray();
@@ -61,17 +60,12 @@ namespace ProvaOnline.Components.Layout
 
         protected void SearchQuestions()
         {
-            var searchParameters = new SearchParameters
-            {
-                WordKey = _wordKey,
-                TypeQuestions = _questionTypeSelected?.ToArray() ?? Array.Empty<string>(),
-                MainAreas = _mainAreaSelected?.ToArray() ?? Array.Empty<string>(),
-                SubAreas = _subAreaSelected?.ToArray() ?? Array.Empty<string>()
-            };
-
-            var searchId = Guid.NewGuid();
-            _searchParameters.SearchParameters = searchParameters;
-            _navigationManager.NavigateTo($"/result?searchId={searchId}");
+            _searchParameters.WordKey = _wordKey;
+            _searchParameters.TypeQuestions = _questionTypeSelected?.ToArray() ?? Array.Empty<string>();
+            _searchParameters.MainAreas = _mainAreaSelected?.ToArray() ?? Array.Empty<string>();
+            _searchParameters.SubAreas = _subAreaSelected?.ToArray() ?? Array.Empty<string>();            
+            
+            _navigationManager.NavigateTo($"/result?{_searchParameters}");
         }
     }
 }

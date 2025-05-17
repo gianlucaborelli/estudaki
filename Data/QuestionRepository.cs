@@ -4,9 +4,7 @@ using ProvaOnline.Data.Context;
 using ProvaOnline.Helper;
 using ProvaOnline.Helpers;
 using ProvaOnline.Models;
-using ProvaOnline.Services;
-using System.Runtime.Intrinsics.X86;
-using ZstdSharp.Unsafe;
+using ProvaOnline.Models.DTO;
 
 namespace ProvaOnline.Data
 {
@@ -26,15 +24,7 @@ namespace ProvaOnline.Data
 
         public async Task<List<QuestionDocument>> GetAllAsync()
         {
-            try
-            {
-                return await _collection.Find(_ => true).ToListAsync();
-            }
-            catch (Exception ex)
-            {
-                // Log the exception (ex) here if needed
-                throw;
-            }
+            return await _collection.Find(_ => true).ToListAsync();
         }
 
         public async Task<QuestionDocument?> GetByIdAsync(ObjectId id)
@@ -42,14 +32,7 @@ namespace ProvaOnline.Data
             return await _collection.Find(q => q._id == id).FirstOrDefaultAsync();
         }
 
-        public async Task<List<string>> GetDistinctPropertyValuesAsync(string nomePropriedade)
-        {
-            var valoresDistintos = await _collection
-                .DistinctAsync<string>(nomePropriedade, FilterDefinition<QuestionDocument>.Empty);
-            return await valoresDistintos.ToListAsync();
-        }
-
-        public async Task<FilterParameters> QueryDistinctPropertiesAsync(FilterParameters filterParameters)
+        public async Task<FilterParameters> FindFilterParametersAsync(FilterParameters filterParameters)
         {
             var builder = Builders<QuestionDocument>.Filter;
             var filters = new List<FilterDefinition<QuestionDocument>>();
@@ -79,44 +62,40 @@ namespace ProvaOnline.Data
             };
         }
 
-
-        public async Task<PageResult<QuestionDocument>> SearchQuestionsPaginatedAsync(SearchService searchService)
+        public async Task<PageResult<QuestionDocument>> FindQuestionsPaginatedAsync(SearchParameters searchParameter)
         {
             var filterBuilder = Builders<QuestionDocument>.Filter;
             var filters = new List<FilterDefinition<QuestionDocument>>();
 
-            // Dynamic filters
-            if (searchService.SearchParameters.MainAreas is { Length: > 0 })
-                filters.Add(filterBuilder.In(q => q.MainArea, searchService.SearchParameters.MainAreas));
+            if (searchParameter.MainAreas is { Length: > 0 })
+                filters.Add(filterBuilder.In(q => q.MainArea, searchParameter.MainAreas));
 
-            if (searchService.SearchParameters.SubAreas is { Length: > 0 })
-                filters.Add(filterBuilder.ElemMatch(q => q.SubAreas, sa => searchService.SearchParameters.SubAreas.Contains(sa)));
+            if (searchParameter.SubAreas is { Length: > 0 })
+                filters.Add(filterBuilder.ElemMatch(q => q.SubAreas, sa => searchParameter.SubAreas.Contains(sa)));
 
 
-            if (!string.IsNullOrWhiteSpace(searchService.SearchParameters.WordKey))
-                filters.Add(filterBuilder.Regex(q => q.QuestionBody, new BsonRegularExpression(searchService.SearchParameters.WordKey, "i")));
+            if (!string.IsNullOrWhiteSpace(searchParameter.WordKey))
+                filters.Add(filterBuilder.Regex(q => q.QuestionBody, new BsonRegularExpression(searchParameter.WordKey, "i")));
 
             var finalFilter = filters.Any() ? filterBuilder.And(filters) : filterBuilder.Empty;
 
-            // Total items count
             var totalItems = await _collection.CountDocumentsAsync(finalFilter);
 
-            // Paginated items
             var items = await _collection.Find(finalFilter)
-                .Skip((searchService.PageNumber - 1) * searchService.PageSize)
-                .Limit(searchService.PageSize)
+                .Skip((searchParameter.CurrentPage - 1) * searchParameter.PageSize)
+                .Limit(searchParameter.PageSize)
                 .ToListAsync();
 
             return new PageResult<QuestionDocument>
             {
                 Items = items,
-                PageNumber = searchService.PageNumber,
-                PageSize = searchService.PageSize,
+                PageNumber = searchParameter.CurrentPage,
+                PageSize = searchParameter.PageSize,
                 TotalItems = totalItems
             };
         }
 
-        public async Task UpdateMany(List<QuestionDocument> questions)
+        public async Task UpdateManyAsync(List<QuestionDocument> questions)
         {
             var operations = questions.Select(question =>
                  new ReplaceOneModel<QuestionDocument>(
@@ -124,7 +103,7 @@ namespace ProvaOnline.Data
                      question
                  )
                  {
-                     IsUpsert = false // true se quiser criar caso não exista
+                     IsUpsert = false
                  }
              ).ToList();
 

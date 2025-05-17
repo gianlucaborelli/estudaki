@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Components;
+using Microsoft.AspNetCore.Components.Routing;
 using Microsoft.JSInterop;
 using MudBlazor;
 using ProvaOnline.Models;
@@ -7,33 +8,177 @@ using ProvaOnline.Services;
 
 namespace ProvaOnline.Components.Pages;
 
-public class ResultBase : ComponentBase
+public partial class ResultBase : ComponentBase, IDisposable
 {
     [Inject]
-    protected SearchService SearchService { get; set; }
-
+    protected IQuestionServices QuestionService { get; set; } = default!;
     [Inject]
-    protected IQuestionServices QuestionService { get; set; }
-
+    protected ISnackbar Snackbar { get; set; } = default!;
     [Inject]
-    protected ISnackbar Snackbar { get; set; }
+    protected NavigationManager Navigation { get; set; } = default!;
 
-    [Inject]
-    protected NavigationManager Navigation { get; set; }    
-
-    protected int _totalPages { get; set; } = 0;
-    protected int _currentPage { get; set; } = 0;
-    protected QuestionDocument[] _questions { get; set; } = [];
-
+    private int _currentPage = 1;
     [Parameter]
-    public string SearchId { get; set; } = string.Empty;
+    public int CurrentPage
+    {
+        get => _currentPage;
+        set
+        {
+            if (_currentPage != value)
+            {
+                _currentPage = value;
+                _ = OnParameterChangedAsync();
+            }
+        }
+    }
 
-    protected override async Task OnParametersSetAsync()
-    {      
-        var searchResult = await QuestionService.SearchQuestionsPaginatedAsync(SearchService);
+    private int _pageSize = 10;
+    [Parameter]
+    public int PageSize
+    {
+        get => _pageSize;
+        set
+        {
+            if (_pageSize != value)
+            {
+                _pageSize = value;
+                _ = OnParameterChangedAsync();
+            }
+        }
+    }
 
-        _questions = [.. searchResult.Items];
-        _totalPages = searchResult.TotalPages;
+    private string[] _typeQuestions = [];
+    [Parameter]
+    public string[] TypeQuestions
+    {
+        get => _typeQuestions;
+        set
+        {
+            if (!AreArraysEqual(_typeQuestions, value))
+            {
+                _typeQuestions = value;
+                _ = OnParameterChangedAsync();
+            }
+        }
+    }
+
+    private string[] _mainAreas = [];
+    [Parameter]
+    public string[] MainAreas
+    {
+        get => _mainAreas;
+        set
+        {
+            if (!AreArraysEqual(_mainAreas, value))
+            {
+                _mainAreas = value;
+                _ = OnParameterChangedAsync();
+            }
+        }
+    }
+
+    private string[] _subAreas = [];
+    [Parameter]
+    public string[] SubAreas
+    {
+        get => _subAreas;
+        set
+        {
+            if (!AreArraysEqual(_subAreas, value))
+            {
+                _subAreas = value;
+                _ = OnParameterChangedAsync();
+            }
+        }
+    }
+
+    private string _wordKey = string.Empty;
+    [Parameter]
+    public string WordKey
+    {
+        get => _wordKey;
+        set
+        {
+            if (_wordKey != value)
+            {
+                _wordKey = value;
+                _ = OnParameterChangedAsync();
+            }
+        }
+    }
+
+    public int TotalPages { get; set; } = 0;
+    protected QuestionDocument[] Questions { get; set; } = [];
+    private SearchParameters _searchParameters = new();
+
+    protected override async Task OnInitializedAsync()
+    {
+        Navigation.LocationChanged += OnLocationChanged;
+        await ParseUrlParametersAndRefresh();
+    }
+
+    private async void OnLocationChanged(object? sender, LocationChangedEventArgs e)
+    {
+        await ParseUrlParametersAndRefresh();
+        StateHasChanged();
+    }
+
+    private async Task ParseUrlParametersAndRefresh()
+    {
+        var uri = Navigation.ToAbsoluteUri(Navigation.Uri);
+        var query = System.Web.HttpUtility.ParseQueryString(uri.Query);
+
+        _currentPage = int.TryParse(query["CurrentPage"], out var cp) ? cp : 1;
+        _pageSize = int.TryParse(query["PageSize"], out var ps) ? ps : 10;
+        _wordKey = query["WordKey"] ?? string.Empty;
+        _typeQuestions = query["TypeQuestions"]?.Split(',', StringSplitOptions.RemoveEmptyEntries) ?? [];
+        _mainAreas = query["MainAreas"]?.Split(',', StringSplitOptions.RemoveEmptyEntries) ?? [];
+        _subAreas = query["SubAreas"]?.Split(',', StringSplitOptions.RemoveEmptyEntries) ?? [];
+
+        await RefreshDataAsync();
+    }
+
+    private async Task RefreshDataAsync()
+    {
+        _searchParameters = new SearchParameters
+        {
+            CurrentPage = CurrentPage,
+            PageSize = PageSize,
+            WordKey = WordKey,
+            TypeQuestions = TypeQuestions,
+            MainAreas = MainAreas,
+            SubAreas = SubAreas
+        };
+
+        var searchResult = await QuestionService.SearchQuestionsPaginatedAsync(_searchParameters);
+
+        Questions = [.. searchResult.Items];
+        TotalPages = searchResult.TotalPages;
         _currentPage = searchResult.PageNumber;
+    }
+
+    private async Task OnParameterChangedAsync()
+    {
+        await RefreshDataAsync();
+        Navigation.NavigateTo($"/result?{_searchParameters}");
+    }
+
+    private static bool AreArraysEqual(string[]? a, string[]? b)
+    {
+        if (a == null && b == null) return true;
+        if (a == null || b == null) return false;
+        if (a.Length != b.Length) return false;
+
+        for (int i = 0; i < a.Length; i++)
+        {
+            if (a[i] != b[i]) return false;
+        }
+
+        return true;
+    }
+
+    public void Dispose()
+    {
+        Navigation.LocationChanged -= OnLocationChanged;
     }
 }

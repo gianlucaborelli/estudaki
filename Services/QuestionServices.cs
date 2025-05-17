@@ -3,6 +3,7 @@ using ProvaOnline.Data;
 using ProvaOnline.Helper;
 using ProvaOnline.Helpers;
 using ProvaOnline.Models;
+using ProvaOnline.Models.DTO;
 
 namespace ProvaOnline.Services
 {
@@ -21,15 +22,14 @@ namespace ProvaOnline.Services
             return _questionRepository.GetByIdAsync(objectId);
         }
 
-        public async Task<FilterParameters> LoadFilterParameters(FilterParameters filterParameters)
-        {
-            var result = await _questionRepository.QueryDistinctPropertiesAsync(filterParameters);
-            return result;
+        public async Task<FilterParameters> FindFilterParametersAsync(FilterParameters filterParameters)
+        {            
+            return await _questionRepository.FindFilterParametersAsync(filterParameters);
         }
 
-        public async Task<PageResult<QuestionDocument>> SearchQuestionsPaginatedAsync(SearchService searchService)
+        public async Task<PageResult<QuestionDocument>> SearchQuestionsPaginatedAsync(SearchParameters searchParameter)
         {
-            return await _questionRepository.SearchQuestionsPaginatedAsync(searchService);
+            return await _questionRepository.FindQuestionsPaginatedAsync(searchParameter);
         }
     }
 }
