@@ -11,13 +11,15 @@
 
     <MudGrid>
         <MudItem xs="12" Style="margin-left: 10px; margin-right: 10px;">
-            <MudText Align="Align.Left" Typo="Typo.h6" Style="margin-top:10px">Termo para pesquisa</MudText>
+            <MudText Align="Align.Center" Typo="Typo.h6" Style="margin-top:10px">Termos para pesquisa</MudText>
             <MudTextField Margin="Margin.Dense"
-                          @bind-Value="_wordKey" Label="Palavra chave" Variant="Variant.Outlined"></MudTextField>
+                          @bind-Value="_wordKey" 
+                          Clearable="true"
+                          Label="Palavra chave" 
+                          Variant="Variant.Outlined" />
         </MudItem>
 
         <MudItem xs="12" Style="margin-left: 10px; margin-right: 10px;">
-            <MudText Align="Align.Left" Typo="Typo.h6">Tipo de Prova</MudText>
             <MudSelectExtended T="string"
                                ItemCollection="_questionType"
                                @bind-SelectedValues="_questionTypeSelected"
@@ -32,7 +34,6 @@
         </MudItem>
 
         <MudItem xs="12" Style="margin-left: 10px; margin-right: 10px;">
-            <MudText Align="Align.Left" Typo="Typo.h6">Área do conhecimento</MudText>
             <MudSelectExtended T="string"
                                ItemCollection="_mainArea"
                                @bind-SelectedValues="_mainAreaSelected"
@@ -47,7 +48,6 @@
         </MudItem>
 
         <MudItem xs="12" Style="margin-left: 10px; margin-right: 10px;">
-            <MudText Align="Align.Left" Typo="Typo.h6">Subárea</MudText>
             <MudSelectExtended T="string"
                                ItemCollection="_subArea"
                                @bind-SelectedValues="_subAreaSelected"

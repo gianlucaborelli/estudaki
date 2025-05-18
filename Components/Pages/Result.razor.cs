@@ -16,7 +16,7 @@ public partial class ResultBase : ComponentBase, IDisposable
     protected ISnackbar Snackbar { get; set; } = default!;
     [Inject]
     protected NavigationManager Navigation { get; set; } = default!;
-
+    
     private int _currentPage = 1;
     [Parameter]
     public int CurrentPage
@@ -108,6 +108,8 @@ public partial class ResultBase : ComponentBase, IDisposable
     }
 
     public int TotalPages { get; set; } = 0;
+    protected int BoundaryCount { get; set; } = 1;
+
     protected QuestionDocument[] Questions { get; set; } = [];
     private SearchParameters _searchParameters = new();
 
@@ -115,7 +117,7 @@ public partial class ResultBase : ComponentBase, IDisposable
     {
         Navigation.LocationChanged += OnLocationChanged;
         await ParseUrlParametersAndRefresh();
-    }
+    }    
 
     private async void OnLocationChanged(object? sender, LocationChangedEventArgs e)
     {

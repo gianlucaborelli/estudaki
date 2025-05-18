@@ -3,12 +3,13 @@
 @using ProvaOnline.Models
 @inherits ResultBase
 
-
-<MudGrid>
+<MudGrid >
     <MudItem xs="12"
              Style="display: flex; justify-content:center">
         <MudPagination Color="Color.Primary"
                        Count="@TotalPages" @bind-Selected="@CurrentPage"
+                       Variant="Variant.Text"
+                       BoundaryCount="@BoundaryCount"
                        ShowFirstButton="true"
                        ShowLastButton="true"
                        Class="mt-4" />
@@ -16,7 +17,7 @@
 
     @foreach (QuestionDocument question in Questions)
     {
-        <MudItem >
+        <MudItem xs="12">
             <QuestionComponent Value="question" />
         </MudItem>
     }
@@ -25,6 +26,8 @@
              Style="display: flex; justify-content:center">
         <MudPagination Color="Color.Primary"
                        Count="@TotalPages" @bind-Selected="@CurrentPage"
+                       Variant="Variant.Text"
+                       BoundaryCount="1"
                        ShowFirstButton="true"
                        ShowLastButton="true"
                        Class="mt-4" />
