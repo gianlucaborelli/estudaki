@@ -1,7 +1,7 @@
 ﻿using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Routing;
-using Microsoft.JSInterop;
 using MudBlazor;
+using ProvaOnline.Extensions;
 using ProvaOnline.Models;
 using ProvaOnline.Models.DTO;
 using ProvaOnline.Services;
@@ -54,7 +54,7 @@ public partial class ResultBase : ComponentBase, IDisposable
         get => _typeQuestions;
         set
         {
-            if (!AreArraysEqual(_typeQuestions, value))
+            if (!_typeQuestions.AreArraysEqual(value))
             {
                 _typeQuestions = value;
                 _ = OnParameterChangedAsync();
@@ -69,7 +69,7 @@ public partial class ResultBase : ComponentBase, IDisposable
         get => _mainAreas;
         set
         {
-            if (!AreArraysEqual(_mainAreas, value))
+            if (!_mainAreas.AreArraysEqual(value))
             {
                 _mainAreas = value;
                 _ = OnParameterChangedAsync();
@@ -84,7 +84,7 @@ public partial class ResultBase : ComponentBase, IDisposable
         get => _subAreas;
         set
         {
-            if (!AreArraysEqual(_subAreas, value))
+            if (!_subAreas.AreArraysEqual(value))
             {
                 _subAreas = value;
                 _ = OnParameterChangedAsync();
@@ -161,20 +161,6 @@ public partial class ResultBase : ComponentBase, IDisposable
     {
         await RefreshDataAsync();
         Navigation.NavigateTo($"/result?{_searchParameters}");
-    }
-
-    private static bool AreArraysEqual(string[]? a, string[]? b)
-    {
-        if (a == null && b == null) return true;
-        if (a == null || b == null) return false;
-        if (a.Length != b.Length) return false;
-
-        for (int i = 0; i < a.Length; i++)
-        {
-            if (a[i] != b[i]) return false;
-        }
-
-        return true;
     }
 
     public void Dispose()

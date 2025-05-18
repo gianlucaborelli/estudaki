@@ -1,0 +1,29 @@
+﻿@page "/Error/404"
+@inject NavigationManager NavigationManager
+
+<MudContainer MaxWidth="MaxWidth.Medium" Class="mt-16">
+    <MudPaper Elevation="8" Class="pa-8 text-center" Style="border-radius: 16px;">
+        <MudIcon Icon="@Icons.Material.Filled.SentimentDissatisfied" Size="Size.Large" Color="Color.Error" Class="mb-4" Style="font-size: 5rem;" />
+
+        <MudText Typo="Typo.h3" Class="mb-4" Color="Color.Error">404 - Página não encontrada</MudText>
+
+        <MudText Typo="Typo.body1" Class="mb-6" Color="Color.Secondary">
+            O endereço solicitado não existe. Verifique o URL ou navegue pelo menu.
+        </MudText>
+
+        <div class="d-flex justify-center gap-4 mt-8">
+            <MudButton Variant="Variant.Filled"
+                       Color="Color.Primary"
+                       StartIcon="@Icons.Material.Filled.Home"
+                       OnClick="GoToHome">
+                Página Inicial
+            </MudButton>            
+        </div>
+    </MudPaper>
+</MudContainer>
+@code {
+    private void GoToHome()
+    {
+        NavigationManager.NavigateTo("/");
+    }
+}

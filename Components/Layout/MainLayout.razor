@@ -14,7 +14,8 @@
     </MudAppBar>
     <MudBreakpointProvider OnBreakpointChanged="OnBreakpointChanged" />
     <MudDrawer @bind-Open="_drawerOpen"
-               Width="@_drawerWidth"
+               Breakpoint="Breakpoint.Md"
+               Width="@_drawerWidth"               
                ClipMode="DrawerClipMode.Always"
                Elevation="1">
         <NavMenu />

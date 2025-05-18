@@ -15,7 +15,7 @@ builder.Services.AddMudExtensions();
 builder.Services.AddSingleton<IMongoContext, MongoContext>();
 builder.Services.AddScoped<IQuestionRepository, QuestionRepository>();
 builder.Services.AddTransient<IQuestionServices, QuestionServices>();
-
+builder.Services.AddHttpContextAccessor();
 // Add services to the container.
 builder.Services.AddRazorComponents()
     .AddInteractiveServerComponents();
@@ -29,9 +29,9 @@ if (!app.Environment.IsDevelopment())
     app.UseHsts();
 }
 
+app.UseStatusCodePagesWithReExecute("/Error/{0}");
 app.UseHttpsRedirection();
-
-
+app.UseRouting();
 app.UseAntiforgery();
 
 app.MapStaticAssets();

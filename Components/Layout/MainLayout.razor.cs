@@ -11,7 +11,7 @@ namespace ProvaOnline.Components.Layout
         protected MudTheme? _theme = null;
 
         protected Breakpoint _currentBreakpoint;
-        protected string _drawerWidth = "260px";
+        protected string _drawerWidth = "280px";
 
         [Inject] private IJSRuntime JS { get; set; } = default!;
         protected void OnBreakpointChanged(Breakpoint breakpoint)
@@ -119,7 +119,7 @@ namespace ProvaOnline.Components.Layout
 
         public string DarkLightModeButtonIcon => _isDarkMode switch
         {
-            true => Icons.Material.Rounded.AutoMode,
+            true => Icons.Material.Rounded.LightMode,
             false => Icons.Material.Outlined.DarkMode,
         };
     }
