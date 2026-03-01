@@ -32,6 +32,9 @@ namespace ProvaOnline.Components.Layout
         [Inject]
         protected NavigationManager _navigationManager { get; set; } = default!;
 
+        [CascadingParameter]
+        protected MainLayoutPage? MainLayout { get; set; }
+
         protected SearchParameters _searchParameters { get; set; } = new();
 
         private async Task GetFilterParameters()
@@ -64,7 +67,9 @@ namespace ProvaOnline.Components.Layout
             _searchParameters.TypeQuestions = _questionTypeSelected?.ToArray() ?? Array.Empty<string>();
             _searchParameters.MainAreas = _mainAreaSelected?.ToArray() ?? Array.Empty<string>();
             _searchParameters.SubAreas = _subAreaSelected?.ToArray() ?? Array.Empty<string>();            
-            
+
+            MainLayout?.CloseDrawer();
+
             _navigationManager.NavigateTo($"/result?{_searchParameters}");
         }
     }

@@ -20,8 +20,8 @@ namespace ProvaOnline.Components.Layout
 
             _drawerWidth = breakpoint switch
             {
-                Breakpoint.Xs => "280px",
-                Breakpoint.Sm => "280px",
+                Breakpoint.Xs => "100%",
+                Breakpoint.Sm => "100%",
                 Breakpoint.Md => "340px",
                 Breakpoint.Lg => "380px",
                 _ => "400px"
@@ -53,6 +53,15 @@ namespace ProvaOnline.Components.Layout
         protected void DrawerToggle()
         {
             _drawerOpen = !_drawerOpen;
+        }
+
+        public void CloseDrawer()
+        {
+            if (_currentBreakpoint == Breakpoint.Xs || _currentBreakpoint == Breakpoint.Sm)
+            {
+                _drawerOpen = false;
+                StateHasChanged();
+            }
         }
 
         protected void DarkModeToggle()
