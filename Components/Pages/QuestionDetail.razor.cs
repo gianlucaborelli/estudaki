@@ -134,7 +134,7 @@ public partial class QuestionDetailBase : ComponentBase
 
     protected string GetCanonicalUrl()
     {
-        return $"https://estudaki.com.br/questao/{Id}";
+        return $"https://estudaki.com.br/question/{Id}";
     }
 
     protected string GetStructuredData()

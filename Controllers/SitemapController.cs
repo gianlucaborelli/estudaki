@@ -42,12 +42,11 @@ namespace ProvaOnline.Controllers
             {
                 _logger.LogInformation("Buscando questões para o sitemap...");
 
-                // Buscar todas as questões publicadas (com paginação grande)
                 var searchParameters = new SearchParameters
                 {
                     IsPublished = true,
                     CurrentPage = 1,
-                    PageSize = 10000 // Pega todas as questões publicadas
+                    PageSize = 10000 
                 };
 
                 _logger.LogInformation($"Parâmetros de busca - IsPublished: {searchParameters.IsPublished}, PageSize: {searchParameters.PageSize}");
@@ -64,7 +63,7 @@ namespace ProvaOnline.Controllers
                 int addedCount = 0;
                 foreach (var question in result.Items)
                 {
-                    var questionUrl = $"https://estudaki.com.br/questao/{question._id}";
+                    var questionUrl = $"https://estudaki.com.br/question/{question._id}";
                     AddUrl(sitemap, questionUrl, question.CreatedAt, "monthly", "0.7");
                     addedCount++;
                 }
@@ -76,7 +75,6 @@ namespace ProvaOnline.Controllers
                 _logger.LogError(ex, "❌ ERRO ao buscar questões para o sitemap");
                 _logger.LogError($"Message: {ex.Message}");
                 _logger.LogError($"StackTrace: {ex.StackTrace}");
-                // Se falhar, continua com sitemap básico
             }
 
             sitemap.AppendLine("</urlset>");

@@ -1,7 +1,7 @@
 User-agent: *
 Allow: /
 Allow: /result
-Allow: /questao/
+Allow: /question/
 Disallow: /admin
 
 Sitemap: https://estudaki.com.br/sitemap
