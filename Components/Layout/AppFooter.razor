@@ -1,11 +1,11 @@
 ﻿@inherits AppFooterBase
 
-<MudPaper Class="mt-12 p-6" Elevation="0" Square="true">
+<MudPaper Class="mt-12 p-6" Elevation="0" Square="true" Component="footer">
     <MudContainer MaxWidth="MaxWidth.Large">
         <MudGrid>
             <MudItem xs="12" sm="6">
-                <MudText Typo="Typo.subtitle1" Color="Color.Primary">
-                    estudaki
+                <MudText Typo="Typo.subtitle1" Color="Color.Primary" Component="strong">
+                    EstudaKi
                 </MudText>
                 <MudText Typo="Typo.body2">
                     Um ambiente livre para você praticar questões e se preparar com confiança para vestibulares, concursos públicos e OAB.
@@ -14,23 +14,21 @@
 
             <MudItem xs="12" sm="3">
                 <MudText Typo="Typo.subtitle2" GutterBottom="true">Links úteis</MudText>
-                @* <MudList Dense="true"> *@
-                @*     <MudListItem Href="/questoes" Target="_self">Ver questões</MudListItem> *@
-                @*     <MudListItem Href="https://github.com" Target="_blank">GitHub</MudListItem> *@
-                @*     <MudListItem Href="/sobre" Target="_self">Sobre</MudListItem> *@
-                @* </MudList> *@
+                <MudStack Spacing="1">
+                    <MudLink Href="/" Color="Color.Inherit">Início</MudLink>
+                    <MudLink Href="/result" Color="Color.Inherit">Buscar Questões</MudLink>
+                </MudStack>
             </MudItem>
 
             <MudItem xs="12" sm="3">
                 <MudText Typo="Typo.subtitle2" GutterBottom="true">Contato</MudText>
-                <MudText Typo="Typo.body2">Email: contato@estudaki.com</MudText>
-                <MudText Typo="Typo.body2">Instagram: </MudText>
+                <MudText Typo="Typo.body2">Email: contato@estudaki.com.br</MudText>
             </MudItem>
         </MudGrid>
 
         <MudDivider Class="my-4" />
         <MudText Typo="Typo.caption" Align="Align.Center" Color="Color.Secondary">
-            © @DateTime.Now.Year estudaki. Todos os direitos reservados.
+            © @DateTime.Now.Year EstudaKi. Todos os direitos reservados.
         </MudText>
     </MudContainer>
 </MudPaper>

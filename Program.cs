@@ -1,10 +1,8 @@
-using Microsoft.Extensions.DependencyInjection;
 using MudBlazor.Services;
 using MudExtensions.Services;
 using ProvaOnline.Components;
 using ProvaOnline.Data;
 using ProvaOnline.Data.Context;
-using ProvaOnline.Models.DTO;
 using ProvaOnline.Services;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -19,6 +17,8 @@ builder.Services.AddHttpContextAccessor();
 // Add services to the container.
 builder.Services.AddRazorComponents()
     .AddInteractiveServerComponents();
+
+builder.Services.AddControllers();
 
 var app = builder.Build();
 
@@ -35,7 +35,8 @@ app.UseRouting();
 app.UseAntiforgery();
 
 app.MapStaticAssets();
+app.MapControllers();
 app.MapRazorComponents<App>()
-    .AddInteractiveServerRenderMode();
+    .AddInteractiveServerRenderMode();    
 
 app.Run();

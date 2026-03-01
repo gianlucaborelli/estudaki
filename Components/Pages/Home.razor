@@ -1,68 +1,84 @@
 ﻿@page "/"
 @using MudBlazor
+@using ProvaOnline.Components.Shared
 
-<PageTitle>EstudaKi</PageTitle>
+<PageTitle>EstudaKi - Questões Gratuitas para Vestibular, Concurso e OAB</PageTitle>
+
+<SeoHead 
+    Title="EstudaKi - Questões Gratuitas para Vestibular, Concurso e OAB"
+    Description="EstudaKi é um ambiente de estudo gratuito para praticar questões de vestibulares, concursos públicos e da OAB. Comece a estudar agora, sem cadastro."
+    Keywords="questões vestibular, questões concurso, questões OAB, ENEM, Fuvest, simulado gratuito, estudar online, prova concurso"
+    CanonicalUrl="https://estudaki.com.br/"
+    JsonLd="@GetStructuredData()" />
 
 <MudContainer MaxWidth="MaxWidth.Large" Class="mt-10">
 
-    <MudText Typo="Typo.h4" Align="Align.Center" GutterBottom="true" Color="Color.Primary">
-        Comece agora. O <b>EstudaKi</b> é um ambiente de estudo livre para você praticar questões e ganhar confiança nas principais provas do país.
-    </MudText>
-    <MudText Typo="Typo.subtitle1" Align="Align.Center" Class="mb-6">
-        Explore questões de vestibulares, concursos públicos e do exame da OAB, sem precisar de cadastro.
-    </MudText>
+    <header>
+        <MudText Typo="Typo.h1" Align="Align.Center" GutterBottom="true" Color="Color.Primary" Style="font-size: 2rem;">
+            Comece agora. O <b>EstudaKi</b> é um ambiente de estudo livre para você praticar questões e ganhar confiança nas principais provas do país.
+        </MudText>
+        <MudText Typo="Typo.subtitle1" Align="Align.Center" Class="mb-6">
+            Explore questões de vestibulares, concursos públicos e do exame da OAB, sem precisar de cadastro.
+        </MudText>
+    </header>
 
     <MudDivider Class="my-8" />
 
-    <MudGrid GutterSize="3">
-        <MudItem xs="12" sm="4">
+    <section aria-label="Benefícios da plataforma">
+        <MudGrid GutterSize="3">
+            <MudItem xs="12" sm="4">
 
-            <MudText Typo="Typo.h6" Color="Color.Primary">Acesso Livre</MudText>
-            <MudText Typo="Typo.body2">
-                Não precisa criar conta. Comece a estudar agora mesmo.
-            </MudText>
+                <MudText Typo="Typo.h6" Color="Color.Primary">Acesso Livre</MudText>
+                <MudText Typo="Typo.body2">
+                    Não precisa criar conta. Comece a estudar agora mesmo.
+                </MudText>
 
-        </MudItem>
-        <MudItem xs="12" sm="4">
+            </MudItem>
+            <MudItem xs="12" sm="4">
 
-            <MudText Typo="Typo.h6" Color="Color.Primary">Diversas áreas</MudText>
-            <MudText Typo="Typo.body2">
-                Questões de vestibulares, concursos públicos e exame da OAB organizadas por tema.
-            </MudText>
+                <MudText Typo="Typo.h6" Color="Color.Primary">Diversas áreas</MudText>
+                <MudText Typo="Typo.body2">
+                    Questões de vestibulares, concursos públicos e exame da OAB organizadas por tema.
+                </MudText>
 
-        </MudItem>
-        <MudItem xs="12" sm="4">
+            </MudItem>
+            <MudItem xs="12" sm="4">
 
-            <MudText Typo="Typo.h6" Color="Color.Primary">Novidades em breve</MudText>
-            <MudText Typo="Typo.body2">
-                Em breve você poderá montar simulados e deixar comentários nas questões.
-            </MudText>
+                <MudText Typo="Typo.h6" Color="Color.Primary">Novidades em breve</MudText>
+                <MudText Typo="Typo.body2">
+                    Em breve você poderá montar simulados e deixar comentários nas questões.
+                </MudText>
 
-        </MudItem>
-    </MudGrid>
-
-    <MudDivider Class="my-8" />
-
-    <MudText Typo="Typo.h5" GutterBottom="true" Color="Color.Primary">Perguntas Frequentes</MudText>
-
-    <MudExpansionPanels Elevation="1">
-        <MudExpansionPanel Text="Preciso criar uma conta para usar?">
-            Não! Todo o conteúdo está disponível gratuitamente e sem necessidade de login.
-        </MudExpansionPanel>
-        <MudExpansionPanel Text="Quais tipos de prova estão disponíveis?">
-            Você encontrará questões de vestibulares (como ENEM e Fuvest), concursos públicos e da 1ª fase da OAB.
-        </MudExpansionPanel>
-        <MudExpansionPanel Text="Já posso montar simulados personalizados?">
-            Ainda não, mas essa funcionalidade será lançada em breve.
-        </MudExpansionPanel>
-        <MudExpansionPanel Text="Posso comentar as questões?">
-            Ainda não é possível, mas essa é outra funcionalidade planejada para as próximas atualizações.
-        </MudExpansionPanel>
-    </MudExpansionPanels>
+            </MudItem>
+        </MudGrid>
+    </section>
 
     <MudDivider Class="my-8" />
 
-    <MudText Typo="Typo.subtitle2" Align="Align.Center" Color="Color.Secondary" Class="mt-6">
-        © 2025 estudaki. Todos os direitos reservados.
-    </MudText>
+    <section aria-label="Perguntas Frequentes">
+        <MudText Typo="Typo.h2" GutterBottom="true" Color="Color.Primary" Style="font-size: 1.5rem;">Perguntas Frequentes</MudText>
+
+        <MudExpansionPanels Elevation="1">
+            <MudExpansionPanel Text="Preciso criar uma conta para usar?">
+                Não! Todo o conteúdo está disponível gratuitamente e sem necessidade de login.
+            </MudExpansionPanel>
+            <MudExpansionPanel Text="Quais tipos de prova estão disponíveis?">
+                Você encontrará questões de vestibulares (como ENEM e Fuvest), concursos públicos e da 1ª fase da OAB.
+            </MudExpansionPanel>
+            <MudExpansionPanel Text="Já posso montar simulados personalizados?">
+                Ainda não, mas essa funcionalidade será lançada em breve.
+            </MudExpansionPanel>
+            <MudExpansionPanel Text="Posso comentar as questões?">
+                Ainda não é possível, mas essa é outra funcionalidade planejada para as próximas atualizações.
+            </MudExpansionPanel>
+        </MudExpansionPanels>
+    </section>
+
+    <MudDivider Class="my-8" />
+
+    <footer>
+        <MudText Typo="Typo.subtitle2" Align="Align.Center" Color="Color.Secondary" Class="mt-6">
+            © 2025 estudaki. Todos os direitos reservados.
+        </MudText>
+    </footer>
 </MudContainer>
