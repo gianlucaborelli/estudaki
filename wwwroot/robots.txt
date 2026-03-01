@@ -1,4 +1,7 @@
 User-agent: *
-Disallow:
+Allow: /
+Allow: /result
+Allow: /questao/
+Disallow: /admin
 
-Sitemap: https://estudaki.com.br/sitemap.xml
+Sitemap: https://estudaki.com.br/sitemap

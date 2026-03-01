@@ -1,0 +1,75 @@
+@page "/questao/{id}"
+@using ProvaOnline.Components.Elements
+@using ProvaOnline.Components.Shared
+@using ProvaOnline.Models
+@inherits QuestionDetailBase
+
+<PageTitle>@GetPageTitle()</PageTitle>
+
+<SeoHead 
+    Title="@GetPageTitle()"
+    Description="@GetMetaDescription()"
+    Keywords="@GetKeywords()"
+    CanonicalUrl="@GetCanonicalUrl()"
+    JsonLd="@GetStructuredData()" />
+
+@if (IsLoading)
+{
+    <MudContainer MaxWidth="MaxWidth.Large" Class="mt-10">
+        <MudStack AlignItems="AlignItems.Center" Spacing="3">
+            <MudProgressCircular Color="Color.Primary" Indeterminate="true" Size="Size.Large" />
+            <MudText Typo="Typo.body1">Carregando questão...</MudText>
+        </MudStack>
+    </MudContainer>
+}
+else if (Question == null)
+{
+    <MudContainer MaxWidth="MaxWidth.Large" Class="mt-10">
+        <MudAlert Severity="Severity.Error">Questão não encontrada.</MudAlert>
+        <MudButton Href="/result" Variant="Variant.Filled" Color="Color.Primary" Class="mt-4">
+            Voltar para Busca
+        </MudButton>
+    </MudContainer>
+}
+else
+{
+    <MudContainer MaxWidth="MaxWidth.Large" Class="mt-10">
+        <MudBreadcrumbs Items="_breadcrumbItems" Class="mb-4"></MudBreadcrumbs>
+
+        <QuestionComponent Value="Question" />
+
+        <MudPaper Class="mt-6 pa-4" Elevation="1">
+            <MudText Typo="Typo.h6" GutterBottom="true">Buscar mais questões</MudText>
+            <MudStack Row="true" Spacing="2" Class="mt-2" Wrap="Wrap.Wrap">
+                <MudChip T="string" Href="@GetAreaSearchLink()" Color="Color.Primary" Variant="Variant.Outlined" Size="Size.Small">
+                    @Question.MainArea
+                </MudChip>
+                @foreach (var subArea in Question.SubAreas.Take(3))
+                {
+                    <MudChip T="string" Href="@GetSubAreaSearchLink(subArea)" Color="Color.Secondary" Variant="Variant.Outlined" Size="Size.Small">
+                        @subArea
+                    </MudChip>
+                }
+                <MudChip T="string" Href="@GetTypeSearchLink()" Color="Color.Tertiary" Variant="Variant.Outlined" Size="Size.Small">
+                    @Question.QuestionType
+                </MudChip>
+            </MudStack>
+        </MudPaper>
+
+        <MudDivider Class="my-6" />
+
+        <MudStack Row="true" Justify="Justify.Center" Spacing="2">
+            <MudButton Href="/result" 
+                       Variant="Variant.Outlined" 
+                       StartIcon="@Icons.Material.Filled.Search"
+                       Color="Color.Primary">
+                Buscar Mais Questões
+            </MudButton>
+            <MudButton Href="/" 
+                       Variant="Variant.Text" 
+                       Color="Color.Default">
+                Voltar ao Início
+            </MudButton>
+        </MudStack>
+    </MudContainer>
+}

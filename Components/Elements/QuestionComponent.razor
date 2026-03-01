@@ -1,7 +1,16 @@
 ﻿<MudCard Outlined="true">
     <MudCardHeader>
         <CardHeaderContent>
-            <MudText Typo="Typo.h6">@Value.PublicNotice.ExamBoard - @Value.PublicNotice.Position  @Value.PublicNotice.ExamPhase @Value.PublicNotice.Year</MudText>
+            <MudStack Row="true" Justify="Justify.SpaceBetween" AlignItems="AlignItems.Center">
+                <MudText Typo="Typo.h6">@Value.PublicNotice.ExamBoard - @Value.PublicNotice.Position  @Value.PublicNotice.ExamPhase @Value.PublicNotice.Year</MudText>
+                <MudButton Href="@($"/questao/{Value._id}")" 
+                           Variant="Variant.Text" 
+                           Color="Color.Primary"
+                           Size="Size.Small"
+                           EndIcon="@Icons.Material.Filled.OpenInNew">
+                    Ver Detalhes
+                </MudButton>
+            </MudStack>
         </CardHeaderContent>
     </MudCardHeader>
     <MudCardContent>

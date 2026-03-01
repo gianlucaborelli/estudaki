@@ -67,6 +67,14 @@ namespace ProvaOnline.Data
             var filterBuilder = Builders<QuestionDocument>.Filter;
             var filters = new List<FilterDefinition<QuestionDocument>>();
 
+            if (searchParameter.IsPublished)
+            {
+                filters.Add(filterBuilder.Eq(q => q.IsPublished, true));
+            }
+
+            if (searchParameter.TypeQuestions is { Length: > 0 })
+                filters.Add(filterBuilder.In(q => q.QuestionType, searchParameter.TypeQuestions));
+
             if (searchParameter.MainAreas is { Length: > 0 })
                 filters.Add(filterBuilder.In(q => q.MainArea, searchParameter.MainAreas));
 
