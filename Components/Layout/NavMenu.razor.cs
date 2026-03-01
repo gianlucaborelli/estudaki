@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Components;
+using Microsoft.AspNetCore.WebUtilities;
 using MudBlazor;
 using ProvaOnline.Helpers;
 using ProvaOnline.Models.DTO;
@@ -20,9 +21,6 @@ namespace ProvaOnline.Components.Layout
         protected string[] _subArea { get; set; } = [];
         protected IEnumerable<string> _subAreaSelected { get; set; } = [];
 
-        // End Filter Parameters
-
-
         [Inject]
         protected IQuestionServices _questionService { get; set; } = default!;
 
@@ -34,8 +32,6 @@ namespace ProvaOnline.Components.Layout
 
         [CascadingParameter]
         protected MainLayoutPage? MainLayout { get; set; }
-
-        protected SearchParameters _searchParameters { get; set; } = new();
 
         private async Task GetFilterParameters()
         {
@@ -63,14 +59,31 @@ namespace ProvaOnline.Components.Layout
 
         protected void SearchQuestions()
         {
-            _searchParameters.WordKey = _wordKey;
-            _searchParameters.TypeQuestions = _questionTypeSelected?.ToArray() ?? Array.Empty<string>();
-            _searchParameters.MainAreas = _mainAreaSelected?.ToArray() ?? Array.Empty<string>();
-            _searchParameters.SubAreas = _subAreaSelected?.ToArray() ?? Array.Empty<string>();            
+            var queryParams = new Dictionary<string, string?>
+            {
+                ["page"] = "1",
+                ["size"] = "10"
+            };
+
+            if (!string.IsNullOrWhiteSpace(_wordKey))
+                queryParams["q"] = _wordKey;
+
+            var types = _questionTypeSelected?.ToArray() ?? [];
+            if (types.Length > 0)
+                queryParams["types"] = string.Join(",", types);
+
+            var areas = _mainAreaSelected?.ToArray() ?? [];
+            if (areas.Length > 0)
+                queryParams["areas"] = string.Join(",", areas);
+
+            var subAreas = _subAreaSelected?.ToArray() ?? [];
+            if (subAreas.Length > 0)
+                queryParams["subareas"] = string.Join(",", subAreas);
+
+            var url = QueryHelpers.AddQueryString("/result", queryParams);
 
             MainLayout?.CloseDrawer();
-
-            _navigationManager.NavigateTo($"/result?{_searchParameters}");
+            _navigationManager.NavigateTo(url);
         }
     }
 }

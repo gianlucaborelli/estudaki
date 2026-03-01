@@ -16,7 +16,9 @@
     <MudItem xs="12"
              Style="display: flex; justify-content:center">
         <MudPagination Color="Color.Primary"
-                       Count="@TotalPages" @bind-Selected="@CurrentPage"
+                       Count="@TotalPages" 
+                       Selected="@CurrentPage"
+                       SelectedChanged="OnPageChanged"
                        Variant="Variant.Text"
                        BoundaryCount="@BoundaryCount"
                        ShowFirstButton="true"
@@ -34,7 +36,9 @@
     <MudItem xs="12"
              Style="display: flex; justify-content:center">
         <MudPagination Color="Color.Primary"
-                       Count="@TotalPages" @bind-Selected="@CurrentPage"
+                       Count="@TotalPages" 
+                       Selected="@CurrentPage"
+                       SelectedChanged="OnPageChanged"
                        Variant="Variant.Text"
                        BoundaryCount="1"
                        ShowFirstButton="true"
