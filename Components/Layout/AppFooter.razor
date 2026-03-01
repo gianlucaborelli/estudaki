@@ -3,16 +3,16 @@
 <MudPaper Class="mt-12 p-6" Elevation="0" Square="true" Component="footer">
     <MudContainer MaxWidth="MaxWidth.Large">
         <MudGrid>
-            <MudItem xs="12" sm="6">
-                <MudText Typo="Typo.subtitle1" Color="Color.Primary" Component="strong">
+            <MudItem xs="12" sm="12" md="4">
+                <MudText Typo="Typo.subtitle1" Color="Color.Primary" Component="strong" GutterBottom="true">
                     EstudaKi
                 </MudText>
-                <MudText Typo="Typo.body2">
+                <MudText Typo="Typo.body2" Class="mb-3">
                     Um ambiente livre para você praticar questões e se preparar com confiança para vestibulares, concursos públicos e OAB.
                 </MudText>
             </MudItem>
 
-            <MudItem xs="12" sm="3">
+            <MudItem xs="12" sm="6" md="3">
                 <MudText Typo="Typo.subtitle2" GutterBottom="true">Links úteis</MudText>
                 <MudStack Spacing="1">
                     <MudLink Href="/" Color="Color.Inherit">Início</MudLink>
@@ -20,15 +20,33 @@
                 </MudStack>
             </MudItem>
 
-            <MudItem xs="12" sm="3">
+            <MudItem xs="12" sm="6" md="3">
+                <MudText Typo="Typo.subtitle2" GutterBottom="true">Recursos</MudText>
+                <MudStack Spacing="1">
+                    <MudText Typo="Typo.body2">Vestibulares</MudText>
+                    <MudText Typo="Typo.body2">Concursos Públicos</MudText>
+                    <MudText Typo="Typo.body2">OAB</MudText>
+                </MudStack>
+            </MudItem>
+
+            <MudItem xs="12" sm="12" md="2">
                 <MudText Typo="Typo.subtitle2" GutterBottom="true">Contato</MudText>
-                <MudText Typo="Typo.body2">Email: contato@estudaki.com.br</MudText>
+                <MudLink Href="mailto:contato@estudaki.com.br" Color="Color.Inherit" Typo="Typo.body2">
+                    contato@estudaki.com.br
+                </MudLink>
             </MudItem>
         </MudGrid>
 
         <MudDivider Class="my-4" />
-        <MudText Typo="Typo.caption" Align="Align.Center" Color="Color.Secondary">
-            © @DateTime.Now.Year EstudaKi. Todos os direitos reservados.
-        </MudText>
+
+        <MudStack Row="true" Justify="Justify.SpaceBetween" AlignItems="AlignItems.Center">
+            <MudText Typo="Typo.caption" Color="Color.Secondary">
+                © @DateTime.Now.Year EstudaKi. Todos os direitos reservados.
+            </MudText>
+            <MudStack Row="true" Spacing="2">
+                @* <MudLink Href="/privacy" Color="Color.Inherit" Typo="Typo.caption">Privacidade</MudLink>
+                <MudLink Href="/terms" Color="Color.Inherit" Typo="Typo.caption">Termos de Uso</MudLink> *@
+            </MudStack>
+        </MudStack>
     </MudContainer>
 </MudPaper>
