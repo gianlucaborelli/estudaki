@@ -60,4 +60,9 @@
 
     [Parameter]
     public string? JsonLd { get; set; }
+
+    private string GetImageUrl()
+    {
+        return !string.IsNullOrEmpty(ImageUrl) ? ImageUrl : "https://estudaki.com.br/favicon.ico";
+    }
 }
