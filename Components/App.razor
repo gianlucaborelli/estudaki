@@ -30,28 +30,32 @@
 
     <script src="themeHelper.js"></script>            
 
-    <!-- Google Analitics -->
-    <script async src="https://www.googletagmanager.com/gtag/js?id=G-TL3SGRTV88"></script>
-    <script>
-        window.dataLayer = window.dataLayer || [];
-        function gtag(){dataLayer.push(arguments);}
-        gtag('js', new Date());
-
-        gtag('config', 'G-TL3SGRTV88');
-    </script>
-
     @* Google Ads *@
     @* <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-9306950234366060" *@
     @*         crossorigin="anonymous"></script> *@
 
-    @* Microsoft Analytics clarity.microsoft.com*@
+    @* Analytics - Google Analytics e Microsoft Clarity *@
     <script type="text/javascript">
         if (!window.location.host.includes('localhost')) {
-        (function(c,l,a,r,i,t,y){
-            c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};
-            t=l.createElement(r);t.async=1;t.src="https://www.clarity.ms/tag/"+i;
-            y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);
-        })(window, document, "clarity", "script", "rimtkk5bm6");
+            // Google Analytics
+            (function() {
+                var script = document.createElement('script');
+                script.async = true;
+                script.src = 'https://www.googletagmanager.com/gtag/js?id=G-TL3SGRTV88';
+                document.head.appendChild(script);
+
+                window.dataLayer = window.dataLayer || [];
+                function gtag(){dataLayer.push(arguments);}
+                gtag('js', new Date());
+                gtag('config', 'G-TL3SGRTV88');
+            })();
+
+            // Microsoft Clarity
+            (function(c,l,a,r,i,t,y){
+                c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};
+                t=l.createElement(r);t.async=1;t.src="https://www.clarity.ms/tag/"+i;
+                y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);
+            })(window, document, "clarity", "script", "rimtkk5bm6");
         }
     </script>
 </head>
