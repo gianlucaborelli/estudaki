@@ -1,7 +1,17 @@
-﻿namespace ProvaOnline.Models
+using MongoDB.Bson;
+using MongoDB.Bson.Serialization.Attributes;
+
+namespace ProvaOnline.ModelsV2
 {
-    public class PublicNotice
+    public class PublicNoticeDocumentV2
     {
+        /// <summary>
+        /// Seleciona ou atribui um ID único para o documento.
+        /// </summary>
+        [BsonId]
+        [BsonRepresentation(BsonType.ObjectId)]
+        public string? Id { get; set; }
+
         /// <summary>
         /// Número do Edital.
         /// </summary>
@@ -33,8 +43,13 @@
         public string? ExamBookletURL { get; set; }
 
         /// <summary>
-        /// Link para o arquivo PDF do edital completo.
+        /// Link para o arquivo PDF do gabarito do exame.
         /// </summary>
-        public string? ExamAnswerKeyURL { get; set; }        
+        public string? ExamAnswerKeyURL { get; set; }
+
+        /// <summary>
+        /// Data de criação do documento.
+        /// </summary>
+        public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
     }
 }

@@ -2,6 +2,7 @@
 
 namespace ProvaOnline.Models
 {
+    [Obsolete("This class is deprecated.")]
     public class Choice
     {
         /// <summary>
