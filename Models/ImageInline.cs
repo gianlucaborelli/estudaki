@@ -1,5 +1,8 @@
-﻿namespace ProvaOnline.ModelsV2
+﻿using MongoDB.Bson.Serialization.Attributes;
+
+namespace ProvaOnline.Models
 {
+    [BsonDiscriminator("ImageInline")]
     public class ImageInline : InlineContent
     {
         /// <summary>

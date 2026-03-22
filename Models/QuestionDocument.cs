@@ -1,11 +1,8 @@
-﻿using MongoDB.Bson.Serialization.Attributes;
-using MongoDB.Bson;
+﻿using MongoDB.Bson;
+using MongoDB.Bson.Serialization.Attributes;
 
 namespace ProvaOnline.Models
 {
-    /// <summary>
-    /// Represents a question document.
-    /// </summary>
     public class QuestionDocument
     {
         /// <summary>
@@ -13,7 +10,12 @@ namespace ProvaOnline.Models
         /// </summary>
         [BsonId]
         [BsonRepresentation(BsonType.ObjectId)]
-        public ObjectId _id { get; set; }
+        public string Id { get; set; }
+
+        /// <summary>
+        /// Edital do Exame.
+        /// </summary>
+        public string? PublicNoticeId { get; set; }
 
         /// <summary>
         /// Data de criação do documento.
@@ -28,34 +30,17 @@ namespace ProvaOnline.Models
         /// <summary>
         /// Indica se a questão foi anulada.
         /// </summary>
-        public bool? IsNullified { get; set; } = false;
-
-        /// <summary>
-        /// Edital do Exame.
-        /// </summary>
-        public PublicNotice? PublicNotice { get; set; }
+        public bool? IsNullified { get; set; } = false;        
 
         /// <summary>
         /// Número da questão na prova.
         /// </summary>
         public int QuestionNumber { get; set; }
 
-        public string QuestionType { get; set; }
-
         /// <summary>
-        /// Texto da questão.
+        /// Tipo de questão, Ex: Verstibular, Concursos, ENEM, etc.
         /// </summary>
-        public string QuestionBody { get; set; }
-
-        /// <summary>
-        /// Texto ou Imagem de apoio a questão.
-        /// </summary>
-        public List<QuestionSupport> Supports { get; set; } = new List<QuestionSupport>();
-
-        /// <summary>
-        /// Alternativas de resposta para a questão.
-        /// </summary>
-        public List<Choice>? Choices { get; set; }
+        public string QuestionType { get; set; } 
 
         /// <summary>
         /// Principal área de conhecimento da questão.
@@ -66,5 +51,15 @@ namespace ProvaOnline.Models
         /// Subáreas de conhecimento da questão.
         /// </summary>
         public string[] SubAreas { get; set; } = [];
+
+        /// <summary>
+        /// Corpo da questão.
+        /// </summary>
+        public List<ContentBlock> QuestionContents { get; set; } = [];
+
+        /// <summary>
+        /// Alternativas de resposta para a questão.
+        /// </summary>
+        public List<Choice>? Choices { get; set; }
     }
 }

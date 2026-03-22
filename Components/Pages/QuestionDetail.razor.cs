@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Components;
 using MudBlazor;
 using ProvaOnline.Models;
+using ProvaOnline.Models.DTO;
 using ProvaOnline.Services;
 using System.Text;
 using System.Text.RegularExpressions;
@@ -21,7 +22,7 @@ public partial class QuestionDetailBase : ComponentBase
     [Parameter]
     public string Id { get; set; } = string.Empty;
 
-    protected QuestionDocument? Question { get; set; }
+    protected QuestionWithNoticeDto? Question { get; set; }
     protected bool IsLoading { get; set; } = true;
 
     protected List<BreadcrumbItem> _breadcrumbItems = new();
@@ -45,7 +46,7 @@ public partial class QuestionDetailBase : ComponentBase
 
         try
         {
-            Question = await QuestionService.GetQuestionById(Id);
+            Question = await QuestionService.GetQuestionByIdAsync(Id);
 
             if (Question != null)
             {
@@ -69,7 +70,7 @@ public partial class QuestionDetailBase : ComponentBase
         {
             new BreadcrumbItem("Início", href: "/"),
             new BreadcrumbItem("Busca", href: "/result"),
-            new BreadcrumbItem($"Questão #{Question?.QuestionNumber ?? 0}", href: null, disabled: true)
+            new BreadcrumbItem($"Questão #{Question?.Question.QuestionNumber ?? 0}", href: null, disabled: true)
         };
     }
 
@@ -77,10 +78,10 @@ public partial class QuestionDetailBase : ComponentBase
     {
         if (Question == null) return "Questão não encontrada - EstudaKi";
 
-        var examName = Question.PublicNotice?.ExamBoard ?? Question.QuestionType;
+        var examName = Question.PublicNotice?.ExamBoard ?? Question.Question.QuestionType;
         var year = Question.PublicNotice?.Year ?? DateTime.Now.Year;
 
-        return $"Questão {Question.QuestionNumber} - {examName} {year} - {Question.MainArea} | EstudaKi";
+        return $"Questão {Question.Question.QuestionNumber} - {examName} {year} - {Question.Question.MainArea} | EstudaKi";
     }
 
     protected string GetMetaDescription()
@@ -88,14 +89,14 @@ public partial class QuestionDetailBase : ComponentBase
         if (Question == null) return "Questão não encontrada";
 
         var description = new StringBuilder();
-        description.Append($"Pratique questão de {Question.MainArea}");
+        description.Append($"Pratique questão de {Question.Question.MainArea}");
 
-        if (Question.SubAreas.Length > 0)
+        if (Question.Question.SubAreas.Length > 0)
         {
-            description.Append($" sobre {string.Join(", ", Question.SubAreas.Take(2))}");
+            description.Append($" sobre {string.Join(", ", Question.Question.SubAreas.Take(2))}");
         }
 
-        var examName = Question.PublicNotice?.ExamBoard ?? Question.QuestionType;
+        var examName = Question.PublicNotice?.ExamBoard ?? Question.Question.QuestionType;
         description.Append($" do {examName}");
 
         if (Question.PublicNotice?.Year != null)
@@ -114,14 +115,14 @@ public partial class QuestionDetailBase : ComponentBase
 
         var keywords = new List<string>
         {
-            Question.MainArea,
-            Question.QuestionType,
-            $"questão {Question.QuestionNumber}",
+            Question.Question.MainArea,
+            Question.Question.QuestionType,
+            $"questão {Question.Question.QuestionNumber}",
             "questões online",
             "estudo gratuito"
         };
 
-        keywords.AddRange(Question.SubAreas.Take(3));
+        keywords.AddRange(Question.Question.SubAreas.Take(3));
 
         if (Question.PublicNotice != null)
         {
@@ -141,24 +142,24 @@ public partial class QuestionDetailBase : ComponentBase
     {
         if (Question == null) return "{}";
 
-        var examName = Question.PublicNotice?.ExamBoard ?? Question.QuestionType;
+        var examName = Question.PublicNotice?.ExamBoard ?? Question.Question.QuestionType;
         var year = Question.PublicNotice?.Year ?? DateTime.Now.Year;
 
-        var questionText = SanitizeText(Question.QuestionBody);
+        var questionText = GetQuestionTextForStructuredData();
         var correctAnswer = GetCorrectAnswerText();
 
         return $@"{{
             ""@context"": ""https://schema.org"",
             ""@type"": ""Question"",
-            ""name"": ""Questão {Question.QuestionNumber} - {examName} {year}"",
+            ""name"": ""Questão {Question.Question.QuestionNumber} - {examName} {year}"",
             ""text"": ""{questionText}"",
-            ""answerCount"": {Question.Choices?.Count ?? 0},
+            ""answerCount"": {Question.Question.Choices?.Count ?? 0},
             ""eduQuestionType"": ""Multiple choice"",
             ""educationalLevel"": ""Higher Education"",
             ""learningResourceType"": ""Exam Question"",
             ""about"": {{
                 ""@type"": ""Thing"",
-                ""name"": ""{Question.MainArea}""
+                ""name"": ""{Question.Question.MainArea}""
             }},
             ""acceptedAnswer"": {{
                 ""@type"": ""Answer"",
@@ -168,7 +169,7 @@ public partial class QuestionDetailBase : ComponentBase
                 ""@type"": ""Organization"",
                 ""name"": ""{examName}""
             }},
-            ""datePublished"": ""{Question.CreatedAt:yyyy-MM-dd}""
+            ""datePublished"": ""{Question.Question.CreatedAt:yyyy-MM-dd}""
         }}";
     }
 
@@ -188,19 +189,51 @@ public partial class QuestionDetailBase : ComponentBase
         return text;
     }
 
+    private string GetQuestionTextForStructuredData()
+    {
+        if (Question?.Question.QuestionContents == null) return "";
+
+        var textParts = new List<string>();
+
+        foreach (var content in Question.Question.QuestionContents.OrderBy(c => c.Order))
+        {
+            if (content is ParagraphBlock paragraph)
+            {
+                foreach (var inline in paragraph.Inlines)
+                {
+                    if (inline is TextInline textInline)
+                    {
+                        textParts.Add(textInline.Text);
+                    }
+                }
+            }
+        }
+
+        var fullText = string.Join(" ", textParts);
+        return SanitizeText(fullText);
+    }
+
     private string GetCorrectAnswerText()
     {
-        var correctChoice = Question?.Choices?.FirstOrDefault(c => c.IsCorrect);
+        var correctChoice = Question?.Question.Choices?.FirstOrDefault(c => c.IsCorrect);
         if (correctChoice != null)
         {
-            return SanitizeText(correctChoice.Text);
+            var textParts = new List<string>();
+            foreach (var inline in correctChoice.Content)
+            {
+                if (inline is TextInline textInline)
+                {
+                    textParts.Add(textInline.Text);
+                }
+            }
+            return SanitizeText(string.Join(" ", textParts));
         }
         return "";
     }
 
     protected string GetAreaSearchLink()
     {
-        return $"/result?areas={Uri.EscapeDataString(Question?.MainArea ?? "")}";
+        return $"/result?areas={Uri.EscapeDataString(Question?.Question.MainArea ?? "")}";
     }
 
     protected string GetSubAreaSearchLink(string subArea)
@@ -210,6 +243,6 @@ public partial class QuestionDetailBase : ComponentBase
 
     protected string GetTypeSearchLink()
     {
-        return $"/result?types={Uri.EscapeDataString(Question?.QuestionType ?? "")}";
+        return $"/result?types={Uri.EscapeDataString(Question?.Question.QuestionType ?? "")}";
     }
 }

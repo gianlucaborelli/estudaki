@@ -61,10 +61,10 @@ namespace ProvaOnline.Controllers
                 }
 
                 int addedCount = 0;
-                foreach (var question in result.Items)
+                foreach (var questionDto in result.Items)
                 {
-                    var questionUrl = $"https://estudaki.com.br/question/{question._id}";
-                    AddUrl(sitemap, questionUrl, question.CreatedAt, "monthly", "0.7");
+                    var questionUrl = $"https://estudaki.com.br/question/{questionDto.Question.Id}";
+                    AddUrl(sitemap, questionUrl, questionDto.Question.CreatedAt, "monthly", "0.7");
                     addedCount++;
                 }
 

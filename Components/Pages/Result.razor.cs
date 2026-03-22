@@ -42,7 +42,7 @@ public partial class ResultBase : ComponentBase
 
     public int TotalPages { get; set; } = 0;
     protected int BoundaryCount { get; set; } = 1;
-    protected QuestionDocument[] Questions { get; set; } = [];
+    protected QuestionWithNoticeDto[] Questions { get; set; } = [];
 
     private string _previousParametersHash = string.Empty;
 

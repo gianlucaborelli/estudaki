@@ -2,7 +2,6 @@
 
 namespace ProvaOnline.Models
 {
-    [Obsolete("This class is deprecated.")]
     public class Choice
     {
         /// <summary>
@@ -11,15 +10,9 @@ namespace ProvaOnline.Models
         public string? Option { get; set; }
 
         /// <summary>
-        /// Texto da opção de resposta, pode ser nula quando a resposta for baseada em analise de imagem.
+        /// Conteúdo da opção de resposta.Pode ser texto, imagem ou ambos, dependendo do formato da questão. P
         /// </summary>
-        public string? Text { get; set; }
-
-        /// <summary>
-        /// Imagem de apoio a opção de resposta, pode ser nula quando a resposta for baseada em texto.
-        /// </summary>
-        [BsonIgnoreIfNull]
-        public ImageSupport? SupportImage { get; set; }
+        public List<InlineContent> Content { get; set; } = [];      
 
         /// <summary>
         /// Define se a resposta é correta ou não, de acordo com o gabarito ofícial.

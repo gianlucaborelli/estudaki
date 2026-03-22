@@ -27,9 +27,13 @@ namespace ProvaOnline.Data
             return await _collection.Find(_ => true).ToListAsync();
         }
 
-        public async Task<QuestionDocument?> GetByIdAsync(ObjectId id)
+        public async Task<QuestionDocument?> GetByIdAsync(string id)
         {
-            return await _collection.Find(q => q._id == id).FirstOrDefaultAsync();
+            if (!ObjectId.TryParse(id, out var objectId))
+                return null;
+
+            var filter = Builders<QuestionDocument>.Filter.Eq(q => q.Id, id);
+            return await _collection.Find(filter).FirstOrDefaultAsync();
         }
 
         public async Task<FilterParameters> FindFilterParametersAsync(FilterParameters filterParameters)
@@ -38,10 +42,10 @@ namespace ProvaOnline.Data
             var filters = new List<FilterDefinition<QuestionDocument>>();
 
             if (filterParameters.TypeQuestions is { Length: > 0 })
-                filters.Add(builder.In("QuestionType", filterParameters.TypeQuestions));
+                filters.Add(builder.In(q => q.QuestionType, filterParameters.TypeQuestions));
 
             if (filterParameters.MainAreas is { Length: > 0 })
-                filters.Add(builder.In("MainArea", filterParameters.MainAreas));
+                filters.Add(builder.In(q => q.MainArea, filterParameters.MainAreas));
 
             if (filterParameters.SubAreas is { Length: > 0 })
                 filters.Add(builder.In("SubAreas", filterParameters.SubAreas));
@@ -81,9 +85,25 @@ namespace ProvaOnline.Data
             if (searchParameter.SubAreas is { Length: > 0 })
                 filters.Add(filterBuilder.ElemMatch(q => q.SubAreas, sa => searchParameter.SubAreas.Contains(sa)));
 
-
             if (!string.IsNullOrWhiteSpace(searchParameter.WordKey))
-                filters.Add(filterBuilder.Regex(q => q.QuestionBody, new BsonRegularExpression(searchParameter.WordKey, "i")));
+            {
+                var textFilter = filterBuilder.ElemMatch(
+                    q => q.QuestionContents,
+                    Builders<ContentBlock>.Filter.OfType<ParagraphBlock>(
+                        Builders<ParagraphBlock>.Filter.ElemMatch(
+                            p => p.Inlines,
+                            Builders<InlineContent>.Filter.OfType<TextInline>(
+                                Builders<TextInline>.Filter.Regex(
+                                    t => t.Text,
+                                    new BsonRegularExpression(searchParameter.WordKey, "i")
+                                )
+                            )
+                        )
+                    )
+                );
+
+                filters.Add(textFilter);
+            }
 
             var finalFilter = filters.Any() ? filterBuilder.And(filters) : filterBuilder.Empty;
 
@@ -106,14 +126,14 @@ namespace ProvaOnline.Data
         public async Task UpdateManyAsync(List<QuestionDocument> questions)
         {
             var operations = questions.Select(question =>
-                 new ReplaceOneModel<QuestionDocument>(
-                     Builders<QuestionDocument>.Filter.Eq(q => q._id, question._id),
-                     question
-                 )
-                 {
-                     IsUpsert = false
-                 }
-             ).ToList();
+                new ReplaceOneModel<QuestionDocument>(
+                    Builders<QuestionDocument>.Filter.Eq(q => q.Id, question.Id),
+                    question
+                )
+                {
+                    IsUpsert = false
+                }
+            ).ToList();
 
             if (operations.Count > 0)
             {

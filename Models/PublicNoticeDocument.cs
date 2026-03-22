@@ -1,9 +1,9 @@
 using MongoDB.Bson;
 using MongoDB.Bson.Serialization.Attributes;
 
-namespace ProvaOnline.ModelsV2
+namespace ProvaOnline.Models
 {
-    public class PublicNoticeDocumentV2
+    public class PublicNoticeDocument
     {
         /// <summary>
         /// Seleciona ou atribui um ID único para o documento.

@@ -1,5 +1,5 @@
 ﻿using Microsoft.AspNetCore.Components;
-using ProvaOnline.Models;
+using ProvaOnline.Models.DTO;
 
 namespace ProvaOnline.Components.Elements
 {
@@ -7,7 +7,7 @@ namespace ProvaOnline.Components.Elements
     public partial class QuestionComponent : ComponentBase
     {
         [Parameter]
-        public QuestionDocument? Value { get; set; }
+        public QuestionWithNoticeDto? Value { get; set; }
 
         protected bool _showAnswers = false;
 

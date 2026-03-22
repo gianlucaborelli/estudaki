@@ -10,7 +10,7 @@ namespace ProvaOnline.Data.Context
         {
             var connectionString = configuration.GetConnectionString("DefaultConnection");
             var client = new MongoClient(connectionString);
-            _database = client.GetDatabase("ProvaOnline");
+            _database = client.GetDatabase("ProvaOnlineV2");
         }
 
         public IMongoCollection<T> GetCollection<T>(string name)
@@ -21,9 +21,7 @@ namespace ProvaOnline.Data.Context
             }
             catch (Exception ex)
             {
-                // Log the exception (ex) here if needed
                 throw;
-
             }
         }
     }

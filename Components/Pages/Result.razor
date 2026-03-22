@@ -26,10 +26,10 @@
                        Class="mt-4" />
     </MudItem>    
 
-    @foreach (QuestionDocument question in Questions)
+    @foreach (var questionDto in Questions)
     {
         <MudItem xs="12">
-            <QuestionComponent Value="question" />
+            <QuestionComponent Value="questionDto" />
         </MudItem>
     }
 

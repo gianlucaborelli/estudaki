@@ -10,9 +10,18 @@ var builder = WebApplication.CreateBuilder(args);
 // Add MudBlazor services
 builder.Services.AddMudServices();
 builder.Services.AddMudExtensions();
-builder.Services.AddSingleton<IMongoContext, MongoContext>();
+
+// MongoDB Context
+builder.Services.AddSingleton<IMongoContext>(sp =>
+    new MongoContext(sp.GetRequiredService<IConfiguration>()));
+
+// Repositories
 builder.Services.AddScoped<IQuestionRepository, QuestionRepository>();
+builder.Services.AddScoped<IPublicNoticeRepository, PublicNoticeRepository>();
+
+// Services
 builder.Services.AddTransient<IQuestionServices, QuestionServices>();
+
 builder.Services.AddHttpContextAccessor();
 // Add services to the container.
 builder.Services.AddRazorComponents()

@@ -1,8 +1,8 @@
 ﻿using MongoDB.Bson.Serialization.Attributes;
 
-namespace ProvaOnline.ModelsV2
+namespace ProvaOnline.Models
 {
-    [BsonDiscriminator("inline")]
+    [BsonDiscriminator(RootClass = true)]
     [BsonKnownTypes(typeof(TextInline), typeof(ImageInline))]
     public abstract class InlineContent
     {

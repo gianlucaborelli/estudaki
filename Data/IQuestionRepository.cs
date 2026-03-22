@@ -8,11 +8,11 @@ namespace ProvaOnline.Data
 {
     public interface IQuestionRepository
     {
-        Task AddAsync(QuestionDocument question);        
-        Task<QuestionDocument?> GetByIdAsync(ObjectId id);
+        Task AddAsync(QuestionDocument question);
+        Task<QuestionDocument?> GetByIdAsync(string id);
         Task<List<QuestionDocument>> GetAllAsync();
-        Task<FilterParameters> FindFilterParametersAsync(FilterParameters filterParameters);        
+        Task<FilterParameters> FindFilterParametersAsync(FilterParameters filterParameters);
         Task<PageResult<QuestionDocument>> FindQuestionsPaginatedAsync(SearchParameters searchParameter);
-        Task UpdateManyAsync(List<QuestionDocument> question);        
+        Task UpdateManyAsync(List<QuestionDocument> questions);
     }
 }
