@@ -48,6 +48,11 @@ public partial class ResultBase : ComponentBase
 
     protected override async Task OnParametersSetAsync()
     {
+        // Validação: garante valores mínimos
+        if (CurrentPage < 1) CurrentPage = 1;
+        if (PageSize < 1) PageSize = 10;
+        if (PageSize > 100) PageSize = 100; // Limite máximo para evitar sobrecarga
+
         var currentHash = $"{CurrentPage}|{PageSize}|{WordKey}|{TypeQuestionsParam}|{MainAreasParam}|{SubAreasParam}";
 
         if (_previousParametersHash != currentHash)
