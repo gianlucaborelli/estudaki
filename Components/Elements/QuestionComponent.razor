@@ -68,7 +68,7 @@
         @* Renderiza as alternativas *@
         @if (Value?.Question.Choices != null && Value.Question.Choices.Any())
         {
-            <MudRadioGroup T="string" ValueChanged="@(() => _showAnswers = true)">
+            <MudRadioGroup T="string" Value="_selectedValue" ValueChanged="OnAnswerSelected">
                 @foreach (var choice in Value.Question.Choices)
                 {
                     string choiceClass = "choice";
@@ -111,7 +111,7 @@
     <MudCardActions>
         <MudButton Variant="Variant.Outlined"
                    Color="Color.Primary"
-                   OnClick="@(() => _showAnswers = !_showAnswers)">
+                   OnClick="ToggleAnswers">
             @if (_showAnswers)
             {
                 @:Ocultar resposta
