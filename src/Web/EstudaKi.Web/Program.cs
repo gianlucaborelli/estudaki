@@ -1,3 +1,4 @@
+using Estudaki.Infrastructure.Observability;
 using EstudaKi.Web.Components;
 using EstudaKi.Web.Data;
 using EstudaKi.Web.Data.Context;
@@ -10,6 +11,7 @@ var builder = WebApplication.CreateBuilder(args);
 // Add MudBlazor services
 builder.Services.AddMudServices();
 builder.Services.AddMudExtensions();
+builder.AddObservability();
 
 // MongoDB Context
 builder.Services.AddSingleton<IMongoContext>(sp =>
