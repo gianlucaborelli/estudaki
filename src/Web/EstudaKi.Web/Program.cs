@@ -40,6 +40,7 @@ if (!app.Environment.IsDevelopment())
     app.UseHsts();
 }
 
+app.UseObservability();
 app.UseStatusCodePagesWithReExecute("/Error/{0}");
 app.UseHttpsRedirection();
 app.UseRouting();

@@ -3,7 +3,7 @@ using System.Reflection;
 
 namespace Estudaki.Infrastructure.Observability.Configs;
 
-internal static class OpenTelemetryExtensions
+public static class OpenTelemetryExtensions
 {
     public static string ServiceName { get; }
     public static string ServiceVersion { get; }
