@@ -5,6 +5,27 @@
 
 # dotenv files
 .env
+.env.local
+.env.*.local
+
+# Docker & Container files
+.dockerignore.generated
+docker-compose.prod.yml
+docker-compose.local.yml
+docker-compose.yml
+
+# SSL Certificates (security)
+*.pfx
+*.p12
+*.key
+*.crt
+*.pem
+certificates/
+
+# Secrets and sensitive files
+secrets/
+appsettings.Production.json
+appsettings.*.local.json
 
 # User-specific files
 *.rsuser

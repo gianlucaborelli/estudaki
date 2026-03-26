@@ -7,24 +7,32 @@ WORKDIR /app
 EXPOSE 8080
 EXPOSE 8081
 
-
 # Esta fase é usada para compilar o projeto de serviço
 FROM mcr.microsoft.com/dotnet/sdk:9.0 AS build
 ARG BUILD_CONFIGURATION=Release
 WORKDIR /src
-COPY ["ProvaOnline.csproj", "."]
-RUN dotnet restore "./ProvaOnline.csproj"
+
+# Copiar toda a estrutura src/ - incluirá automaticamente qualquer novo módulo
+COPY ["src/", "src/"]
+
+# Restore de toda a solução (descobrirá automaticamente todos os projetos)
+RUN dotnet restore "src/EstudaKi.slnx"
+
+# Copiar arquivos restantes (se houver algum fora de src/)
 COPY . .
-WORKDIR "/src/."
-RUN dotnet build "./ProvaOnline.csproj" -c $BUILD_CONFIGURATION -o /app/build
+
+# Build do projeto principal Web
+WORKDIR "/src/src/Web/EstudaKi.Web"
+RUN dotnet build "EstudaKi.Web.csproj" -c $BUILD_CONFIGURATION -o /app/build
 
 # Esta fase é usada para publicar o projeto de serviço a ser copiado para a fase final
 FROM build AS publish
 ARG BUILD_CONFIGURATION=Release
-RUN dotnet publish "./ProvaOnline.csproj" -c $BUILD_CONFIGURATION -o /app/publish /p:UseAppHost=false
+WORKDIR "/src/src/Web/EstudaKi.Web"
+RUN dotnet publish "EstudaKi.Web.csproj" -c $BUILD_CONFIGURATION -o /app/publish /p:UseAppHost=false
 
 # Esta fase é usada na produção ou quando executada no VS no modo normal (padrão quando não está usando a configuração de Depuração)
 FROM base AS final
 WORKDIR /app
 COPY --from=publish /app/publish .
-ENTRYPOINT ["dotnet", "ProvaOnline.dll"]
+ENTRYPOINT ["dotnet", "EstudaKi.Web.dll"]

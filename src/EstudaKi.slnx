@@ -1,0 +1,11 @@
+<Solution>
+  <Folder Name="/Modules/" />
+  <Folder Name="/Modules/Questions/">
+    <Project Path="Modules/Questions/Estudaki.Modules.Questions.Application/Estudaki.Modules.Questions.Application.csproj" />
+    <Project Path="Modules/Questions/Estudaki.Modules.Questions.Domain/Estudaki.Modules.Questions.Domain.csproj" />
+    <Project Path="Modules/Questions/Estudaki.Modules.Questions.Infrastructure/Estudaki.Modules.Questions.Infrastructure.csproj" />
+  </Folder>
+  <Folder Name="/Web/">
+    <Project Path="Web/EstudaKi.Web/EstudaKi.Web.csproj" />
+  </Folder>
+</Solution>

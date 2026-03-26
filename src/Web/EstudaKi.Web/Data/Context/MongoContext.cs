@@ -1,0 +1,28 @@
+﻿using MongoDB.Driver;
+
+namespace EstudaKi.Web.Data.Context
+{
+    public class MongoContext : IMongoContext
+    {
+        private readonly IMongoDatabase _database;
+
+        public MongoContext(IConfiguration configuration)
+        {
+            var connectionString = configuration.GetConnectionString("DefaultConnection");
+            var client = new MongoClient(connectionString);
+            _database = client.GetDatabase("ProvaOnlineV2");
+        }
+
+        public IMongoCollection<T> GetCollection<T>(string name)
+        {
+            try
+            {
+                return _database.GetCollection<T>(name);
+            }
+            catch (Exception ex)
+            {
+                throw;
+            }
+        }
+    }
+}

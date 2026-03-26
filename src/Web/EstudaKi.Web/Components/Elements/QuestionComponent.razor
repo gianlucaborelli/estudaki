@@ -1,0 +1,147 @@
+@using EstudaKi.Web.Models
+
+<MudCard Outlined="true">
+    <MudCardHeader>
+        <CardHeaderContent>
+            <MudStack Row="true" Justify="Justify.SpaceBetween" AlignItems="AlignItems.Center">
+                @if (Value?.PublicNotice != null)
+                {
+                    <MudText Typo="Typo.h6">
+                        @Value.PublicNotice.ExamBoard - @Value.PublicNotice.Position @Value.PublicNotice.ExamPhase @Value.PublicNotice.Year
+                    </MudText>
+                }
+                <MudButton Href="@($"/question/{Value?.Question.Id}")" 
+                           Variant="Variant.Text" 
+                           Color="Color.Primary"
+                           Size="Size.Small"
+                           EndIcon="@Icons.Material.Filled.OpenInNew">
+                    Ver Detalhes
+                </MudButton>
+            </MudStack>
+        </CardHeaderContent>
+    </MudCardHeader>
+    <MudCardContent>
+        @* Renderiza os ContentBlocks (vertical) *@
+        @if (Value?.Question.QuestionContents != null)
+        {
+            foreach (var contentBlock in Value.Question.QuestionContents.OrderBy(c => c.Order))
+            {
+                @if (contentBlock is ParagraphBlock paragraph)
+                {
+                    <MudText Align="Align.Justify" Class="mb-3">
+                        @* Renderiza os InlineContents (horizontal) *@
+                        @foreach (var inline in paragraph.Inlines)
+                        {
+                            @if (inline is TextInline textInline)
+                            {
+                                <span style="@GetTextStyle(textInline)">@textInline.Text</span>
+                            }
+                            else if (inline is ImageInline imageInline)
+                            {
+                                <img src="@GetImageUrl(imageInline.Key)" 
+                                     alt="@imageInline.Alt" 
+                                     style="max-width: 100%; height: auto; display: inline-block; vertical-align: middle;"
+                                     class="mx-2" />
+                            }
+                        }
+                    </MudText>
+                }
+                else if (contentBlock is ImageBlock imageBlock)
+                {
+                    <div class="mb-3">
+                        <img src="@GetImageUrl(imageBlock.Key)" 
+                             alt="@imageBlock.Title" 
+                             style="max-width: 100%; height: auto; display: block;" />
+                        @if (!string.IsNullOrEmpty(imageBlock.Title))
+                        {
+                            <MudText Typo="Typo.caption" Align="Align.Center" Class="mt-1">@imageBlock.Title</MudText>
+                        }
+                        @if (!string.IsNullOrEmpty(imageBlock.Source))
+                        {
+                            <MudText Typo="Typo.caption" Align="Align.Center" Color="Color.Secondary">Fonte: @imageBlock.Source</MudText>
+                        }
+                    </div>
+                }
+            }
+        }
+
+        @* Renderiza as alternativas *@
+        @if (Value?.Question.Choices != null && Value.Question.Choices.Any())
+        {
+            <MudRadioGroup T="string" Value="_selectedValue" ValueChanged="OnAnswerSelected">
+                @foreach (var choice in Value.Question.Choices)
+                {
+                    string choiceClass = "choice";
+
+                    if (_showAnswers)
+                    {
+                        if (choice.IsCorrect)
+                            choiceClass += " correct";
+                        else
+                            choiceClass += " incorrect";
+                    }
+
+                    <div class="@choiceClass">
+                        <MudRadio T="string" 
+                                  Value="@choice.Option" 
+                                  Color="Color.Primary">
+                            <MudText Typo="Typo.body2" Align="Align.Justify">
+                                @* Renderiza o conteúdo da alternativa (horizontal) *@
+                                @foreach (var inline in choice.Content)
+                                {
+                                    @if (inline is TextInline textInline)
+                                    {
+                                        <span style="@GetTextStyle(textInline)">@textInline.Text</span>
+                                    }
+                                    else if (inline is ImageInline imageInline)
+                                    {
+                                        <img src="@GetImageUrl(imageInline.Key)" 
+                                             alt="@imageInline.Alt" 
+                                             style="max-width: 100%; height: auto; display: inline-block; vertical-align: middle;"
+                                             class="mx-2" />
+                                    }
+                                }
+                            </MudText>
+                        </MudRadio>
+                    </div>
+                }
+            </MudRadioGroup>
+        }
+    </MudCardContent>
+    <MudCardActions>
+        <MudButton Variant="Variant.Outlined"
+                   Color="Color.Primary"
+                   OnClick="ToggleAnswers">
+            @if (_showAnswers)
+            {
+                @:Ocultar resposta
+            }
+            else
+            {
+                @:Verificar resposta
+            }
+        </MudButton>
+    </MudCardActions>
+</MudCard>
+
+@code {
+    private string GetTextStyle(TextInline textInline)
+    {
+        var styles = new List<string>();
+        
+        if (textInline.Bold)
+            styles.Add("font-weight: bold");
+            
+        if (textInline.Italic)
+            styles.Add("font-style: italic");
+            
+        return string.Join("; ", styles);
+    }
+
+    private string GetImageUrl(string key)
+    {
+        // TODO: Implementar lógica de storage (S3, Azure Blob, etc.)
+        // Por enquanto retorna um placeholder ou URL local
+        return $"/api/images/{key}";
+    }
+}
