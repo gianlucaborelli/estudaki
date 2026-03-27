@@ -12,20 +12,42 @@ public class ObservabilityMiddleware
         _next = next;
     }
 
+    private static string? GetClientIpAddress(HttpContext context)
+    {
+        if (context.Request.Headers.TryGetValue("X-Forwarded-For", out var forwardedFor))
+        {
+            var ips = forwardedFor.ToString().Split(',', StringSplitOptions.RemoveEmptyEntries);
+            if (ips.Length > 0)
+            {
+                return ips[0].Trim(); // Primeiro IP é o cliente original
+            }
+        }
+
+        if (context.Request.Headers.TryGetValue("X-Real-IP", out var realIp))
+        {
+            return realIp.ToString();
+        }
+
+        if (context.Request.Headers.TryGetValue("CF-Connecting-IP", out var cfIp))
+        {
+            return cfIp.ToString();
+        }
+
+        return context.Connection.RemoteIpAddress?.ToString();
+    }
+
     public async Task InvokeAsync(HttpContext context)
     {
         var activity = Activity.Current;
-        
+
         if (activity != null)
         {
-            // Enriquece com informações do request
             activity.SetTag("http.method", context.Request.Method);
             activity.SetTag("http.path", context.Request.Path);
             activity.SetTag("http.query", context.Request.QueryString.ToString());
-            activity.SetTag("http.client_ip", context.Connection.RemoteIpAddress?.ToString());
+            activity.SetTag("http.client_ip", GetClientIpAddress(context));
             activity.SetTag("http.user_agent", context.Request.Headers.UserAgent.ToString());
             
-            // User info
             if (context.User?.Identity?.IsAuthenticated == true)
             {
                 activity.SetTag("user.id", context.User.Identity.Name);
@@ -36,7 +58,6 @@ public class ObservabilityMiddleware
                 activity.SetTag("user.authenticated", false);
             }
 
-            // Request ID
             var requestId = context.TraceIdentifier;
             activity.SetTag("request.id", requestId);
             context.Response.Headers.Append("X-Request-ID", requestId);
@@ -44,7 +65,6 @@ public class ObservabilityMiddleware
 
         await _next(context);
 
-        // Enriquece com informações do response
         if (activity != null)
         {
             activity.SetTag("http.status_code", context.Response.StatusCode);
