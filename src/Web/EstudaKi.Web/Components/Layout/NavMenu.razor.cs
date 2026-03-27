@@ -1,8 +1,9 @@
-﻿using Microsoft.AspNetCore.Components;
+﻿using Estudaki.Commons.Core.CQRS;
+using Estudaki.Modules.Questions.Application.Queries.GetFilterParameters;
+using Estudaki.Modules.Questions.Domain.Common;
+using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.WebUtilities;
 using MudBlazor;
-using EstudaKi.Web.Helpers;
-using EstudaKi.Web.Services;
 
 namespace EstudaKi.Web.Components.Layout
 {
@@ -21,7 +22,7 @@ namespace EstudaKi.Web.Components.Layout
         protected IEnumerable<string> _subAreaSelected { get; set; } = [];
 
         [Inject]
-        protected IQuestionServices _questionService { get; set; } = default!;
+        protected IQueryDispatcher _queryDispatcher{ get; set; } = default!;
 
         [Inject]
         protected ISnackbar Snackbar { get; set; } = default!;
@@ -40,7 +41,10 @@ namespace EstudaKi.Web.Components.Layout
                 MainAreas = _mainAreaSelected?.ToArray() ?? Array.Empty<string>(),
                 SubAreas = _subAreaSelected?.ToArray() ?? Array.Empty<string>()
             };
-            filterParameters = await _questionService.FindFilterParametersAsync(filterParameters);
+
+            filterParameters = await _queryDispatcher
+                        .DispatchAsync<GetFilterParametersQuery, FilterParameters>(new GetFilterParametersQuery(filterParameters));
+            
             _questionType = filterParameters.TypeQuestions.ToArray();
             _mainArea = filterParameters.MainAreas.ToArray();
             _subArea = filterParameters.SubAreas.ToArray();

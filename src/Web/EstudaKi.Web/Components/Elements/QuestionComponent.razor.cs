@@ -1,5 +1,5 @@
-﻿using Microsoft.AspNetCore.Components;
-using EstudaKi.Web.Models.DTO;
+﻿using Estudaki.Modules.Questions.Application.DTOs;
+using Microsoft.AspNetCore.Components;
 
 namespace EstudaKi.Web.Components.Elements
 {

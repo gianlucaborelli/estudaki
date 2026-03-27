@@ -1,6 +1,8 @@
+using Estudaki.Commons.Core.CQRS;
+using Estudaki.Modules.Questions.Application.DTOs;
+using Estudaki.Modules.Questions.Application.Queries.SearchQuestions;
+using Estudaki.Modules.Questions.Domain.Common;
 using Microsoft.AspNetCore.Mvc;
-using EstudaKi.Web.Models.DTO;
-using EstudaKi.Web.Services;
 using System.Text;
 
 namespace EstudaKi.Controllers
@@ -9,12 +11,12 @@ namespace EstudaKi.Controllers
     [ApiController]
     public class SitemapController : ControllerBase
     {
-        private readonly IQuestionServices _questionService;
+        protected IQueryDispatcher _queryDispatcher { get; set; } = default!;
         private readonly ILogger<SitemapController> _logger;
 
-        public SitemapController(IQuestionServices questionService, ILogger<SitemapController> logger)
+        public SitemapController(IQueryDispatcher queryDispatcher, ILogger<SitemapController> logger)
         {
-            _questionService = questionService;
+            _queryDispatcher = queryDispatcher;
             _logger = logger;
         }
 
@@ -51,8 +53,8 @@ namespace EstudaKi.Controllers
 
                 _logger.LogInformation($"Parâmetros de busca - IsPublished: {searchParameters.IsPublished}, PageSize: {searchParameters.PageSize}");
 
-                var result = await _questionService.SearchQuestionsPaginatedAsync(searchParameters);
-
+                var result = await _queryDispatcher
+                                    .DispatchAsync<SearchQuestionsPaginatedQuery, PageResult<QuestionWithNoticeDto>>(new SearchQuestionsPaginatedQuery(searchParameters));
                 _logger.LogInformation($"Resultado da busca - TotalItems: {result.TotalItems}, Items.Count: {result.Items.Count}");
 
                 if (result.Items.Count == 0)

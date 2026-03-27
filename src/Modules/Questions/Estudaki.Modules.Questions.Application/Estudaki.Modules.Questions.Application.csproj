@@ -1,5 +1,10 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\Core\Estudaki.Commons.Core\Estudaki.Commons.Core.csproj" />
+    <ProjectReference Include="..\Estudaki.Modules.Questions.Domain\Estudaki.Modules.Questions.Domain.csproj" />
+  </ItemGroup>
+
   <PropertyGroup>
     <TargetFramework>net9.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>

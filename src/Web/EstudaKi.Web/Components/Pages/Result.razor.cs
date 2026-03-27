@@ -1,15 +1,17 @@
-﻿using Microsoft.AspNetCore.Components;
+﻿using Estudaki.Commons.Core.CQRS;
+using Estudaki.Modules.Questions.Application.DTOs;
+using Estudaki.Modules.Questions.Application.Queries.SearchQuestions;
+using Estudaki.Modules.Questions.Domain.Common;
+using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.WebUtilities;
 using MudBlazor;
-using EstudaKi.Web.Models.DTO;
-using EstudaKi.Web.Services;
 
 namespace EstudaKi.Web.Components.Pages;
 
 public partial class ResultBase : ComponentBase
 {
     [Inject]
-    protected IQuestionServices QuestionService { get; set; } = default!;
+    protected IQueryDispatcher _queryDispatcher { get; set; } = default!;
 
     [Inject]
     protected NavigationManager Navigation { get; set; } = default!;
@@ -75,7 +77,8 @@ public partial class ResultBase : ComponentBase
                 SubAreas = SubAreas
             };
 
-            var searchResult = await QuestionService.SearchQuestionsPaginatedAsync(searchParameters);
+            var searchResult = await _queryDispatcher
+                .DispatchAsync<SearchQuestionsPaginatedQuery, PageResult<QuestionWithNoticeDto>>(new SearchQuestionsPaginatedQuery(searchParameters));
 
             Questions = [.. searchResult.Items];
             TotalPages = searchResult.TotalPages;

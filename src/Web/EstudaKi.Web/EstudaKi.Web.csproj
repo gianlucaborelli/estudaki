@@ -13,12 +13,13 @@
   <ItemGroup>
     <PackageReference Include="CodeBeam.MudBlazor.Extensions" Version="8.2.0" />
     <PackageReference Include="Microsoft.VisualStudio.Azure.Containers.Tools.Targets" Version="1.21.0" />
-    <PackageReference Include="MongoDB.Driver" Version="3.3.0" />
+    <PackageReference Include="MongoDB.Driver" Version="3.7.1" />
     <PackageReference Include="MudBlazor" Version="8.*" />
   </ItemGroup>
 
 
   <ItemGroup>
     <ProjectReference Include="..\..\Infrastructure\Estudaki.Infrastructure.Observability\Estudaki.Infrastructure.Observability.csproj" />
+    <ProjectReference Include="..\..\Modules\Questions\Estudaki.Modules.Questions.Infrastructure\Estudaki.Modules.Questions.Infrastructure.csproj" />
   </ItemGroup>
 </Project>

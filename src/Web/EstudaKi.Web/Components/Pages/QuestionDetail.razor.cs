@@ -1,8 +1,9 @@
+using Estudaki.Commons.Core.CQRS;
+using Estudaki.Modules.Questions.Application.DTOs;
+using Estudaki.Modules.Questions.Application.Queries.GetQuestionById;
+using Estudaki.Modules.Questions.Domain.ValueObjects;
 using Microsoft.AspNetCore.Components;
 using MudBlazor;
-using EstudaKi.Web.Models;
-using EstudaKi.Web.Models.DTO;
-using EstudaKi.Web.Services;
 using System.Text;
 using System.Text.RegularExpressions;
 
@@ -11,7 +12,7 @@ namespace EstudaKi.Web.Components.Pages;
 public partial class QuestionDetailBase : ComponentBase
 {
     [Inject]
-    protected IQuestionServices QuestionService { get; set; } = default!;
+    protected IQueryDispatcher _queryDispatcher { get; set; } = default!;
 
     [Inject]
     protected NavigationManager Navigation { get; set; } = default!;
@@ -46,7 +47,7 @@ public partial class QuestionDetailBase : ComponentBase
 
         try
         {
-            Question = await QuestionService.GetQuestionByIdAsync(Id);
+            Question = await _queryDispatcher.DispatchAsync<GetQuestionByIdQuery, QuestionWithNoticeDto>(new GetQuestionByIdQuery(Id));
 
             if (Question != null)
             {

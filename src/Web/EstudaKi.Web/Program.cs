@@ -1,8 +1,7 @@
+using Estudaki.Commons.Core.CQRS.Extensions;
 using Estudaki.Infrastructure.Observability;
+using Estudaki.Modules.Questions.Infrastructure.Extensions;
 using EstudaKi.Web.Components;
-using EstudaKi.Web.Data;
-using EstudaKi.Web.Data.Context;
-using EstudaKi.Web.Services;
 using MudBlazor.Services;
 using MudExtensions.Services;
 
@@ -13,16 +12,13 @@ builder.Services.AddMudServices();
 builder.Services.AddMudExtensions();
 builder.AddObservability();
 
-// MongoDB Context
-builder.Services.AddSingleton<IMongoContext>(sp =>
-    new MongoContext(sp.GetRequiredService<IConfiguration>()));
+// Add CQRS
+builder.Services.AddCQRS();
 
-// Repositories
-builder.Services.AddScoped<IQuestionRepository, QuestionRepository>();
-builder.Services.AddScoped<IPublicNoticeRepository, PublicNoticeRepository>();
-
-// Services
-builder.Services.AddTransient<IQuestionServices, QuestionServices>();
+// Add Questions Module
+var mongoConnectionString = builder.Configuration.GetConnectionString("DefaultConnection") 
+    ?? throw new InvalidOperationException("MongoDB connection string not found");
+builder.Services.AddQuestionsModule(mongoConnectionString, "ProvaOnlineV2");
 
 builder.Services.AddHttpContextAccessor();
 // Add services to the container.
