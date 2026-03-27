@@ -1,4 +1,7 @@
 <Solution>
+  <Folder Name="/Core/">
+    <Project Path="Core/Estudaki.Commons.Core/Estudaki.Commons.Core.csproj" />
+  </Folder>
   <Folder Name="/Infrastructure/">
     <Project Path="Infrastructure/Estudaki.Infrastructure.Observability/Estudaki.Infrastructure.Observability.csproj" />
   </Folder>
