@@ -6,27 +6,9 @@ namespace EstudaKi.Web.Components.Layout
 {
     public partial class MainLayoutPage : LayoutComponentBase
     {
-        protected bool _drawerOpen = true;
         protected bool _isDarkMode = true;
         protected MudTheme? _theme = null;
-
-        protected Breakpoint _currentBreakpoint;
-        protected string _drawerWidth = "280px";
-
         [Inject] private IJSRuntime JS { get; set; } = default!;
-        protected void OnBreakpointChanged(Breakpoint breakpoint)
-        {
-            _currentBreakpoint = breakpoint;
-
-            _drawerWidth = breakpoint switch
-            {
-                Breakpoint.Xs => "100%",
-                Breakpoint.Sm => "100%",
-                Breakpoint.Md => "340px",
-                Breakpoint.Lg => "380px",
-                _ => "400px"
-            };
-        }
 
         protected override async Task OnAfterRenderAsync(bool firstRender)
         {
@@ -48,25 +30,6 @@ namespace EstudaKi.Web.Components.Layout
                 PaletteDark = _darkPalette,
                 LayoutProperties = new LayoutProperties()
             };
-        }
-
-        protected void DrawerToggle()
-        {
-            _drawerOpen = !_drawerOpen;
-        }
-
-        public void CloseDrawer()
-        {
-            if (_currentBreakpoint == Breakpoint.Xs || _currentBreakpoint == Breakpoint.Sm)
-            {
-                _drawerOpen = false;
-                StateHasChanged();
-            }
-        }
-
-        protected void DarkModeToggle()
-        {
-            _isDarkMode = !_isDarkMode;
         }
 
         private readonly PaletteLight _lightPalette = new()
@@ -126,10 +89,29 @@ namespace EstudaKi.Web.Components.Layout
             OverlayLight = "#1e1e2d80"
         };
 
-        public string DarkLightModeButtonIcon => _isDarkMode switch
+        protected bool _drawerOpen = true;
+        
+
+        protected Breakpoint _currentBreakpoint;
+        protected string _drawerWidth = "280px";
+
+        protected void DrawerToggle()
         {
-            true => Icons.Material.Rounded.LightMode,
-            false => Icons.Material.Outlined.DarkMode,
-        };
+            _drawerOpen = !_drawerOpen;
+        }
+
+        public void CloseDrawer()
+        {
+            if (_currentBreakpoint == Breakpoint.Xs || _currentBreakpoint == Breakpoint.Sm)
+            {
+                _drawerOpen = false;
+                StateHasChanged();
+            }
+        }
+
+        protected void OnBreakpointChanged(Breakpoint breakpoint)
+        {
+            _currentBreakpoint = breakpoint;            
+        }        
     }
 }

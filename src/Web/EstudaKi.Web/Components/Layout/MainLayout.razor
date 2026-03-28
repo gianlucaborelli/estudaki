@@ -6,22 +6,9 @@
 <MudSnackbarProvider />
 <CascadingValue Value="this">
 <MudLayout>
-    <MudAppBar Elevation="1">
-        <MudIconButton Icon="@Icons.Material.Filled.Search" Color="Color.Inherit" Edge="Edge.Start" OnClick="@((e) => DrawerToggle())" />
-        <MudSpacer />
-        <MudText Typo="Typo.h5" Align="Align.Center" Class="ml-3">EstudaKi</MudText>
-        <MudSpacer />
-        <MudIconButton Icon="@(DarkLightModeButtonIcon)" Color="Color.Inherit" OnClick="@DarkModeToggle" />
-    </MudAppBar>
+    <AppBarCustom @bind-IsDarkMode="_isDarkMode" />
     <MudBreakpointProvider OnBreakpointChanged="OnBreakpointChanged" />
-    <MudDrawer @bind-Open="_drawerOpen"
-               Breakpoint="Breakpoint.Md"
-               Width="@_drawerWidth"               
-               ClipMode="DrawerClipMode.Always"
-               Elevation="1">
-        <NavMenu />
-    </MudDrawer>
-    <MudMainContent Class="pt-20 pa-4">
+    <MudMainContent Class="pa-4">
         <MudGrid>
             <MudItem xs="12" md="12">                
                 @Body                
