@@ -9,6 +9,12 @@ namespace EstudaKi.Web.Components.Layout
 {
     public partial class AppBarCustomBase : ComponentBase
     {
+        [CascadingParameter(Name = "Theme")]
+        protected MudTheme? Theme { get; set; }
+
+        [CascadingParameter(Name = "IsDarkModeValue")]
+        protected bool IsDarkModeValue { get; set; }
+
         [Parameter]
         public bool IsDarkMode { get; set; }
 
@@ -19,7 +25,28 @@ namespace EstudaKi.Web.Components.Layout
         {
             IsDarkMode = value;
             await IsDarkModeChanged.InvokeAsync(value);
+            StateHasChanged();
         }
+
+        protected override void OnParametersSet()
+        {
+            base.OnParametersSet();
+            StateHasChanged();
+        }
+
+        protected string AppBarStyle
+        {
+            get
+            {
+                if (Theme == null) return string.Empty;
+
+                var bgColor = IsDarkModeValue ? Theme.PaletteDark.AppbarBackground.Value : Theme.PaletteLight.AppbarBackground.Value;
+                var textColor = IsDarkModeValue ? Theme.PaletteDark.AppbarText.Value : Theme.PaletteLight.AppbarText.Value;
+
+                return $"background-color: {bgColor}; color: {textColor};";
+            }
+        }
+               
 
         protected bool _showFilters = false;
         protected string _wordKey { get; set; } = string.Empty;

@@ -1,37 +1,62 @@
 ﻿@inherits AppBarCustomBase
 
-<MudPaper Class="search-bar" Elevation="2">
-    <MudContainer MaxWidth="MaxWidth.Large">
-        <!-- 🔝 Header -->
+<style>
+    .my-custom-textfield .mud-icon-root.mud-svg-icon {
+        fill: #b0b6a8 !important;
+    }
+    
+    .my-custom-textfield .mud-input-outlined-border{
+        border-radius: 24px !important;
+        border-width: 2.4px !important;
+        border-color: #b0b6a8 !important;       
+    }
+   
+    .my-custom-textfield .mud-input-root {
+        color: #b0b6a8 !important;
+        font-weight: 800 !important;
+    }
+
+    
+
+</style>
+
+<MudPaper Elevation="2" Style="@AppBarStyle">
+    <MudContainer MaxWidth="MaxWidth.Large" Class="pa-4">
+
         <MudStack Row="true" AlignItems="AlignItems.Center" Spacing="2">
-            <MudText Typo="Typo.h6">EstudaKi</MudText>
-            <MudSpacer />            
-            <DarkModeToggleSwitch IsDarkMode="@IsDarkMode" IsDarkModeChanged="@OnDarkModeChanged" />
+            <MudText Typo="Typo.h5" Class="pa-2">EstudaKi</MudText>
+
+            <div style="flex-grow: 1; display: flex; flex-direction: column; gap: 8px;">
+                <MudTextField Class="my-custom-textfield "
+                              @bind-Value="_wordKey"
+                              Placeholder="Buscar questões..."
+                              Adornment="Adornment.Start"                                     
+                              AdornmentIcon="@Icons.Material.Filled.Search"  
+                              
+                              Variant="Variant.Outlined"                      
+                              Margin="Margin.Dense"
+                              FullWidth="true"                              
+                              Clearable="true"
+                              OnKeyDown="@(e => { if (e.Key == "Enter") SearchQuestions(); })" />
+                
+            </div>
+
+            <DarkModeToggleSwitch IsDarkMode="@IsDarkMode" IsDarkModeChanged="@OnDarkModeChanged" />            
         </MudStack>
-        <!-- 🔍 Busca -->
-        <MudTextField @bind-Value="_wordKey"
-                      Placeholder="Buscar questões..."
-                      Adornment="Adornment.Start"
-                      AdornmentIcon="@Icons.Material.Filled.Search"
-                      Variant="Variant.Outlined"
-                      Margin="Margin.Dense"
-                      Class="mt-2"
-                      FullWidth="true" />
 
-        <!-- 🔽 Toggle -->
-        <MudButton Variant="Variant.Text"
-                   Class="mt-1 pa-0"
-                   OnClick="ToggleFilters">
-            @(_showFilters ? "Ocultar filtros" : "Mostrar filtros")
-        </MudButton>
+        <div class="d-flex justify-center mt-1">
+            <MudButton Variant="Variant.Text"
+                       Class="pa-0"
+                       OnClick="ToggleFilters">
+                @(_showFilters ? "Ocultar filtros" : "Mostrar filtros")
+            </MudButton>
+        </div>
 
-        <!-- 🎛 Filtros -->
         <MudCollapse Expanded="_showFilters">
-
             <MudGrid Class="mt-2">
 
                 <MudItem xs="12" md="4">
-                    <MudSelectExtended T="string"
+                    <MudSelectExtended T="string" Class="my-custom-textfield"
                                        ItemCollection="_questionType"
                                        @bind-SelectedValues="_questionTypeSelected"
                                        MultiSelection="true"
@@ -42,10 +67,10 @@
                 </MudItem>
 
                 <MudItem xs="12" md="4">
-                    <MudSelectExtended T="string"
+                    <MudSelectExtended T="string" Class="my-custom-textfield my-custom-select"
                                        ItemCollection="_mainArea"
                                        @bind-SelectedValues="_mainAreaSelected"
-                                       MultiSelection="true"
+                                       MultiSelection="true"          
                                        Label="Área de conhecimento"
                                        Variant="Variant.Outlined"
                                        Margin="Margin.Dense"
@@ -53,7 +78,7 @@
                 </MudItem>
 
                 <MudItem xs="12" md="4">
-                    <MudSelectExtended T="string"
+                    <MudSelectExtended T="string" Class="my-custom-textfield"
                                        ItemCollection="_subArea"
                                        @bind-SelectedValues="_subAreaSelected"
                                        MultiSelection="true"

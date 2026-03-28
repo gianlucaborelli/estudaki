@@ -5,6 +5,8 @@
 <MudDialogProvider />
 <MudSnackbarProvider />
 <CascadingValue Value="this">
+<CascadingValue Value="_theme" Name="Theme">
+<CascadingValue Value="_isDarkMode" Name="IsDarkModeValue">
 <MudLayout>
     <AppBarCustom @bind-IsDarkMode="_isDarkMode" />
     <MudBreakpointProvider OnBreakpointChanged="OnBreakpointChanged" />
@@ -17,4 +19,6 @@
         <AppFooter />
     </MudMainContent>
 </MudLayout>
+</CascadingValue>
+</CascadingValue>
 </CascadingValue>
