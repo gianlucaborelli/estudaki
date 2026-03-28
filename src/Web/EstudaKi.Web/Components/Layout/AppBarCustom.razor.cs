@@ -43,7 +43,7 @@ namespace EstudaKi.Web.Components.Layout
                 var bgColor = IsDarkModeValue ? Theme.PaletteDark.AppbarBackground.Value : Theme.PaletteLight.AppbarBackground.Value;
                 var textColor = IsDarkModeValue ? Theme.PaletteDark.AppbarText.Value : Theme.PaletteLight.AppbarText.Value;
 
-                return $"background-color: {bgColor}; color: {textColor};";
+                return $"background-color: {bgColor}; color: {textColor}; border-radius: 0px; position: relative; z-index: 2;";
             }
         }
                
@@ -101,6 +101,11 @@ namespace EstudaKi.Web.Components.Layout
             _showFilters = !_showFilters;
         }
 
+        protected void CloseFilters()
+        {
+            _showFilters = false;
+        }
+
         protected void SearchQuestions()
         {
             var queryParams = new Dictionary<string, string?>
@@ -126,6 +131,7 @@ namespace EstudaKi.Web.Components.Layout
 
             var url = QueryHelpers.AddQueryString("/result", queryParams);
 
+            _showFilters = false;
             _navigationManager.NavigateTo(url);
         }
     }

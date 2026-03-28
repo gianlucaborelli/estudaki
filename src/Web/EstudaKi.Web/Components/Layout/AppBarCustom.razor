@@ -4,23 +4,30 @@
     .my-custom-textfield .mud-icon-root.mud-svg-icon {
         fill: #b0b6a8 !important;
     }
-    
-    .my-custom-textfield .mud-input-outlined-border{
+
+    .my-custom-textfield .mud-input-outlined-border {
         border-radius: 24px !important;
         border-width: 2.4px !important;
         border-color: #b0b6a8 !important;       
     }
-   
+
     .my-custom-textfield .mud-input-root {
         color: #b0b6a8 !important;
         font-weight: 800 !important;
     }
 
-    
-
+    .my-custom-textfield .mud-input-label,
+    .my-custom-textfield .mud-input-label-text {
+        color: #b0b6a8 !important;
+    }
 </style>
 
-<MudPaper Elevation="2" Style="@AppBarStyle">
+@if (_showFilters)
+{
+    <div @onclick="CloseFilters" style="position: fixed; top: 0; left: 0; right: 0; bottom: 0; z-index: 1;"></div>
+}
+
+<MudPaper Elevation="2" Style="@AppBarStyle" @onclick:stopPropagation="true">
     <MudContainer MaxWidth="MaxWidth.Large" Class="pa-4">
 
         <MudStack Row="true" AlignItems="AlignItems.Center" Spacing="2">
@@ -63,7 +70,9 @@
                                        Label="Tipo de Prova"
                                        Variant="Variant.Outlined"
                                        Margin="Margin.Dense"
-                                       Clearable="true" />
+                                       Clearable="true"
+                                       AnchorOrigin="Origin.BottomCenter"
+                                       TransformOrigin="Origin.TopCenter" />
                 </MudItem>
 
                 <MudItem xs="12" md="4">
@@ -74,7 +83,9 @@
                                        Label="Área de conhecimento"
                                        Variant="Variant.Outlined"
                                        Margin="Margin.Dense"
-                                       Clearable="true" />
+                                       Clearable="true"
+                                       AnchorOrigin="Origin.BottomCenter"
+                                       TransformOrigin="Origin.TopCenter" />
                 </MudItem>
 
                 <MudItem xs="12" md="4">
@@ -87,12 +98,14 @@
                                        Label="Subárea"
                                        Variant="Variant.Outlined"
                                        Margin="Margin.Dense"
-                                       Clearable="true" />
+                                       Clearable="true"
+                                       AnchorOrigin="Origin.BottomCenter"
+                                       TransformOrigin="Origin.TopCenter" />
                 </MudItem>
 
                 <MudItem xs="12" Class="d-flex justify-center mt-2">
-                    <MudButton Variant="Variant.Filled"
-                               StartIcon="@Icons.Material.Filled.Search"
+                    <MudButton Variant="Variant.Outlined"
+                               StartIcon="@Icons.Material.Filled.Search"                               
                                OnClick="SearchQuestions">
                         Pesquisar
                     </MudButton>
