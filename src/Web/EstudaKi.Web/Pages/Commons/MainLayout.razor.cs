@@ -2,7 +2,7 @@ using Microsoft.AspNetCore.Components;
 using Microsoft.JSInterop;
 using MudBlazor;
 
-namespace EstudaKi.Web.Components.Layout
+namespace EstudaKi.Web.Pages.Commons
 {
     public partial class MainLayoutPage : LayoutComponentBase
     {

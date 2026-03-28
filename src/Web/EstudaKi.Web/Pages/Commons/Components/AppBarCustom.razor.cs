@@ -5,7 +5,7 @@ using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.WebUtilities;
 using MudBlazor;
 
-namespace EstudaKi.Web.Components.Layout
+namespace EstudaKi.Web.Pages.Commons.Components
 {
     public partial class AppBarCustomBase : ComponentBase
     {

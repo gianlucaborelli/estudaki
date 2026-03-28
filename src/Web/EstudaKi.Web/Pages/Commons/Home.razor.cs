@@ -1,6 +1,6 @@
 using Microsoft.AspNetCore.Components;
 
-namespace EstudaKi.Web.Components.Pages
+namespace EstudaKi.Web.Pages.Commons
 {
     public partial class Home
     {

@@ -1,6 +1,6 @@
 ﻿using Microsoft.AspNetCore.Components;
 
-namespace EstudaKi.Helpers
+namespace EstudaKi.Web.Pages.Commons
 {
     public partial class AdsComponent : ComponentBase
     {

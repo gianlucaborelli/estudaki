@@ -1,5 +1,6 @@
 ﻿using Estudaki.Infrastructure.Observability.Middlewares;
 using Estudaki.Infrastructure.Observability.Setups;
+using EstudaKi.Infrastructure.Observability.Middlewares;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -18,6 +19,7 @@ public static class ObservabilityExtensions
 
     public static void UseObservability(this WebApplication app)
     {
+        app.UseErrorLogging();
         app.UseMiddleware<ObservabilityMiddleware>();
     }
 }

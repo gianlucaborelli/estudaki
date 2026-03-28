@@ -6,7 +6,7 @@ using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.WebUtilities;
 using MudBlazor;
 
-namespace EstudaKi.Web.Components.Pages;
+namespace EstudaKi.Web.Pages.Features.Questions;
 
 public partial class ResultBase : ComponentBase
 {

@@ -1,6 +1,9 @@
+using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.Logging;
 using System.Diagnostics;
 
-namespace EstudaKi.Web.Middlewares;
+namespace EstudaKi.Infrastructure.Observability.Middlewares;
 
 public class ErrorLoggingMiddleware
 {

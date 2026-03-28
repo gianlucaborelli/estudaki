@@ -1,7 +1,7 @@
 ﻿using Estudaki.Modules.Questions.Application.DTOs;
 using Microsoft.AspNetCore.Components;
 
-namespace EstudaKi.Web.Components.Elements
+namespace EstudaKi.Web.Pages.Features.Questions.Components
 {
 
     public partial class QuestionComponent : ComponentBase

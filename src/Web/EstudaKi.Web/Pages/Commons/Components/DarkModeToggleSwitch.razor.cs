@@ -1,7 +1,7 @@
 ﻿using Microsoft.AspNetCore.Components;
 using MudBlazor;
 
-namespace EstudaKi.Web.Components.Layout;
+namespace EstudaKi.Web.Pages.Commons.Components;
 
 public partial class DarkModeToggleSwitchBase : ComponentBase
 {

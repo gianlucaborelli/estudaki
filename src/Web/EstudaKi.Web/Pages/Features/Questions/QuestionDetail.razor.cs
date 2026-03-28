@@ -7,7 +7,7 @@ using MudBlazor;
 using System.Text;
 using System.Text.RegularExpressions;
 
-namespace EstudaKi.Web.Components.Pages;
+namespace EstudaKi.Web.Pages.Features.Questions;
 
 public partial class QuestionDetailBase : ComponentBase
 {

@@ -2,7 +2,6 @@ using Estudaki.Commons.Core.CQRS.Extensions;
 using Estudaki.Infrastructure.Observability;
 using Estudaki.Modules.Questions.Infrastructure.Extensions;
 using EstudaKi.Web.Components;
-using EstudaKi.Web.Middlewares;
 using MudBlazor.Services;
 using MudExtensions.Services;
 
@@ -36,8 +35,6 @@ if (!app.Environment.IsDevelopment())
     app.UseExceptionHandler("/Error", createScopeForErrors: true);
     app.UseHsts();
 }
-
-app.UseErrorLogging();
 
 app.UseObservability();
 app.UseStatusCodePagesWithReExecute("/Error/{0}");
