@@ -1,10 +1,10 @@
+using Estudaki.Commons.Core.Models;
 using Estudaki.Modules.Questions.Domain.ValueObjects;
 
 namespace Estudaki.Modules.Questions.Domain.Entities;
 
-public class Question
+public class Question : Entity
 {
-    public string Id { get; set; } = string.Empty;
     public string? PublicNoticeId { get; set; }
     public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
     public bool IsPublished { get; set; } = false;

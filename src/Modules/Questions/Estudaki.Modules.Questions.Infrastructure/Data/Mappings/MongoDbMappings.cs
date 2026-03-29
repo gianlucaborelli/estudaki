@@ -17,19 +17,13 @@ public static class MongoDbMappings
 
         BsonClassMap.RegisterClassMap<Question>(cm =>
         {
-            cm.AutoMap();
-            cm.MapIdProperty(q => q.Id)
-                .SetIdGenerator(StringObjectIdGenerator.Instance)
-                .SetSerializer(new MongoDB.Bson.Serialization.Serializers.StringSerializer(BsonType.ObjectId));
+            cm.AutoMap();            
             cm.SetIgnoreExtraElements(true);
         });
 
         BsonClassMap.RegisterClassMap<PublicNotice>(cm =>
         {
-            cm.AutoMap();
-            cm.MapIdProperty(pn => pn.Id)
-                .SetIdGenerator(StringObjectIdGenerator.Instance)
-                .SetSerializer(new MongoDB.Bson.Serialization.Serializers.StringSerializer(BsonType.ObjectId));
+            cm.AutoMap();            
             cm.SetIgnoreExtraElements(true);
         });
 

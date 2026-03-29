@@ -3,9 +3,15 @@
     <Project Path="Core/Estudaki.Commons.Core/Estudaki.Commons.Core.csproj" />
   </Folder>
   <Folder Name="/Infrastructure/">
+    <Project Path="Infrastructure/Estudaki.Infrastructure.Crosscutting/Estudaki.Infrastructure.Crosscutting.csproj" />
     <Project Path="Infrastructure/Estudaki.Infrastructure.Observability/Estudaki.Infrastructure.Observability.csproj" />
   </Folder>
   <Folder Name="/Modules/" />
+  <Folder Name="/Modules/Comunications/">
+    <Project Path="Modules/Comunications/Estudaki.Modules.Comunications.Application/Estudaki.Modules.Comunications.Application.csproj" />
+    <Project Path="Modules/Comunications/Estudaki.Modules.Comunications.Domain/Estudaki.Modules.Comunications.Domain.csproj" />
+    <Project Path="Modules/Comunications/Estudaki.Modules.Comunications.Infrastructure/Estudaki.Modules.Comunications.Infrastructure.csproj" />
+  </Folder>
   <Folder Name="/Modules/Questions/">
     <Project Path="Modules/Questions/Estudaki.Modules.Questions.Application/Estudaki.Modules.Questions.Application.csproj" />
     <Project Path="Modules/Questions/Estudaki.Modules.Questions.Domain/Estudaki.Modules.Questions.Domain.csproj" />

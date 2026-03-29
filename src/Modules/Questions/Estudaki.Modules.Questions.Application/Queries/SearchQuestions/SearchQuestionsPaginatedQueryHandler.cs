@@ -29,7 +29,7 @@ public class SearchQuestionsPaginatedQueryHandler : IQueryHandler<SearchQuestion
             .ToList();
 
         var publicNotices = publicNoticeIds.Any()
-            ? await _publicNoticeRepository.GetByIdsAsync(publicNoticeIds)
+            ? await _publicNoticeRepository.GetByIds(publicNoticeIds)
             : [];
 
         var publicNoticesDict = publicNotices.ToDictionary(pn => pn.Id!);

@@ -1,40 +1,19 @@
+using Estudaki.Commons.Core.Data.Context;
+using Estudaki.Commons.Core.Data.Repository;
 using Estudaki.Modules.Questions.Domain.Common;
 using Estudaki.Modules.Questions.Domain.Entities;
 using Estudaki.Modules.Questions.Domain.Repositories;
 using Estudaki.Modules.Questions.Domain.ValueObjects;
-using Estudaki.Modules.Questions.Infrastructure.Data.Context;
 using MongoDB.Bson;
 using MongoDB.Driver;
 
 namespace Estudaki.Modules.Questions.Infrastructure.Data.Repositories;
 
-public class QuestionRepository : IQuestionRepository
+public class QuestionRepository : BaseRepository<Question>, IQuestionRepository
 {
-    private readonly IMongoCollection<Question> _collection;
-
-    public QuestionRepository(IMongoContext context)
+    public QuestionRepository(IMongoContext context) : base(context)
     {
-        _collection = context.GetCollection<Question>("Questions");
-    }
-
-    public async Task AddAsync(Question question)
-    {
-        await _collection.InsertOneAsync(question);
-    }
-
-    public async Task<List<Question>> GetAllAsync()
-    {
-        return await _collection.Find(_ => true).ToListAsync();
-    }
-
-    public async Task<Question?> GetByIdAsync(string id)
-    {
-        if (!ObjectId.TryParse(id, out var objectId))
-            return null;
-
-        var filter = Builders<Question>.Filter.Eq(q => q.Id, id);
-        return await _collection.Find(filter).FirstOrDefaultAsync();
-    }
+    }        
 
     public async Task<FilterParameters> FindFilterParametersAsync(FilterParameters filterParameters)
     {
@@ -52,9 +31,9 @@ public class QuestionRepository : IQuestionRepository
 
         var combinedFilter = filters.Any() ? builder.And(filters) : builder.Empty;
 
-        var typeQuestionsTask = _collection.DistinctAsync<string>("QuestionType", combinedFilter);
-        var mainAreasTask = _collection.DistinctAsync<string>("MainArea", combinedFilter);
-        var subAreasTask = _collection.DistinctAsync<string>("SubAreas", combinedFilter);
+        var typeQuestionsTask = DbSet.DistinctAsync<string>("QuestionType", combinedFilter);
+        var mainAreasTask = DbSet.DistinctAsync<string>("MainArea", combinedFilter);
+        var subAreasTask = DbSet.DistinctAsync<string>("SubAreas", combinedFilter);
 
         await Task.WhenAll(typeQuestionsTask, mainAreasTask, subAreasTask);
 
@@ -107,9 +86,9 @@ public class QuestionRepository : IQuestionRepository
 
         var finalFilter = filters.Any() ? filterBuilder.And(filters) : filterBuilder.Empty;
 
-        var totalItems = await _collection.CountDocumentsAsync(finalFilter);
+        var totalItems = await DbSet.CountDocumentsAsync(finalFilter);
 
-        var items = await _collection.Find(finalFilter)
+        var items = await DbSet.Find(finalFilter)
             .Skip((searchParameter.CurrentPage - 1) * searchParameter.PageSize)
             .Limit(searchParameter.PageSize)
             .ToListAsync();
@@ -137,7 +116,7 @@ public class QuestionRepository : IQuestionRepository
 
         if (operations.Count > 0)
         {
-            await _collection.BulkWriteAsync(operations);
+            await DbSet.BulkWriteAsync(operations);
         }
     }
 }

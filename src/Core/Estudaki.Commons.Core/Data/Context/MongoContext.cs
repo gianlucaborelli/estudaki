@@ -1,13 +1,16 @@
+﻿using Microsoft.Extensions.Configuration;
 using MongoDB.Driver;
 
-namespace Estudaki.Modules.Questions.Infrastructure.Data.Context;
+namespace Estudaki.Commons.Core.Data.Context;
 
 public class MongoContext : IMongoContext
 {
     private readonly IMongoDatabase _database;
 
-    public MongoContext(string connectionString, string databaseName)
+    public MongoContext(IConfiguration configuration)
     {
+        var connectionString = configuration.GetConnectionString("DefaultConnection");
+        var databaseName = "ProvaOnlineV2";
         var client = new MongoClient(connectionString);
         _database = client.GetDatabase(databaseName);
     }

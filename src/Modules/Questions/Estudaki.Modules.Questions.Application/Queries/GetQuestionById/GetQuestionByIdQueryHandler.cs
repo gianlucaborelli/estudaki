@@ -19,7 +19,7 @@ public class GetQuestionByIdQueryHandler : IQueryHandler<GetQuestionByIdQuery, Q
 
     public async Task<QuestionWithNoticeDto?> HandleAsync(GetQuestionByIdQuery query, CancellationToken cancellationToken = default)
     {
-        var question = await _questionRepository.GetByIdAsync(query.Id);
+        var question = await _questionRepository.GetById(query.Id);
 
         if (question == null)
             return null;
@@ -31,7 +31,7 @@ public class GetQuestionByIdQueryHandler : IQueryHandler<GetQuestionByIdQuery, Q
 
         if (!string.IsNullOrEmpty(question.PublicNoticeId))
         {
-            dto.PublicNotice = await _publicNoticeRepository.GetByIdAsync(question.PublicNoticeId);
+            dto.PublicNotice = await _publicNoticeRepository.GetById(question.PublicNoticeId);
         }
 
         return dto;

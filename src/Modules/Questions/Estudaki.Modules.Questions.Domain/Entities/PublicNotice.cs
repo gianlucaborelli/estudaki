@@ -1,8 +1,9 @@
+using Estudaki.Commons.Core.Models;
+
 namespace Estudaki.Modules.Questions.Domain.Entities;
 
-public class PublicNotice
+public class PublicNotice : Entity
 {
-    public string? Id { get; set; }
     public string? Number { get; set; }
     public int Year { get; set; }
     public string? ExamPhase { get; set; }

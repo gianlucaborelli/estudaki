@@ -1,9 +1,9 @@
+using Estudaki.Commons.Core.Data.Repository;
 using Estudaki.Modules.Questions.Domain.Entities;
 
 namespace Estudaki.Modules.Questions.Domain.Repositories;
 
-public interface IPublicNoticeRepository
+public interface IPublicNoticeRepository : IRepository<PublicNotice>
 {
-    Task<PublicNotice?> GetByIdAsync(string id);
-    Task<List<PublicNotice>> GetByIdsAsync(List<string> ids);
+    Task<List<PublicNotice>> GetByIds(List<string> ids);
 }

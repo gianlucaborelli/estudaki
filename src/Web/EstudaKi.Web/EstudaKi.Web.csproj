@@ -19,6 +19,7 @@
 
 
   <ItemGroup>
+    <ProjectReference Include="..\..\Infrastructure\Estudaki.Infrastructure.Crosscutting\Estudaki.Infrastructure.Crosscutting.csproj" />
     <ProjectReference Include="..\..\Infrastructure\Estudaki.Infrastructure.Observability\Estudaki.Infrastructure.Observability.csproj" />
     <ProjectReference Include="..\..\Modules\Questions\Estudaki.Modules.Questions.Infrastructure\Estudaki.Modules.Questions.Infrastructure.csproj" />
   </ItemGroup>
