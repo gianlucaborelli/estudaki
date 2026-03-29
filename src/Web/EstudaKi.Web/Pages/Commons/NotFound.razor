@@ -1,4 +1,6 @@
 ﻿@page "/Error/404"
+@inject ILogger<NotFound> Logger
+@inject IHttpContextAccessor HttpContextAccessor
 @inject NavigationManager NavigationManager
 
 <PageTitle>Página não encontrada - EstudaKi</PageTitle>

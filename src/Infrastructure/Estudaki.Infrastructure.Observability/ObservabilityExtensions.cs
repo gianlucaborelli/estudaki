@@ -1,4 +1,5 @@
-﻿using Estudaki.Infrastructure.Observability.Middlewares;
+﻿using Estudaki.Infrastructure.Observability.Helpers;
+using Estudaki.Infrastructure.Observability.Middlewares;
 using Estudaki.Infrastructure.Observability.Setups;
 using EstudaKi.Infrastructure.Observability.Middlewares;
 using Microsoft.AspNetCore.Builder;
@@ -14,6 +15,7 @@ public static class ObservabilityExtensions
         builder.MetricsInit();
         builder.TracingInit();
 
+        builder.Services.AddScoped<NavigationTracker>();
         builder.Services.AddHttpContextAccessor();
     }
 
