@@ -1,10 +1,21 @@
 using Estudaki.Infrastructure.Crosscutting;
 using Estudaki.Infrastructure.Observability;
 using EstudaKi.Web.Components;
+using Microsoft.AspNetCore.HttpOverrides;
 using MudBlazor.Services;
 using MudExtensions.Services;
 
 var builder = WebApplication.CreateBuilder(args);
+
+builder.Services.Configure<ForwardedHeadersOptions>(options =>
+{
+    options.ForwardedHeaders =
+        ForwardedHeaders.XForwardedFor |
+        ForwardedHeaders.XForwardedProto;
+       
+    options.KnownNetworks.Clear();
+    options.KnownProxies.Clear();
+});
 
 builder.Services.AddMudServices();
 builder.Services.AddMudExtensions();
@@ -19,6 +30,8 @@ builder.Services.AddRazorComponents()
 builder.Services.AddControllers();
 
 var app = builder.Build();
+
+app.UseForwardedHeaders();
 
 app.Use(async (context, next) =>
 {
@@ -52,7 +65,7 @@ app.Use(async (context, next) =>
     var logger = context.RequestServices.GetRequiredService<ILogger<Program>>();
 
     var pathLower = path.ToLowerInvariant();
-        
+
     var isSuspicious =
         pathLower.StartsWith("/wp-") ||
         pathLower.Contains("php") ||

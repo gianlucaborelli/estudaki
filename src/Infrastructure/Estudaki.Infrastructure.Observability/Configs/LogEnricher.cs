@@ -38,7 +38,14 @@ internal class LogEnricher : BaseProcessor<LogRecord>
                 attributes.Add(new("http.method", httpContext.Request.Method));
                 attributes.Add(new("http.path", httpContext.Request.Path.ToString()));
                 attributes.Add(new("http.user_agent", httpContext.Request.Headers.UserAgent.ToString()));
-                attributes.Add(new("client.ip", httpContext.Connection.RemoteIpAddress?.ToString() ?? "unknown"));
+                var ip = httpContext.Connection.RemoteIpAddress?.ToString();
+                var forwardedFor = httpContext.Request.Headers["X-Forwarded-For"].ToString();
+                attributes.Add(new("client.ip", ip ?? "unknown"));
+
+                if (!string.IsNullOrEmpty(forwardedFor))
+                {
+                    attributes.Add(new("client.forwarded_for", forwardedFor));
+                }
 
                 if (httpContext.User?.Identity?.IsAuthenticated == true)
                 {
