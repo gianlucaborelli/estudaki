@@ -17,9 +17,12 @@ namespace Estudaki.Modules.Comunications.Application.Commands.CreateContactMessa
     {
         public CreateContactMessageCommandValidator()
         {
-            RuleFor(x => x.Name).NotEmpty();
-            RuleFor(x => x.Email).EmailAddress();
-            RuleFor(x => x.Message).MinimumLength(10);
+            RuleFor(x => x.Name).NotEmpty()
+                .WithMessage("O nome é obrigatório.");
+            RuleFor(x => x.Email).EmailAddress()
+                .WithMessage("O email deve ser válido.");
+            RuleFor(x => x.Message).MinimumLength(10)
+                .WithMessage("A mensagem deve ter pelo menos 10 caracteres.");
         }
     }
 }

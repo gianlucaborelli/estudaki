@@ -1,0 +1,18 @@
+﻿@inherits ContactMessageModalBase
+
+<MudDialog>
+    <DialogContent>
+        <MudForm @ref="Form" @bind-IsValid="Success" @bind-Errors="Errors">
+            <MudTextField @bind-Value="Name" Label="Nome" Required="true" />
+            <MudTextField @bind-Value="Email" Label="Email" Required="true" />
+            <MudTextField @bind-Value="Message" Label="Mensagem" Required="true" Lines="4" />
+            <MudSwitch @bind-Value="CanBeReplied"
+                        Color="Color.Primary"
+                        Label="Autoriza o envio de resposta referente a esta mensagem?" />
+        </MudForm>
+    </DialogContent>
+    <DialogActions>
+        <MudButton OnClick="Cancel">Cancel</MudButton>
+        <MudButton Color="Color.Primary" OnClick="Submit">OK</MudButton>
+    </DialogActions>
+</MudDialog>

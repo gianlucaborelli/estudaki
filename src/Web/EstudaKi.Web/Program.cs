@@ -29,6 +29,7 @@ builder.Services.AddRazorComponents()
 
 builder.Services.AddControllers();
 
+
 var app = builder.Build();
 
 app.UseForwardedHeaders();
