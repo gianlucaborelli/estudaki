@@ -12,7 +12,7 @@ public abstract class BaseRepository<TEntity> : IRepository<TEntity> where TEnti
     protected BaseRepository(IMongoContext context)
     {
         Context = context;
-        DbSet = Context.GetCollection<TEntity>(typeof(TEntity).Name);
+        DbSet = Context.GetCollection<TEntity>();
     }
 
     public virtual void Add(TEntity obj)

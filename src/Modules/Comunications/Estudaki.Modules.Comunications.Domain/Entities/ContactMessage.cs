@@ -1,7 +1,9 @@
-﻿using Estudaki.Commons.Core.Models;
+﻿using Estudaki.Commons.Core.Data;
+using Estudaki.Commons.Core.Models;
 
 namespace Estudaki.Modules.Comunications.Domain.Entities;
 
+[CollectionName("contact_messages")]
 public sealed class ContactMessage: Entity
 {
     public string? UserId { get; private set; }
@@ -13,7 +15,7 @@ public sealed class ContactMessage: Entity
 
     private ContactMessage() { }
 
-    public ContactMessage( string name, string email, string message, bool canBeReplied = false, string? userId = null)
+    public ContactMessage(string name, string email, string message, bool canBeReplied = false, string? userId = null)
     {
         UserId = userId;
         Name = name;

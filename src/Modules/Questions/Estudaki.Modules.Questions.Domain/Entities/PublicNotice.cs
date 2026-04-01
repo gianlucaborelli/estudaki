@@ -1,7 +1,9 @@
+using Estudaki.Commons.Core.Data;
 using Estudaki.Commons.Core.Models;
 
 namespace Estudaki.Modules.Questions.Domain.Entities;
 
+[CollectionName("public_notices")]
 public class PublicNotice : Entity
 {
     public string? Number { get; set; }

@@ -7,16 +7,20 @@ public class MongoContext : IMongoContext
 {
     private readonly IMongoDatabase _database;
 
-    public MongoContext(IConfiguration configuration)
+    public MongoContext(IMongoClient client)
     {
-        var connectionString = configuration.GetConnectionString("DefaultConnection");
         var databaseName = "ProvaOnlineV2";
-        var client = new MongoClient(connectionString);
         _database = client.GetDatabase(databaseName);
     }
 
-    public IMongoCollection<T> GetCollection<T>(string name)
+    public IMongoCollection<T> GetCollection<T>()
     {
-        return _database.GetCollection<T>(name);
+        var collectionName = typeof(T)
+             .GetCustomAttributes(typeof(CollectionNameAttribute), false)
+             .Cast<CollectionNameAttribute>()
+             .FirstOrDefault()?.Name
+             ?? typeof(T).Name;
+
+        return _database.GetCollection<T>(collectionName);
     }
 }

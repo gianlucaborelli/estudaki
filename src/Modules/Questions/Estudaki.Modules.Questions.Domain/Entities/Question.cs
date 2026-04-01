@@ -1,8 +1,10 @@
+using Estudaki.Commons.Core.Data;
 using Estudaki.Commons.Core.Models;
 using Estudaki.Modules.Questions.Domain.ValueObjects;
 
 namespace Estudaki.Modules.Questions.Domain.Entities;
 
+[CollectionName("questions")]
 public class Question : Entity
 {
     public string? PublicNoticeId { get; set; }
