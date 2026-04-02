@@ -32,9 +32,14 @@ public static class ConfigureExtensions
 
         // Storage S3
         services.Configure<StorageSettings>(configuration.GetSection(StorageSettings.SectionName));
-        services.AddSingleton<IAmazonS3>(sp =>
+        services.AddSingleton(sp =>
         {
             var s3Settings = configuration.GetSection(StorageSettings.SectionName).Get<StorageSettings>();
+            return s3Settings ?? new StorageSettings();
+        });
+        services.AddSingleton<IAmazonS3>(sp =>
+        {
+            var s3Settings = sp.GetRequiredService<StorageSettings>();
             var regionEndpoint = RegionEndpoint.GetBySystemName(s3Settings?.Region ?? "us-east-1");
             return new AmazonS3Client(s3Settings?.AccessKey, s3Settings?.SecretKey, regionEndpoint);
         });

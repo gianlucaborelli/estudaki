@@ -1,13 +1,17 @@
 ﻿using Estudaki.Modules.Questions.Application.DTOs;
 using Microsoft.AspNetCore.Components;
+using Microsoft.Extensions.Logging;
 
 namespace EstudaKi.Web.Pages.Features.Questions.Components
 {
 
     public partial class QuestionComponent : ComponentBase
     {
+        [Inject]
+        private ILogger<QuestionComponent> Logger { get; set; } = default!;
+
         [Parameter]
-        public QuestionWithNoticeDto? Value { get; set; }
+        public QuestionDto? Value { get; set; }
 
         protected bool _showAnswers = false;
         protected string? _selectedValue = null;
@@ -34,6 +38,30 @@ namespace EstudaKi.Web.Pages.Features.Questions.Components
         {
             _selectedValue = value;
             _showAnswers = true;
+        }
+
+        protected void OnDownloadExamBooklet()
+        {
+            Logger.LogInformation(
+                "Exam booklet download started - QuestionId: {QuestionId}, PublicNoticeId: {PublicNoticeId}, ExamBoard: {ExamBoard}, Year: {Year}, Url: {Url}",
+                Value?.Id,
+                Value?.PublicNotice?.Id,
+                Value?.PublicNotice?.ExamBoard,
+                Value?.PublicNotice?.Year,
+                Value?.PublicNotice?.ExamBookletUrl
+            );
+        }
+
+        protected void OnDownloadAnswerKey()
+        {
+            Logger.LogInformation(
+                "Answer key download started - QuestionId: {QuestionId}, PublicNoticeId: {PublicNoticeId}, ExamBoard: {ExamBoard}, Year: {Year}, Url: {Url}",
+                Value?.Id,
+                Value?.PublicNotice?.Id,
+                Value?.PublicNotice?.ExamBoard,
+                Value?.PublicNotice?.Year,
+                Value?.PublicNotice?.AnswerKeyUrl
+            );
         }
     }
 }

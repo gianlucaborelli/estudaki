@@ -41,16 +41,16 @@ else
             <MudText Typo="Typo.h6" GutterBottom="true">Buscar mais questões</MudText>
             <MudStack Row="true" Spacing="2" Class="mt-2" Wrap="Wrap.Wrap">
                 <MudChip T="string" Href="@GetAreaSearchLink()" Color="Color.Primary" Variant="Variant.Outlined" Size="Size.Small">
-                    @Question.Question.MainArea
+                    @Question.MainArea
                 </MudChip>
-                @foreach (var subArea in Question.Question.SubAreas.Take(3))
+                @foreach (var subArea in Question.SubAreas.Take(3))
                 {
                     <MudChip T="string" Href="@GetSubAreaSearchLink(subArea)" Color="Color.Secondary" Variant="Variant.Outlined" Size="Size.Small">
                         @subArea
                     </MudChip>
                 }
                 <MudChip T="string" Href="@GetTypeSearchLink()" Color="Color.Tertiary" Variant="Variant.Outlined" Size="Size.Small">
-                    @Question.Question.QuestionType
+                    @Question.QuestionType
                 </MudChip>
             </MudStack>
         </MudPaper>

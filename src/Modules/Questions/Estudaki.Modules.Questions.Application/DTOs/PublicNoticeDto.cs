@@ -9,9 +9,9 @@ public class PublicNoticeDto
     public string? ExamBoard { get; set; }
     public string? Position { get; set; }
     
-    // URLs completas para consumo pelo frontend
     public string? ExamBookletUrl { get; set; }
     public string? AnswerKeyUrl { get; set; }
-    
+    public bool HasAttachments { get; set; }
+
     public DateTime CreatedAt { get; set; }
 }

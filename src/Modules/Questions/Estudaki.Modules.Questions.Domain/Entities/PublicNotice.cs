@@ -21,14 +21,7 @@ public class PublicNotice : Entity
     public int Year { get; set; }
     public string? ExamPhase { get; set; }
     public string? ExamBoard { get; set; }
-    public string? Position { get; set; }
-
-    //Estrutura de armazenamento de arquivos a ser adotado
-    // /files/exams/{year}/{examBoard}/{id}/{id}.pdf
-    public string? ExamBookletURL { get; set; }
-
-    //Estrutura de armazenamento de arquivos a ser adotado
-    // /files/exams/{year}/{examBoard}/{id}/{id}-answer-key.pdf
-    public string? ExamAnswerKeyURL { get; set; }
+    public string? Position { get; set; }    
     public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
+    public bool HasAttachments { get; set; } = false;
 }

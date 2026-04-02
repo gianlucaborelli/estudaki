@@ -19,7 +19,8 @@ public static class PublicNoticeMapper
             Position = notice.Position,
             ExamBookletUrl = notice.GetQuestionFolder(storageService),
             AnswerKeyUrl = notice.GetAnswerKeyFolder(storageService),
-            CreatedAt = notice.CreatedAt
+            CreatedAt = notice.CreatedAt,
+            HasAttachments = notice.HasAttachments
         };
     }
 }

@@ -43,13 +43,12 @@ public partial class ResultBase : ComponentBase
 
     public int TotalPages { get; set; } = 0;
     protected int BoundaryCount { get; set; } = 1;
-    protected QuestionWithNoticeDto[] Questions { get; set; } = [];
+    protected QuestionDto[] Questions { get; set; } = [];
 
     private string _previousParametersHash = string.Empty;
 
     protected override async Task OnParametersSetAsync()
     {
-        // Validação: garante valores mínimos
         if (CurrentPage < 1) CurrentPage = 1;
         if (PageSize < 1) PageSize = 10;
         if (PageSize > 100) PageSize = 100; // Limite máximo para evitar sobrecarga
@@ -78,7 +77,7 @@ public partial class ResultBase : ComponentBase
             };
 
             var searchResult = await _queryDispatcher
-                .DispatchAsync<SearchQuestionsPaginatedQuery, PageResult<QuestionWithNoticeDto>>(new SearchQuestionsPaginatedQuery(searchParameters));
+                .DispatchAsync<SearchQuestionsPaginatedQuery, PageResult<QuestionDto>>(new SearchQuestionsPaginatedQuery(searchParameters));
 
             Questions = [.. searchResult.Items];
             TotalPages = searchResult.TotalPages;

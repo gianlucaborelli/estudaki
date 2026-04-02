@@ -4,33 +4,33 @@ namespace EstudaKi.Web.ViewModels.Mappers;
 
 public static class QuestionViewModelMapper
 {
-    public static QuestionViewModel ToViewModel(this QuestionWithNoticeDto dto)
+    public static QuestionViewModel ToViewModel(this QuestionDto dto)
     {
         return new QuestionViewModel
         {
-            Id = dto.Question.Id,
-            QuestionNumber = dto.Question.QuestionNumber,
-            QuestionType = dto.Question.QuestionType,
-            MainArea = dto.Question.MainArea,
-            SubAreas = dto.Question.SubAreas,
-            CreatedAt = dto.Question.CreatedAt,
-            QuestionContents = dto.Question.QuestionContents,
-            Choices = dto.Question.Choices,
+            Id = dto.Id,
+            QuestionNumber = dto.QuestionNumber,
+            QuestionType = dto.QuestionType,
+            MainArea = dto.MainArea,
+            SubAreas = dto.SubAreas,
+            CreatedAt = dto.CreatedAt,
+            QuestionContents = dto.QuestionContents,
+            Choices = dto.Choices,
             PublicNotice = dto.PublicNotice?.ToViewModel()
         };
     }
 
-    public static IEnumerable<QuestionViewModel> ToViewModels(this IEnumerable<QuestionWithNoticeDto> dtos)
+    public static IEnumerable<QuestionViewModel> ToViewModels(this IEnumerable<QuestionDto> dtos)
     {
         return dtos.Select(dto => dto.ToViewModel());
     }
 
-    public static IEnumerable<QuestionViewModel> ToViewModels(this IReadOnlyList<QuestionWithNoticeDto> dtos)
+    public static IEnumerable<QuestionViewModel> ToViewModels(this IReadOnlyList<QuestionDto> dtos)
     {
         return dtos.Select(dto => dto.ToViewModel());
     }
 
-    public static IEnumerable<QuestionViewModel> ToViewModels(this List<QuestionWithNoticeDto> dtos)
+    public static IEnumerable<QuestionViewModel> ToViewModels(this List<QuestionDto> dtos)
     {
         return dtos.Select(dto => dto.ToViewModel());
     }

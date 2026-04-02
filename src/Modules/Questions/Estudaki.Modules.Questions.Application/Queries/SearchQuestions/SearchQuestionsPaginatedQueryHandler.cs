@@ -1,24 +1,32 @@
 using Estudaki.Commons.Core.CQRS;
+using Estudaki.Commons.Core.Storage;
 using Estudaki.Modules.Questions.Application.DTOs;
+using Estudaki.Modules.Questions.Application.Mappers;
 using Estudaki.Modules.Questions.Domain.Common;
 using Estudaki.Modules.Questions.Domain.Repositories;
 
 namespace Estudaki.Modules.Questions.Application.Queries.SearchQuestions;
 
-public class SearchQuestionsPaginatedQueryHandler : IQueryHandler<SearchQuestionsPaginatedQuery, PageResult<QuestionWithNoticeDto>>
+public class SearchQuestionsPaginatedQueryHandler : IQueryHandler<SearchQuestionsPaginatedQuery, PageResult<QuestionDto>>
 {
     private readonly IQuestionRepository _questionRepository;
     private readonly IPublicNoticeRepository _publicNoticeRepository;
+    private readonly IStorageService _storageService;
+    private readonly StorageSettings _storageSettings;
 
     public SearchQuestionsPaginatedQueryHandler(
         IQuestionRepository questionRepository,
-        IPublicNoticeRepository publicNoticeRepository)
+        IPublicNoticeRepository publicNoticeRepository,
+        IStorageService storageService,
+        StorageSettings storageSettings)
     {
         _questionRepository = questionRepository;
         _publicNoticeRepository = publicNoticeRepository;
+        _storageService = storageService;
+        _storageSettings = storageSettings;
     }
 
-    public async Task<PageResult<QuestionWithNoticeDto>> HandleAsync(SearchQuestionsPaginatedQuery query, CancellationToken cancellationToken = default)
+    public async Task<PageResult<QuestionDto>> HandleAsync(SearchQuestionsPaginatedQuery query, CancellationToken cancellationToken = default)
     {
         var questionsPage = await _questionRepository.FindQuestionsPaginatedAsync(query.SearchParameters);
 
@@ -34,15 +42,16 @@ public class SearchQuestionsPaginatedQueryHandler : IQueryHandler<SearchQuestion
 
         var publicNoticesDict = publicNotices.ToDictionary(pn => pn.Id!);
 
-        var dtos = questionsPage.Items.Select(question => new QuestionWithNoticeDto
+        var dtos = questionsPage.Items.Select(question =>
         {
-            Question = question,
-            PublicNotice = !string.IsNullOrEmpty(question.PublicNoticeId) && publicNoticesDict.ContainsKey(question.PublicNoticeId)
+            var publicNotice = !string.IsNullOrEmpty(question.PublicNoticeId) && publicNoticesDict.ContainsKey(question.PublicNoticeId)
                 ? publicNoticesDict[question.PublicNoticeId]
-                : null
+                : null;
+
+            return question.ToDto(publicNotice, _storageService, _storageSettings);
         }).ToList();
 
-        return new PageResult<QuestionWithNoticeDto>
+        return new PageResult<QuestionDto>
         {
             Items = dtos,
             PageNumber = questionsPage.PageNumber,

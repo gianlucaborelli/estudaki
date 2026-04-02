@@ -10,7 +10,7 @@
                         @Value.PublicNotice.ExamBoard - @Value.PublicNotice.Position @Value.PublicNotice.ExamPhase @Value.PublicNotice.Year
                     </MudText>
                 }
-                <MudButton Href="@($"/question/{Value?.Question.Id}")" 
+                <MudButton Href="@($"/question/{Value?.Id}")" 
                            Variant="Variant.Text" 
                            Color="Color.Primary"
                            Size="Size.Small"
@@ -22,9 +22,9 @@
     </MudCardHeader>
     <MudCardContent>
         @* Renderiza os ContentBlocks (vertical) *@
-        @if (Value?.Question.QuestionContents != null)
+        @if (Value?.QuestionContents != null)
         {
-            foreach (var contentBlock in Value.Question.QuestionContents.OrderBy(c => c.Order))
+            foreach (var contentBlock in Value.QuestionContents.OrderBy(c => c.Order))
             {
                 @if (contentBlock is ParagraphBlock paragraph)
                 {
@@ -66,10 +66,10 @@
         }
 
         @* Renderiza as alternativas *@
-        @if (Value?.Question.Choices != null && Value.Question.Choices.Any())
+        @if (Value?.Choices != null && Value.Choices.Any())
         {
             <MudRadioGroup T="string" Value="_selectedValue" ValueChanged="OnAnswerSelected">
-                @foreach (var choice in Value.Question.Choices)
+                @foreach (var choice in Value.Choices)
                 {
                     string choiceClass = "choice";
 
@@ -109,18 +109,45 @@
         }
     </MudCardContent>
     <MudCardActions>
-        <MudButton Variant="Variant.Outlined"
-                   Color="Color.Primary"
-                   OnClick="ToggleAnswers">
-            @if (_showAnswers)
+        <MudStack Row="true" AlignItems="AlignItems.Center" Style="width:100%;">
+
+            <MudButton Variant="Variant.Outlined"
+                       Color="Color.Primary"
+                       OnClick="ToggleAnswers">
+                @if (_showAnswers)
+                {
+                    @:Ocultar resposta
+                }
+                else
+                {
+                    @:Verificar resposta
+                }
+            </MudButton>
+
+            <MudSpacer />
+
+            @if (Value?.PublicNotice?.HasAttachments == true)
             {
-                @:Ocultar resposta
+                <MudStack Row="true" Spacing="2">
+                    <MudButton Variant="Variant.Outlined"
+                               Color="Color.Primary"
+                               Href="@Value?.PublicNotice?.ExamBookletUrl"
+                               Target="_blank"
+                               OnClick="OnDownloadExamBooklet">
+                        Caderno de Questões
+                    </MudButton>
+
+                    <MudButton Variant="Variant.Outlined"
+                               Color="Color.Primary"
+                               Href="@Value?.PublicNotice?.AnswerKeyUrl"
+                               Target="_blank"
+                               OnClick="OnDownloadAnswerKey">
+                        Gabarito
+                    </MudButton>
+                </MudStack>
             }
-            else
-            {
-                @:Verificar resposta
-            }
-        </MudButton>
+
+        </MudStack>
     </MudCardActions>
 </MudCard>
 
