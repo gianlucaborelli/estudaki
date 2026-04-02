@@ -1,6 +1,10 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <ItemGroup>
+    <PackageReference Include="Microsoft.Extensions.Options" Version="10.0.5" />
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="..\..\..\Core\Estudaki.Commons.Core\Estudaki.Commons.Core.csproj" />
     <ProjectReference Include="..\Estudaki.Modules.Questions.Domain\Estudaki.Modules.Questions.Domain.csproj" />
   </ItemGroup>

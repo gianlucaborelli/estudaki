@@ -21,7 +21,7 @@ builder.Services.AddMudServices();
 builder.Services.AddMudExtensions();
 builder.AddObservability();
 
-builder.Services.AddInfrastructure();
+builder.Services.AddInfrastructure(builder.Configuration);
 
 builder.Services.AddHttpContextAccessor();
 builder.Services.AddRazorComponents()
