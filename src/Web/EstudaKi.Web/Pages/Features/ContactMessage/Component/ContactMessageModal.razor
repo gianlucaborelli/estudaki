@@ -3,9 +3,19 @@
 <MudDialog>
     <DialogContent>
         <MudForm @ref="Form" @bind-IsValid="Success" @bind-Errors="Errors">
-            <MudTextField @bind-Value="Name" Label="Nome" Required="true" />
-            <MudTextField @bind-Value="Email" Label="Email" Required="true" />
-            <MudTextField @bind-Value="Message" Label="Mensagem" Required="true" Lines="4" />
+            <MudTextField @bind-Value="Name" 
+                          Label="Nome" 
+                          Required="true"
+                          Validation="@GetValidationFunc(nameof(Name))" />
+            <MudTextField @bind-Value="Email" 
+                          Label="Email" 
+                          Required="true"
+                          Validation="@GetValidationFunc(nameof(Email))" />
+            <MudTextField @bind-Value="Message" 
+                          Label="Mensagem" 
+                          Required="true" 
+                          Lines="4"
+                          Validation="@GetValidationFunc(nameof(Message))" />
             <MudSwitch @bind-Value="CanBeReplied"
                         Color="Color.Primary"
                         Label="Autoriza o envio de resposta referente a esta mensagem?" />

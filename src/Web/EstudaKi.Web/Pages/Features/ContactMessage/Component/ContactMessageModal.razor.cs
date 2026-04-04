@@ -1,15 +1,19 @@
 ﻿using Estudaki.Commons.Core.CQRS;
 using Estudaki.Modules.Comunications.Application.Commands.CreateContactMessage;
+using EstudaKi.Web.Pages.Commons.Components;
 using FluentValidation.Results;
 using Microsoft.AspNetCore.Components;
 using MudBlazor;
 
 namespace EstudaKi.Web.Pages.Features.ContactMessage.Component
 {
-    public partial class ContactMessageModalBase: ComponentBase
+    public partial class ContactMessageModalBase: ValidatableComponentBase
     {
         [CascadingParameter]
         protected IMudDialogInstance MudDialog { get; set; } = default!;
+        
+        [Inject]
+        protected ISnackbar Snackbar { get; set; } = default!;
 
         [Inject]
         protected ICommandDispatcher CommandDispatcher { get; set; } = default!;
@@ -18,8 +22,7 @@ namespace EstudaKi.Web.Pages.Features.ContactMessage.Component
         protected IHttpContextAccessor HttpContextAccessor { get; set; } = default!;
         
         protected MudForm Form { get; set; } = default!;        
-        protected bool Success { get; set; }        
-        protected string[] Errors { get; set; } = [];
+        protected bool Success { get; set; }
         protected string Name { get; set; } = string.Empty;
         protected string Email { get; set; } = string.Empty;
         protected string Message { get; set; } = string.Empty;
@@ -27,6 +30,8 @@ namespace EstudaKi.Web.Pages.Features.ContactMessage.Component
 
 
         protected async Task Submit() {
+            ClearValidationErrors();
+
             var result = await CommandDispatcher.DispatchAsync<CreateContactMessageCommand, ValidationResult>(new CreateContactMessageCommand
             (
                 Name,
@@ -39,13 +44,15 @@ namespace EstudaKi.Web.Pages.Features.ContactMessage.Component
             if(result.IsValid)
             {
                 Success = true;
-                Errors = [];
                 MudDialog.Close(DialogResult.Ok(true));
+                Snackbar.Add("Mensagem enviada com sucesso!", Severity.Success);
             }
             else
             {
                 Success = false;
-                Errors = result.Errors.Select(e => e.ErrorMessage).ToArray();
+                ProcessValidationErrors(result);
+                await Form.Validate();
+                Snackbar.Add("Falha ao enviar a mensagem!", Severity.Error);
             }
         }
 
