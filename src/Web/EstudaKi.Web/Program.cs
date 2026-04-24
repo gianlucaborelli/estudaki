@@ -1,7 +1,9 @@
+using Estudaki.Commons.Core.Storage;
 using Estudaki.Infrastructure.Crosscutting;
 using Estudaki.Infrastructure.Observability;
 using EstudaKi.Web.Components;
 using Microsoft.AspNetCore.HttpOverrides;
+using Microsoft.Extensions.Options;
 using MudBlazor.Services;
 using MudExtensions.Services;
 
@@ -28,7 +30,6 @@ builder.Services.AddRazorComponents()
     .AddInteractiveServerComponents();
 
 builder.Services.AddControllers();
-
 
 var app = builder.Build();
 

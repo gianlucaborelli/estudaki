@@ -17,7 +17,7 @@ public static class QuestionMapper
             IsPublished = question.IsPublished,
             IsNullified = question.IsNullified,
             QuestionNumber = question.QuestionNumber,
-            QuestionType = question.QuestionType,
+            QuestionType = question.Type,
             MainArea = question.MainArea,
             SubAreas = question.SubAreas,
             QuestionContents = question.QuestionContents,

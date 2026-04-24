@@ -1,4 +1,5 @@
 ﻿using Amazon;
+using Amazon.Runtime;
 using Amazon.S3;
 using Estudaki.Commons.Core.CQRS.Extensions;
 using Estudaki.Commons.Core.Data.Context;
@@ -33,15 +34,24 @@ public static class ConfigureExtensions
         // Storage S3
         services.Configure<StorageSettings>(configuration.GetSection(StorageSettings.SectionName));
         services.AddSingleton(sp =>
-        {
-            var s3Settings = configuration.GetSection(StorageSettings.SectionName).Get<StorageSettings>();
-            return s3Settings ?? new StorageSettings();
-        });
+            sp.GetRequiredService<IOptions<StorageSettings>>().Value);
+
         services.AddSingleton<IAmazonS3>(sp =>
         {
-            var s3Settings = sp.GetRequiredService<StorageSettings>();
-            var regionEndpoint = RegionEndpoint.GetBySystemName(s3Settings?.Region ?? "us-east-1");
-            return new AmazonS3Client(s3Settings?.AccessKey, s3Settings?.SecretKey, regionEndpoint);
+            var storageSettings = configuration.GetSection("AwsS3").Get<StorageSettings>();
+            if (storageSettings == null)
+                throw new InvalidOperationException("AWS S3 configuration not found in appsettings.json");
+
+            var credentials = new BasicAWSCredentials(storageSettings.AccessKey, storageSettings.SecretKey);
+            var config = new AmazonS3Config
+            {
+                ServiceURL = storageSettings.Region,
+                ForcePathStyle = true,
+                UseHttp = false,
+                Timeout = TimeSpan.FromMinutes(10)
+            };
+
+            return new AmazonS3Client(credentials, config);
         });
         services.AddScoped<IStorageService, S3StorageService>();
 

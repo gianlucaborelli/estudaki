@@ -1,0 +1,262 @@
+/* Estilos para MathEditor e MathInline */
+
+/* Container do editor matemático */
+.math-editor-container {
+    margin: 0.5rem 0;
+    padding: 0.75rem;
+    border: 1px solid #dee2e6;
+    border-radius: 0.375rem;
+    background-color: #f8f9fa;
+}
+
+/* Preview da fórmula matemática */
+.math-preview {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 60px;
+    background-color: white;
+    border: 1px solid #dee2e6;
+    border-radius: 0.25rem;
+    padding: 1rem;
+}
+
+/* Aumentar tamanho da fórmula renderizada */
+.math-preview .mq-math-mode {
+    font-size: 1.3em !important;
+    color: #212529 !important;
+}
+
+/* Editor matemático inline (dentro de alternativas) */
+.math-inline-editor {
+    margin: 0.5rem 0;
+    padding: 0.5rem;
+    background-color: #f8f9fa;
+    border-radius: 0.25rem;
+}
+
+/* Preview menor para inline */
+.math-inline-editor .math-preview {
+    min-height: 50px;
+    font-size: 1.1em;
+}
+
+/* Estilo para fórmulas renderizadas no conteúdo */
+.rendered-math {
+    display: inline-block;
+    margin: 0 0.25rem;
+    padding: 0.125rem 0.375rem;
+    background-color: #f8f9fa;
+    border-radius: 0.25rem;
+    font-size: 1.1em;
+}
+
+/* MathQuill customization */
+.mq-editable-field {
+    border: 1px solid #ced4da !important;
+    border-radius: 0.25rem !important;
+    padding: 0.5rem !important;
+    min-height: 50px !important;
+}
+
+.mq-editable-field:focus {
+    border-color: #86b7fe !important;
+    outline: 0 !important;
+    box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.25) !important;
+}
+
+/* Cursor matemático */
+.mq-cursor {
+    border-left-color: #0d6efd !important;
+}
+
+/* Melhorar contraste de fórmulas - cor preta padrão */
+.mq-math-mode {
+    color: #212529 !important;
+}
+
+.mq-math-mode * {
+    color: #212529 !important;
+}
+
+/* Badge para indicar tipo Math */
+.badge-math {
+    background-color: #6f42c1;
+    color: white;
+}
+
+/* Container de inline content com Math */
+.inline-content-item.math-type {
+    border-left: 3px solid #6f42c1;
+}
+
+/* Fórmula matemática renderizada inline (para visualização) */
+.math-inline-display {
+    display: inline;
+    margin: 0;
+    padding: 0;
+    background-color: transparent;
+    border: none;
+    vertical-align: baseline;
+}
+
+.math-inline-display .mq-math-mode {
+    font-size: 1em !important;
+    color: #212529 !important; /* Mesma cor do texto normal */
+}
+
+/* Remover espaçamentos internos do MathQuill para inline */
+.math-inline-display .mq-root-block {
+    padding: 0 !important;
+}
+
+/* Preview da fórmula no editor - mantém estilo visual */
+.math-preview .mq-math-mode {
+    font-size: 1.3em !important;
+    color: #212529 !important; /* Cor preta normal */
+}
+
+/* Animação suave ao adicionar Math */
+@keyframes fadeInMath {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.math-editor-container {
+    animation: fadeInMath 0.3s ease-out;
+}
+
+/* Responsividade */
+@media (max-width: 768px) {
+    .math-preview {
+        font-size: 0.9em;
+    }
+
+    .math-editor-container {
+        padding: 0.5rem;
+    }
+}
+
+/* Dark mode support (opcional) */
+@media (prefers-color-scheme: dark) {
+    .math-editor-container {
+        background-color: #2d3748;
+        border-color: #4a5568;
+    }
+
+    .math-preview {
+        background-color: #1a202c;
+        border-color: #4a5568;
+        color: #e2e8f0;
+    }
+
+    .mq-math-mode {
+        color: #e2e8f0 !important;
+    }
+}
+
+/* =====================================================
+   ESTILOS PARA FÓRMULAS QUÍMICAS (ChemicalFormulaInline)
+   ===================================================== */
+
+/* Container do editor de fórmulas químicas */
+.chemical-editor-container {
+    margin: 0.5rem 0;
+    padding: 0.75rem;
+    border: 1px solid #dee2e6;
+    border-radius: 0.375rem;
+    background-color: #f8f9fa;
+    animation: fadeInMath 0.3s ease-out;
+}
+
+/* Preview da fórmula química */
+.chemical-preview {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 50px;
+    background-color: white;
+    border: 1px solid #dee2e6;
+    border-radius: 0.25rem;
+    padding: 1rem;
+}
+
+/* Fórmula química renderizada inline (para visualização) */
+.chemical-inline-display {
+    display: inline;
+    margin: 0;
+    padding: 0;
+    background-color: transparent;
+    border: none;
+    vertical-align: baseline;
+    visibility: visible !important;
+    opacity: 1 !important;
+}
+
+.chemical-inline-display .katex {
+    font-size: 1em !important;
+    color: #212529 !important;
+    display: inline !important;
+    line-height: normal !important;
+}
+
+.chemical-inline-display .katex * {
+    color: #212529 !important;
+}
+
+/* Garantir que elementos KaTeX sejam visíveis */
+.chemical-inline-display .katex-html {
+    display: inline-block !important;
+    visibility: visible !important;
+}
+
+/* Esconder o "X" fantasma do mhchem */
+.chemical-inline-display .mord.rlap {
+    display: none !important;
+}
+
+/* Esconder phantom X */
+.chemical-inline-display .mord.rlap .mord[style*="transparent"] {
+    display: none !important;
+}
+
+/* Ajustes do KaTeX para fórmulas químicas */
+.chemical-preview .katex {
+    font-size: 1.2em !important;
+    color: #212529 !important;
+}
+
+/* Responsividade para fórmulas químicas */
+@media (max-width: 768px) {
+    .chemical-preview {
+        font-size: 0.9em;
+    }
+
+    .chemical-editor-container {
+        padding: 0.5rem;
+    }
+}
+
+/* Dark mode para fórmulas químicas */
+@media (prefers-color-scheme: dark) {
+    .chemical-editor-container {
+        background-color: #2d3748;
+        border-color: #4a5568;
+    }
+
+    .chemical-preview {
+        background-color: #1a202c;
+        border-color: #4a5568;
+    }
+
+    .chemical-inline-display .katex,
+    .chemical-preview .katex {
+        color: #e2e8f0 !important;
+    }
+}

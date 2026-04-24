@@ -28,7 +28,15 @@
     <link rel="icon" type="image/ico" href="favicon.ico" />
     <HeadOutlet @rendermode="InteractiveServer" />
 
-    <script src="themeHelper.js"></script>            
+    <script src="themeHelper.js"></script>           
+    @* MathQuill CSS *@
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/mathquill/0.10.1/mathquill.min.css" />
+
+    @* KaTeX CSS (for chemical formulas with mhchem) *@
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css" />
+
+    @* Custom MathInline CSS *@
+    <link rel="stylesheet" href="css/mathinline.css" />
 
     @* Google Ads *@
     @* <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-9306950234366060" *@
@@ -62,6 +70,25 @@
 
 <body>
     <Routes @rendermode="InteractiveServer" />
+
+    @* jQuery (required by MathQuill) *@
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+
+    @* MathQuill JS *@
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/mathquill/0.10.1/mathquill.min.js"></script>
+
+    @* KaTeX JS (for chemical formulas) *@
+    <script src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+
+    @* mhchem extension for KaTeX - DEVE ser carregado logo após KaTeX *@
+    <script src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/mhchem.min.js"></script>
+
+    @* MathQuill Helper *@
+    <script src="js/mathquill-helper.js"></script>
+
+    @* Chemical Formula Helper - DEVE ser carregado por último *@
+    <script src="js/chemical-helper.js" defer></script>
+
     <script src="_framework/blazor.web.js"></script>
     <script src=@Assets["_content/MudBlazor/MudBlazor.min.js"]></script>
 </body>

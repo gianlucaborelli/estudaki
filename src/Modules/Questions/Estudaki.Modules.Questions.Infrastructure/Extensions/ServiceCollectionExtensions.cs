@@ -18,6 +18,8 @@ public static class ServiceCollectionExtensions
 
         services.AddScoped<IQuestionRepository, QuestionRepository>();
         services.AddScoped<IPublicNoticeRepository, PublicNoticeRepository>();
+        services.AddScoped<IQuestionSupportRepository, QuestionSupportRepository>();
+        services.AddScoped<IExamProcessingMetadataRepository, ExamProcessingMetadataRepository>();
 
         services.AddCQRSHandlers(typeof(GetQuestionByIdQueryHandler).Assembly);        
         services.AddCQRSHandlers(typeof(GetFilterParametersQueryHandler).Assembly);

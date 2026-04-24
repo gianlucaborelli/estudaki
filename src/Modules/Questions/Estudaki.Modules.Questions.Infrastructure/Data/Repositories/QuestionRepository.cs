@@ -21,7 +21,7 @@ public class QuestionRepository : BaseRepository<Question>, IQuestionRepository
         var filters = new List<FilterDefinition<Question>>();
 
         if (filterParameters.TypeQuestions is { Length: > 0 })
-            filters.Add(builder.In(q => q.QuestionType, filterParameters.TypeQuestions));
+            filters.Add(builder.In(q => q.Type, filterParameters.TypeQuestions));
 
         if (filterParameters.MainAreas is { Length: > 0 })
             filters.Add(builder.In(q => q.MainArea, filterParameters.MainAreas));
@@ -56,7 +56,7 @@ public class QuestionRepository : BaseRepository<Question>, IQuestionRepository
         }
 
         if (searchParameter.TypeQuestions is { Length: > 0 })
-            filters.Add(filterBuilder.In(q => q.QuestionType, searchParameter.TypeQuestions));
+            filters.Add(filterBuilder.In(q => q.Type, searchParameter.TypeQuestions));
 
         if (searchParameter.MainAreas is { Length: > 0 })
             filters.Add(filterBuilder.In(q => q.MainArea, searchParameter.MainAreas));
