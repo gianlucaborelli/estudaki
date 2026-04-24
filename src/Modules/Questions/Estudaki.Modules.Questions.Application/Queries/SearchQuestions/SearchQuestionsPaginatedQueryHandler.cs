@@ -11,17 +11,20 @@ public class SearchQuestionsPaginatedQueryHandler : IQueryHandler<SearchQuestion
 {
     private readonly IQuestionRepository _questionRepository;
     private readonly IPublicNoticeRepository _publicNoticeRepository;
+    private readonly IQuestionSupportRepository _questionSupportRepository;
     private readonly IStorageService _storageService;
     private readonly StorageSettings _storageSettings;
 
     public SearchQuestionsPaginatedQueryHandler(
         IQuestionRepository questionRepository,
         IPublicNoticeRepository publicNoticeRepository,
+        IQuestionSupportRepository questionSupportRepository,
         IStorageService storageService,
         StorageSettings storageSettings)
     {
         _questionRepository = questionRepository;
         _publicNoticeRepository = publicNoticeRepository;
+        _questionSupportRepository = questionSupportRepository;
         _storageService = storageService;
         _storageSettings = storageSettings;
     }
@@ -42,13 +45,33 @@ public class SearchQuestionsPaginatedQueryHandler : IQueryHandler<SearchQuestion
 
         var publicNoticesDict = publicNotices.ToDictionary(pn => pn.Id!);
 
+        // Buscar todos os QuestionSupports necessários
+        var allQuestionSupportIds = questionsPage.Items
+            .Where(q => q.QuestionSupports != null && q.QuestionSupports.Any())
+            .SelectMany(q => q.QuestionSupports)
+            .Distinct()
+            .ToList();
+
+        var questionSupports = allQuestionSupportIds.Any()
+            ? await _questionSupportRepository.GetByIds(allQuestionSupportIds)
+            : [];
+
+        var questionSupportsDict = questionSupports.ToDictionary(qs => qs.Id!);
+
         var dtos = questionsPage.Items.Select(question =>
         {
             var publicNotice = !string.IsNullOrEmpty(question.PublicNoticeId) && publicNoticesDict.ContainsKey(question.PublicNoticeId)
                 ? publicNoticesDict[question.PublicNoticeId]
                 : null;
 
-            return question.ToDto(publicNotice, _storageService, _storageSettings);
+            var supports = question.QuestionSupports != null && question.QuestionSupports.Any()
+                ? question.QuestionSupports
+                    .Where(id => questionSupportsDict.ContainsKey(id))
+                    .Select(id => questionSupportsDict[id])
+                    .ToList()
+                : null;
+
+            return question.ToDto(publicNotice, supports, _storageService, _storageSettings);
         }).ToList();
 
         return new PageResult<QuestionDto>

@@ -7,6 +7,7 @@ public class QuestionDto
     public string Id { get; set; } = string.Empty;
     public string? PublicNoticeId { get; set; }
     public PublicNoticeDto? PublicNotice { get; set; }
+    public List<QuestionSupportDto> QuestionSupports { get; set; } = [];
     public DateTime CreatedAt { get; set; }
     public bool IsPublished { get; set; }
     public bool? IsNullified { get; set; }

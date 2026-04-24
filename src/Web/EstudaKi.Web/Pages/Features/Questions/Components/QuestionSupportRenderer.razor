@@ -1,0 +1,63 @@
+@using Estudaki.Modules.Questions.Domain.ValueObjects
+@using Estudaki.Modules.Questions.Application.DTOs
+@using Estudaki.Modules.Questions.Domain.Entities
+@using Estudaki.Modules.Questions.Domain.Extensions
+@using Estudaki.Commons.Core.Storage
+@inject IStorageService StorageService
+
+@if (QuestionSupport != null && QuestionSupport.Contents.Any())
+{
+    @foreach (var contentBlock in QuestionSupport.Contents.OrderBy(c => c.Order))
+    {
+        @if (contentBlock is ParagraphBlock paragraph)
+        {
+            <MudText Align="Align.Justify" Class="mb-3">
+                @foreach (var inline in paragraph.Inlines)
+                {
+                    <InlineContentRenderer Inline="@inline" PublicNotice="@PublicNotice" />
+                }
+            </MudText>
+        }
+        else if (contentBlock is ImageBlock imageBlock)
+        {
+            <div class="mb-3">
+                <img src="@GetImageUrl(imageBlock.Key)" 
+                     alt="@imageBlock.Title" 
+                     style="max-width: 100%; height: auto; display: block;" />
+                @if (!string.IsNullOrEmpty(imageBlock.Title))
+                {
+                    <MudText Typo="Typo.caption" Align="Align.Center" Class="mt-1">@imageBlock.Title</MudText>
+                }
+                @if (!string.IsNullOrEmpty(imageBlock.Source))
+                {
+                    <MudText Typo="Typo.caption" Align="Align.Center" Color="Color.Secondary">Fonte: @imageBlock.Source</MudText>
+                }
+            </div>
+        }
+    }
+}
+
+@code {
+    [Parameter]
+    public QuestionSupportDto? QuestionSupport { get; set; }
+
+    [Parameter]
+    public PublicNoticeDto? PublicNotice { get; set; }
+
+    private string GetImageUrl(string key)
+    {
+        if (PublicNotice == null)
+        {
+            return $"/api/images/{key}";
+        }
+
+        var notice = new PublicNotice
+        {
+            Id = PublicNotice.Id,
+            Year = PublicNotice.Year,
+            ExamBoard = PublicNotice.ExamBoard ?? string.Empty
+        };
+
+        return notice.GetImageUrl(key, StorageService);
+    }
+}

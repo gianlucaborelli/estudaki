@@ -21,6 +21,15 @@
         </CardHeaderContent>
     </MudCardHeader>
     <MudCardContent>
+        @* Renderiza os QuestionSupports (textos de apoio) antes do conteúdo da questão *@
+        @if (Value?.QuestionSupports != null && Value.QuestionSupports.Any())
+        {
+            foreach (var questionSupport in Value.QuestionSupports)
+            {
+                <QuestionSupportRenderer QuestionSupport="@questionSupport" PublicNotice="@Value.PublicNotice" />
+            }
+        }
+
         @* Renderiza os ContentBlocks (vertical) *@
         @if (Value?.QuestionContents != null)
         {
