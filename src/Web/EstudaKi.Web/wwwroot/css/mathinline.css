@@ -70,13 +70,13 @@
     border-left-color: #0d6efd !important;
 }
 
-/* Melhorar contraste de fórmulas - cor preta padrão */
+/* Melhorar contraste de fórmulas - herda cor do texto pai */
 .mq-math-mode {
-    color: #212529 !important;
+    color: inherit !important;
 }
 
 .mq-math-mode * {
-    color: #212529 !important;
+    color: inherit !important;
 }
 
 /* Badge para indicar tipo Math */
@@ -102,7 +102,7 @@
 
 .math-inline-display .mq-math-mode {
     font-size: 1em !important;
-    color: #212529 !important; /* Mesma cor do texto normal */
+    color: inherit !important; /* Herda cor do texto pai */
 }
 
 /* Remover espaçamentos internos do MathQuill para inline */
@@ -113,7 +113,7 @@
 /* Preview da fórmula no editor - mantém estilo visual */
 .math-preview .mq-math-mode {
     font-size: 1.3em !important;
-    color: #212529 !important; /* Cor preta normal */
+    color: #212529 !important; /* Cor preta normal para preview no editor */
 }
 
 /* Animação suave ao adicionar Math */
@@ -156,7 +156,8 @@
         color: #e2e8f0;
     }
 
-    .mq-math-mode {
+    /* No dark mode, preview mantém cor específica para melhor contraste */
+    .math-preview .mq-math-mode {
         color: #e2e8f0 !important;
     }
 }
@@ -201,13 +202,13 @@
 
 .chemical-inline-display .katex {
     font-size: 1em !important;
-    color: #212529 !important;
+    color: inherit !important; /* Herda cor do texto pai */
     display: inline !important;
     line-height: normal !important;
 }
 
 .chemical-inline-display .katex * {
-    color: #212529 !important;
+    color: inherit !important; /* Herda cor do texto pai */
 }
 
 /* Garantir que elementos KaTeX sejam visíveis */
@@ -255,8 +256,9 @@
         border-color: #4a5568;
     }
 
-    .chemical-inline-display .katex,
-    .chemical-preview .katex {
+    /* No dark mode, preview mantém cor específica para melhor contraste */
+    .chemical-preview .katex,
+    .chemical-preview .katex * {
         color: #e2e8f0 !important;
     }
 }

@@ -11,26 +11,36 @@
     {
         @if (contentBlock is ParagraphBlock paragraph)
         {
-            <MudText Align="Align.Justify" Class="mb-3">
-                @foreach (var inline in paragraph.Inlines)
+            <div class="mb-3">
+                @if (!string.IsNullOrEmpty(paragraph.Title))
                 {
-                    <InlineContentRenderer Inline="@inline" PublicNotice="@PublicNotice" />
+                    <MudText Typo="Typo.subtitle2" Align="Align.Center" Class="mb-2 fw-bold">@paragraph.Title</MudText>
                 }
-            </MudText>
+                <MudText Align="Align.Justify">
+                    @foreach (var inline in paragraph.Inlines)
+                    {
+                        <InlineContentRenderer Inline="@inline" PublicNotice="@PublicNotice" />
+                    }
+                </MudText>
+                @if (!string.IsNullOrEmpty(paragraph.Source))
+                {
+                    <MudText Typo="Typo.caption" Align="Align.Right" Color="Color.Secondary" Class="mt-1">Fonte: @paragraph.Source</MudText>
+                }
+            </div>
         }
         else if (contentBlock is ImageBlock imageBlock)
         {
             <div class="mb-3">
-                <img src="@GetImageUrl(imageBlock.Key)" 
-                     alt="@imageBlock.Title" 
-                     style="max-width: 100%; height: auto; display: block;" />
                 @if (!string.IsNullOrEmpty(imageBlock.Title))
                 {
-                    <MudText Typo="Typo.caption" Align="Align.Center" Class="mt-1">@imageBlock.Title</MudText>
+                    <MudText Typo="Typo.subtitle2" Align="Align.Center" Class="mb-2 fw-bold">@imageBlock.Title</MudText>
                 }
+                <img src="@GetImageUrl(imageBlock.Key)" 
+                     alt="@imageBlock.Title" 
+                     style="max-width: 100%; height: auto; display: block; margin: 0 auto;" />
                 @if (!string.IsNullOrEmpty(imageBlock.Source))
                 {
-                    <MudText Typo="Typo.caption" Align="Align.Center" Color="Color.Secondary">Fonte: @imageBlock.Source</MudText>
+                    <MudText Typo="Typo.caption" Align="Align.Right" Color="Color.Secondary" Class="mt-1">Fonte: @imageBlock.Source</MudText>
                 }
             </div>
         }
