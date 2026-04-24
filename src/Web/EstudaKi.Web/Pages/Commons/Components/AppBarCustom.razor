@@ -63,16 +63,20 @@
             <MudGrid Class="mt-2">
 
                 <MudItem xs="12" md="4">
-                    <MudSelectExtended T="string" Class="my-custom-textfield"
-                                       ItemCollection="_questionType"
-                                       @bind-SelectedValues="_questionTypeSelected"
-                                       MultiSelection="true"
-                                       Label="Tipo de Prova"
-                                       Variant="Variant.Outlined"
-                                       Margin="Margin.Dense"
-                                       Clearable="true"
-                                       AnchorOrigin="Origin.BottomCenter"
-                                       TransformOrigin="Origin.TopCenter" />
+                    <MudSelect T="string" Class="my-custom-textfield"
+                               @bind-SelectedValues="_questionTypeSelected"
+                               MultiSelection="true"
+                               Label="Tipo de Prova"
+                               Variant="Variant.Outlined"
+                               Margin="Margin.Dense"
+                               Clearable="true"
+                               AnchorOrigin="Origin.BottomCenter"
+                               TransformOrigin="Origin.TopCenter">
+                        @foreach (var type in _questionTypeDisplay)
+                        {
+                            <MudSelectItem T="string" Value="@type.Value">@type.DisplayName</MudSelectItem>
+                        }
+                    </MudSelect>
                 </MudItem>
 
                 <MudItem xs="12" md="4">

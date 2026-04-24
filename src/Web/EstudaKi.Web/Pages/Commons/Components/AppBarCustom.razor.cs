@@ -1,6 +1,7 @@
 ﻿using Estudaki.Commons.Core.CQRS;
 using Estudaki.Modules.Questions.Application.Queries.GetFilterParameters;
 using Estudaki.Modules.Questions.Domain.Common;
+using EstudaKi.Web.Helpers;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.WebUtilities;
 using MudBlazor;
@@ -52,6 +53,7 @@ namespace EstudaKi.Web.Pages.Commons.Components
         protected string _wordKey { get; set; } = string.Empty;
 
         protected string[] _questionType { get; set; } = [];
+        protected List<(string Value, string DisplayName)> _questionTypeDisplay { get; set; } = [];
         protected IEnumerable<string> _questionTypeSelected { get; set; } = [];
 
         protected string[] _mainArea { get; set; } = [];
@@ -82,8 +84,11 @@ namespace EstudaKi.Web.Pages.Commons.Components
                         .DispatchAsync<GetFilterParametersQuery, FilterParameters>(new GetFilterParametersQuery(filterParameters));
 
             _questionType = filterParameters.TypeQuestions.ToArray();
+            _questionTypeDisplay = QuestionTypeHelper.GetDisplayList(_questionType);
             _mainArea = filterParameters.MainAreas.ToArray();
             _subArea = filterParameters.SubAreas.ToArray();
+            
+            StateHasChanged();
         }
 
         protected override async Task OnInitializedAsync()

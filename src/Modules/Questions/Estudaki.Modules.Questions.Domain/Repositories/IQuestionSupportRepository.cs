@@ -1,10 +1,5 @@
 ﻿using Estudaki.Commons.Core.Data.Repository;
 using Estudaki.Modules.Questions.Domain.ValueObjects;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Estudaki.Modules.Questions.Domain.Repositories
 {

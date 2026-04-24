@@ -31,17 +31,25 @@ public class QuestionRepository : BaseRepository<Question>, IQuestionRepository
 
         var combinedFilter = filters.Any() ? builder.And(filters) : builder.Empty;
 
-        var typeQuestionsTask = DbSet.DistinctAsync<string>("QuestionType", combinedFilter);
+        var typeQuestionsTask = DbSet.DistinctAsync<string>("Type", combinedFilter);
         var mainAreasTask = DbSet.DistinctAsync<string>("MainArea", combinedFilter);
         var subAreasTask = DbSet.DistinctAsync<string>("SubAreas", combinedFilter);
 
         await Task.WhenAll(typeQuestionsTask, mainAreasTask, subAreasTask);
 
+        var typeQuestions = await typeQuestionsTask;
+        var mainAreas = await mainAreasTask;
+        var subAreas = await subAreasTask;
+
+        var typeQuestionsList = await typeQuestions.ToListAsync();
+        var mainAreasList = await mainAreas.ToListAsync();
+        var subAreasList = await subAreas.ToListAsync();
+
         return new FilterParameters
         {
-            TypeQuestions = [.. (await typeQuestionsTask.Result.ToListAsync())],
-            MainAreas = [.. (await mainAreasTask.Result.ToListAsync())],
-            SubAreas = [.. (await subAreasTask.Result.ToListAsync())]
+            TypeQuestions = [.. typeQuestionsList],
+            MainAreas = [.. mainAreasList],
+            SubAreas = [.. subAreasList]
         };
     }
 
