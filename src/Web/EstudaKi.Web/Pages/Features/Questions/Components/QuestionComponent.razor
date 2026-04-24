@@ -32,17 +32,7 @@
                         @* Renderiza os InlineContents (horizontal) *@
                         @foreach (var inline in paragraph.Inlines)
                         {
-                            @if (inline is TextInline textInline)
-                            {
-                                <span style="@GetTextStyle(textInline)">@textInline.Text</span>
-                            }
-                            else if (inline is ImageInline imageInline)
-                            {
-                                <img src="@GetImageUrl(imageInline.Key)" 
-                                     alt="@imageInline.Alt" 
-                                     style="max-width: 100%; height: auto; display: inline-block; vertical-align: middle;"
-                                     class="mx-2" />
-                            }
+                            <InlineContentRenderer Inline="@inline" />
                         }
                     </MudText>
                 }
@@ -89,17 +79,7 @@
                                 @* Renderiza o conteúdo da alternativa (horizontal) *@
                                 @foreach (var inline in choice.Content)
                                 {
-                                    @if (inline is TextInline textInline)
-                                    {
-                                        <span style="@GetTextStyle(textInline)">@textInline.Text</span>
-                                    }
-                                    else if (inline is ImageInline imageInline)
-                                    {
-                                        <img src="@GetImageUrl(imageInline.Key)" 
-                                             alt="@imageInline.Alt" 
-                                             style="max-width: 100%; height: auto; display: inline-block; vertical-align: middle;"
-                                             class="mx-2" />
-                                    }
+                                    <InlineContentRenderer Inline="@inline" />
                                 }
                             </MudText>
                         </MudRadio>
@@ -151,24 +131,3 @@
     </MudCardActions>
 </MudCard>
 
-@code {
-    private string GetTextStyle(TextInline textInline)
-    {
-        var styles = new List<string>();
-        
-        if (textInline.Bold)
-            styles.Add("font-weight: bold");
-            
-        if (textInline.Italic)
-            styles.Add("font-style: italic");
-            
-        return string.Join("; ", styles);
-    }
-
-    private string GetImageUrl(string key)
-    {
-        // TODO: Implementar lógica de storage (S3, Azure Blob, etc.)
-        // Por enquanto retorna um placeholder ou URL local
-        return $"/api/images/{key}";
-    }
-}

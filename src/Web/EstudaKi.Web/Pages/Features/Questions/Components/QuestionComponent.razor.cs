@@ -63,5 +63,12 @@ namespace EstudaKi.Web.Pages.Features.Questions.Components
                 Value?.PublicNotice?.AnswerKeyUrl
             );
         }
+
+        private string GetImageUrl(string key)
+        {
+            // TODO: Implementar lógica de storage (S3, Azure Blob, etc.)
+            // Por enquanto retorna um placeholder ou URL local
+            return $"/api/images/{key}";
+        }
     }
 }

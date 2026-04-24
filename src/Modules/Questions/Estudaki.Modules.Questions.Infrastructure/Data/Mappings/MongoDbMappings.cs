@@ -53,6 +53,8 @@ public static class MongoDbMappings
             cm.SetIsRootClass(true);
             cm.AddKnownType(typeof(TextInline));
             cm.AddKnownType(typeof(ImageInline));
+            cm.AddKnownType(typeof(MathInline));
+            cm.AddKnownType(typeof(ChemicalFormulaInline));
         });
 
         BsonClassMap.RegisterClassMap<TextInline>(cm =>
@@ -65,6 +67,18 @@ public static class MongoDbMappings
         {
             cm.AutoMap();
             cm.SetDiscriminator("ImageInline");
+        });
+
+        BsonClassMap.RegisterClassMap<MathInline>(cm =>
+        {
+            cm.AutoMap();
+            cm.SetDiscriminator("MathInline");
+        });
+
+        BsonClassMap.RegisterClassMap<ChemicalFormulaInline>(cm =>
+        {
+            cm.AutoMap();
+            cm.SetDiscriminator("ChemicalFormulaInline");
         });
 
         BsonClassMap.RegisterClassMap<Choice>(cm =>
