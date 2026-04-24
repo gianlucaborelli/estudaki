@@ -23,6 +23,22 @@ public class QuestionRepository : BaseRepository<Question>, IQuestionRepository
         if (filterParameters.TypeQuestions is { Length: > 0 })
             filters.Add(builder.In(q => q.Type, filterParameters.TypeQuestions));
 
+        if (filterParameters.ExamCategories is { Length: > 0 })
+        {
+            // Precisamos filtrar por PublicNoticeId que tenham a categoria desejada
+            var publicNoticeBuilder = Builders<PublicNotice>.Filter;
+            var categoryFilter = publicNoticeBuilder.In(pn => pn.ExamCategory, filterParameters.ExamCategories);
+
+            var publicNoticesCollection = Context.GetCollection<PublicNotice>();
+            var publicNoticeIdsForFilter = await publicNoticesCollection
+                .Find(categoryFilter)
+                .Project(pn => pn.Id)
+                .ToListAsync();
+
+            if (publicNoticeIdsForFilter.Any())
+                filters.Add(builder.In(q => q.PublicNoticeId, publicNoticeIdsForFilter));
+        }
+
         if (filterParameters.MainAreas is { Length: > 0 })
             filters.Add(builder.In(q => q.MainArea, filterParameters.MainAreas));
 
@@ -31,23 +47,41 @@ public class QuestionRepository : BaseRepository<Question>, IQuestionRepository
 
         var combinedFilter = filters.Any() ? builder.And(filters) : builder.Empty;
 
+        // Buscar valores distintos das questões
         var typeQuestionsTask = DbSet.DistinctAsync<string>("Type", combinedFilter);
         var mainAreasTask = DbSet.DistinctAsync<string>("MainArea", combinedFilter);
         var subAreasTask = DbSet.DistinctAsync<string>("SubAreas", combinedFilter);
 
-        await Task.WhenAll(typeQuestionsTask, mainAreasTask, subAreasTask);
+        // Buscar PublicNoticeIds distintos das questões filtradas
+        var publicNoticeIdsTask = DbSet.DistinctAsync<string>("PublicNoticeId", combinedFilter);
+
+        await Task.WhenAll(typeQuestionsTask, mainAreasTask, subAreasTask, publicNoticeIdsTask);
 
         var typeQuestions = await typeQuestionsTask;
         var mainAreas = await mainAreasTask;
         var subAreas = await subAreasTask;
+        var publicNoticeIds = await publicNoticeIdsTask;
 
         var typeQuestionsList = await typeQuestions.ToListAsync();
         var mainAreasList = await mainAreas.ToListAsync();
         var subAreasList = await subAreas.ToListAsync();
+        var publicNoticeIdsList = await publicNoticeIds.ToListAsync();
+
+        // Buscar ExamCategories distintas dos PublicNotices relacionados às questões
+        var examCategoriesList = new List<string>();
+        if (publicNoticeIdsList.Any())
+        {
+            var publicNoticesCollection = Context.GetCollection<PublicNotice>();
+            var publicNoticeFilter = Builders<PublicNotice>.Filter.In(pn => pn.Id, publicNoticeIdsList);
+            var examCategoriesCursor = await publicNoticesCollection
+                .DistinctAsync<string>("ExamCategory", publicNoticeFilter);
+            examCategoriesList = await examCategoriesCursor.ToListAsync();
+        }
 
         return new FilterParameters
         {
             TypeQuestions = [.. typeQuestionsList],
+            ExamCategories = [.. examCategoriesList],
             MainAreas = [.. mainAreasList],
             SubAreas = [.. subAreasList]
         };
@@ -65,6 +99,22 @@ public class QuestionRepository : BaseRepository<Question>, IQuestionRepository
 
         if (searchParameter.TypeQuestions is { Length: > 0 })
             filters.Add(filterBuilder.In(q => q.Type, searchParameter.TypeQuestions));
+
+        if (searchParameter.ExamCategories is { Length: > 0 })
+        {
+            // Filtrar por PublicNoticeId que tenham a categoria desejada
+            var publicNoticeBuilder = Builders<PublicNotice>.Filter;
+            var categoryFilter = publicNoticeBuilder.In(pn => pn.ExamCategory, searchParameter.ExamCategories);
+
+            var publicNoticesCollection = Context.GetCollection<PublicNotice>();
+            var publicNoticeIds = await publicNoticesCollection
+                .Find(categoryFilter)
+                .Project(pn => pn.Id)
+                .ToListAsync();
+
+            if (publicNoticeIds.Any())
+                filters.Add(filterBuilder.In(q => q.PublicNoticeId, publicNoticeIds));
+        }
 
         if (searchParameter.MainAreas is { Length: > 0 })
             filters.Add(filterBuilder.In(q => q.MainArea, searchParameter.MainAreas));

@@ -31,6 +31,9 @@ public partial class ResultBase : ComponentBase
     [SupplyParameterFromQuery(Name = "types")]
     public string? TypeQuestionsParam { get; set; }
 
+    [SupplyParameterFromQuery(Name = "categories")]
+    public string? ExamCategoriesParam { get; set; }
+
     [SupplyParameterFromQuery(Name = "areas")]
     public string? MainAreasParam { get; set; }
 
@@ -38,6 +41,7 @@ public partial class ResultBase : ComponentBase
     public string? SubAreasParam { get; set; }
 
     protected string[] TypeQuestions => TypeQuestionsParam?.Split(',', StringSplitOptions.RemoveEmptyEntries) ?? [];
+    protected string[] ExamCategories => ExamCategoriesParam?.Split(',', StringSplitOptions.RemoveEmptyEntries) ?? [];
     protected string[] MainAreas => MainAreasParam?.Split(',', StringSplitOptions.RemoveEmptyEntries) ?? [];
     protected string[] SubAreas => SubAreasParam?.Split(',', StringSplitOptions.RemoveEmptyEntries) ?? [];
 
@@ -53,7 +57,7 @@ public partial class ResultBase : ComponentBase
         if (PageSize < 1) PageSize = 10;
         if (PageSize > 100) PageSize = 100; // Limite máximo para evitar sobrecarga
 
-        var currentHash = $"{CurrentPage}|{PageSize}|{WordKey}|{TypeQuestionsParam}|{MainAreasParam}|{SubAreasParam}";
+        var currentHash = $"{CurrentPage}|{PageSize}|{WordKey}|{TypeQuestionsParam}|{ExamCategoriesParam}|{MainAreasParam}|{SubAreasParam}";
 
         if (_previousParametersHash != currentHash)
         {
@@ -72,6 +76,7 @@ public partial class ResultBase : ComponentBase
                 PageSize = PageSize,
                 WordKey = WordKey,
                 TypeQuestions = TypeQuestions,
+                ExamCategories = ExamCategories,
                 MainAreas = MainAreas,
                 SubAreas = SubAreas
             };
@@ -112,6 +117,9 @@ public partial class ResultBase : ComponentBase
 
         if (TypeQuestions.Length > 0)
             queryParams["types"] = string.Join(",", TypeQuestions);
+
+        if (ExamCategories.Length > 0)
+            queryParams["categories"] = string.Join(",", ExamCategories);
 
         if (MainAreas.Length > 0)
             queryParams["areas"] = string.Join(",", MainAreas);

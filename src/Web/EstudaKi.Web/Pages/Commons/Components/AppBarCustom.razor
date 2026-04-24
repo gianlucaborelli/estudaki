@@ -62,11 +62,11 @@
         <MudCollapse Expanded="_showFilters">
             <MudGrid Class="mt-2">
 
-                <MudItem xs="12" md="4">
+                <MudItem xs="12" md="3">
                     <MudSelect T="string" Class="my-custom-textfield"
                                @bind-SelectedValues="_questionTypeSelected"
                                MultiSelection="true"
-                               Label="Tipo de Prova"
+                               Label="Tipo de Questão"
                                Variant="Variant.Outlined"
                                Margin="Margin.Dense"
                                Clearable="true"
@@ -79,7 +79,24 @@
                     </MudSelect>
                 </MudItem>
 
-                <MudItem xs="12" md="4">
+                <MudItem xs="12" md="3">
+                    <MudSelect T="string" Class="my-custom-textfield"
+                               @bind-SelectedValues="_examCategorySelected"
+                               MultiSelection="true"
+                               Label="Tipo de Prova"
+                               Variant="Variant.Outlined"
+                               Margin="Margin.Dense"
+                               Clearable="true"
+                               AnchorOrigin="Origin.BottomCenter"
+                               TransformOrigin="Origin.TopCenter">
+                        @foreach (var category in _examCategoryDisplay)
+                        {
+                            <MudSelectItem T="string" Value="@category.Value">@category.DisplayName</MudSelectItem>
+                        }
+                    </MudSelect>
+                </MudItem>
+
+                <MudItem xs="12" md="3">
                     <MudSelectExtended T="string" Class="my-custom-textfield my-custom-select"
                                        ItemCollection="_mainArea"
                                        @bind-SelectedValues="_mainAreaSelected"
@@ -92,7 +109,7 @@
                                        TransformOrigin="Origin.TopCenter" />
                 </MudItem>
 
-                <MudItem xs="12" md="4">
+                <MudItem xs="12" md="3">
                     <MudSelectExtended T="string" Class="my-custom-textfield"
                                        ItemCollection="_subArea"
                                        @bind-SelectedValues="_subAreaSelected"

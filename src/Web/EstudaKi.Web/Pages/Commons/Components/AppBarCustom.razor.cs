@@ -56,6 +56,10 @@ namespace EstudaKi.Web.Pages.Commons.Components
         protected List<(string Value, string DisplayName)> _questionTypeDisplay { get; set; } = [];
         protected IEnumerable<string> _questionTypeSelected { get; set; } = [];
 
+        protected string[] _examCategory { get; set; } = [];
+        protected List<(string Value, string DisplayName)> _examCategoryDisplay { get; set; } = [];
+        protected IEnumerable<string> _examCategorySelected { get; set; } = [];
+
         protected string[] _mainArea { get; set; } = [];
         protected IEnumerable<string> _mainAreaSelected { get; set; } = [];
 
@@ -76,6 +80,7 @@ namespace EstudaKi.Web.Pages.Commons.Components
             var filterParameters = new FilterParameters
             {
                 TypeQuestions = _questionTypeSelected?.ToArray() ?? Array.Empty<string>(),
+                ExamCategories = _examCategorySelected?.ToArray() ?? Array.Empty<string>(),
                 MainAreas = _mainAreaSelected?.ToArray() ?? Array.Empty<string>(),
                 SubAreas = _subAreaSelected?.ToArray() ?? Array.Empty<string>()
             };
@@ -85,9 +90,13 @@ namespace EstudaKi.Web.Pages.Commons.Components
 
             _questionType = filterParameters.TypeQuestions.ToArray();
             _questionTypeDisplay = QuestionTypeHelper.GetDisplayList(_questionType);
+
+            _examCategory = filterParameters.ExamCategories.ToArray();
+            _examCategoryDisplay = ExamCategoryHelper.GetDisplayList(_examCategory);
+
             _mainArea = filterParameters.MainAreas.ToArray();
             _subArea = filterParameters.SubAreas.ToArray();
-            
+
             StateHasChanged();
         }
 
@@ -125,6 +134,10 @@ namespace EstudaKi.Web.Pages.Commons.Components
             var types = _questionTypeSelected?.ToArray() ?? [];
             if (types.Length > 0)
                 queryParams["types"] = string.Join(",", types);
+
+            var categories = _examCategorySelected?.ToArray() ?? [];
+            if (categories.Length > 0)
+                queryParams["categories"] = string.Join(",", categories);
 
             var areas = _mainAreaSelected?.ToArray() ?? [];
             if (areas.Length > 0)
