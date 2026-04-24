@@ -1,4 +1,5 @@
-﻿@inherits AppBarCustomBase
+﻿@using EstudaKi.Web.Helpers
+@inherits AppBarCustomBase
 
 <style>
     .my-custom-textfield .mud-icon-root.mud-svg-icon {
@@ -71,7 +72,8 @@
                                Margin="Margin.Dense"
                                Clearable="true"
                                AnchorOrigin="Origin.BottomCenter"
-                               TransformOrigin="Origin.TopCenter">
+                               TransformOrigin="Origin.TopCenter"
+                               ToStringFunc="@(value => QuestionTypeHelper.GetDisplayName(value))">
                         @foreach (var type in _questionTypeDisplay)
                         {
                             <MudSelectItem T="string" Value="@type.Value">@type.DisplayName</MudSelectItem>
@@ -88,7 +90,8 @@
                                Margin="Margin.Dense"
                                Clearable="true"
                                AnchorOrigin="Origin.BottomCenter"
-                               TransformOrigin="Origin.TopCenter">
+                               TransformOrigin="Origin.TopCenter"
+                               ToStringFunc="@(value => ExamCategoryHelper.GetDisplayName(value))">
                         @foreach (var category in _examCategoryDisplay)
                         {
                             <MudSelectItem T="string" Value="@category.Value">@category.DisplayName</MudSelectItem>

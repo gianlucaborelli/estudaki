@@ -20,14 +20,20 @@ public class QuestionRepository : BaseRepository<Question>, IQuestionRepository
         var builder = Builders<Question>.Filter;
         var filters = new List<FilterDefinition<Question>>();
 
+        // Filtrar apenas questões publicadas
+        filters.Add(builder.Eq(q => q.IsPublished, true));
+
         if (filterParameters.TypeQuestions is { Length: > 0 })
             filters.Add(builder.In(q => q.Type, filterParameters.TypeQuestions));
 
         if (filterParameters.ExamCategories is { Length: > 0 })
         {
-            // Precisamos filtrar por PublicNoticeId que tenham a categoria desejada
+            // Filtrar por PublicNoticeId que tenham a categoria desejada E que estejam publicados
             var publicNoticeBuilder = Builders<PublicNotice>.Filter;
-            var categoryFilter = publicNoticeBuilder.In(pn => pn.ExamCategory, filterParameters.ExamCategories);
+            var categoryFilter = publicNoticeBuilder.And(
+                publicNoticeBuilder.In(pn => pn.ExamCategory, filterParameters.ExamCategories),
+                publicNoticeBuilder.Eq(pn => pn.IsPublished, true)
+            );
 
             var publicNoticesCollection = Context.GetCollection<PublicNotice>();
             var publicNoticeIdsForFilter = await publicNoticesCollection
@@ -47,7 +53,7 @@ public class QuestionRepository : BaseRepository<Question>, IQuestionRepository
 
         var combinedFilter = filters.Any() ? builder.And(filters) : builder.Empty;
 
-        // Buscar valores distintos das questões
+        // Buscar valores distintos das questões publicadas
         var typeQuestionsTask = DbSet.DistinctAsync<string>("Type", combinedFilter);
         var mainAreasTask = DbSet.DistinctAsync<string>("MainArea", combinedFilter);
         var subAreasTask = DbSet.DistinctAsync<string>("SubAreas", combinedFilter);
@@ -67,12 +73,15 @@ public class QuestionRepository : BaseRepository<Question>, IQuestionRepository
         var subAreasList = await subAreas.ToListAsync();
         var publicNoticeIdsList = await publicNoticeIds.ToListAsync();
 
-        // Buscar ExamCategories distintas dos PublicNotices relacionados às questões
+        // Buscar ExamCategories distintas dos PublicNotices relacionados às questões (apenas publicados)
         var examCategoriesList = new List<string>();
         if (publicNoticeIdsList.Any())
         {
             var publicNoticesCollection = Context.GetCollection<PublicNotice>();
-            var publicNoticeFilter = Builders<PublicNotice>.Filter.In(pn => pn.Id, publicNoticeIdsList);
+            var publicNoticeFilter = Builders<PublicNotice>.Filter.And(
+                Builders<PublicNotice>.Filter.In(pn => pn.Id, publicNoticeIdsList),
+                Builders<PublicNotice>.Filter.Eq(pn => pn.IsPublished, true)
+            );
             var examCategoriesCursor = await publicNoticesCollection
                 .DistinctAsync<string>("ExamCategory", publicNoticeFilter);
             examCategoriesList = await examCategoriesCursor.ToListAsync();
@@ -102,9 +111,12 @@ public class QuestionRepository : BaseRepository<Question>, IQuestionRepository
 
         if (searchParameter.ExamCategories is { Length: > 0 })
         {
-            // Filtrar por PublicNoticeId que tenham a categoria desejada
+            // Filtrar por PublicNoticeId que tenham a categoria desejada E que estejam publicados
             var publicNoticeBuilder = Builders<PublicNotice>.Filter;
-            var categoryFilter = publicNoticeBuilder.In(pn => pn.ExamCategory, searchParameter.ExamCategories);
+            var categoryFilter = publicNoticeBuilder.And(
+                publicNoticeBuilder.In(pn => pn.ExamCategory, searchParameter.ExamCategories),
+                publicNoticeBuilder.Eq(pn => pn.IsPublished, true)
+            );
 
             var publicNoticesCollection = Context.GetCollection<PublicNotice>();
             var publicNoticeIds = await publicNoticesCollection
