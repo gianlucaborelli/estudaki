@@ -1,6 +1,11 @@
 @using Microsoft.JSInterop
 @using Estudaki.Modules.Questions.Domain.ValueObjects
+@using Estudaki.Modules.Questions.Application.DTOs
+@using Estudaki.Modules.Questions.Domain.Extensions
+@using Estudaki.Modules.Questions.Domain.Entities
+@using Estudaki.Commons.Core.Storage
 @inject IJSRuntime JSRuntime
+@inject IStorageService StorageService
 
 @* Renderiza o conteúdo inline (TextInline, ImageInline, MathInline, ChemicalFormulaInline) *@
 @if (Inline is TextInline textInline)
@@ -9,10 +14,19 @@
 }
 else if (Inline is ImageInline imageInline)
 {
-    <img src="@GetImageUrl(imageInline.Key)" 
-         alt="@imageInline.Alt" 
-         class="img-fluid rounded mx-1" 
-         style="max-height: 300px; display: inline-block; vertical-align: middle;" />
+    @if (PublicNotice != null && !string.IsNullOrEmpty(imageInline.Key))
+    {
+        <img src="@GetImageUrl(imageInline.Key)" 
+             alt="@imageInline.Alt" 
+             class="img-fluid rounded mx-1" 
+             style="max-height: 300px; display: inline-block; vertical-align: middle;" />
+    }
+    else
+    {
+        <span class="badge bg-secondary mx-1">
+            <i class="bi bi-image"></i> @imageInline.Key
+        </span>
+    }
 }
 else if (Inline is MathInline mathInline)
 {
@@ -31,6 +45,9 @@ else
 @code {
     [Parameter]
     public InlineContent? Inline { get; set; }
+
+    [Parameter]
+    public PublicNoticeDto? PublicNotice { get; set; }
 
     private string mathElementId = string.Empty;
     private string chemicalElementId = string.Empty;
@@ -122,8 +139,19 @@ else
 
     private string GetImageUrl(string key)
     {
-        // TODO: Implementar lógica de storage (S3, Azure Blob, etc.)
-        // Por enquanto retorna um placeholder ou URL local
-        return $"/api/images/{key}";
+        if (PublicNotice == null)
+        {
+            return $"/api/images/{key}";
+        }
+
+        // Criar um PublicNotice a partir do DTO para usar a extension
+        var notice = new PublicNotice
+        {
+            Id = PublicNotice.Id,
+            Year = PublicNotice.Year,
+            ExamBoard = PublicNotice.ExamBoard ?? string.Empty
+        };
+
+        return notice.GetImageUrl(key, StorageService);
     }
 }

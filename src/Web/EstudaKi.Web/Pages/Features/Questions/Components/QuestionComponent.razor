@@ -32,7 +32,7 @@
                         @* Renderiza os InlineContents (horizontal) *@
                         @foreach (var inline in paragraph.Inlines)
                         {
-                            <InlineContentRenderer Inline="@inline" />
+                            <InlineContentRenderer Inline="@inline" PublicNotice="@Value.PublicNotice" />
                         }
                     </MudText>
                 }
@@ -79,7 +79,7 @@
                                 @* Renderiza o conteúdo da alternativa (horizontal) *@
                                 @foreach (var inline in choice.Content)
                                 {
-                                    <InlineContentRenderer Inline="@inline" />
+                                    <InlineContentRenderer Inline="@inline" PublicNotice="@Value.PublicNotice" />
                                 }
                             </MudText>
                         </MudRadio>

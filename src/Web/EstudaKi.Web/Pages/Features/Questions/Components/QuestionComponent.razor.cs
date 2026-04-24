@@ -1,4 +1,7 @@
 ﻿using Estudaki.Modules.Questions.Application.DTOs;
+using Estudaki.Modules.Questions.Domain.Entities;
+using Estudaki.Modules.Questions.Domain.Extensions;
+using Estudaki.Commons.Core.Storage;
 using Microsoft.AspNetCore.Components;
 using Microsoft.Extensions.Logging;
 
@@ -9,6 +12,9 @@ namespace EstudaKi.Web.Pages.Features.Questions.Components
     {
         [Inject]
         private ILogger<QuestionComponent> Logger { get; set; } = default!;
+
+        [Inject]
+        private IStorageService StorageService { get; set; } = default!;
 
         [Parameter]
         public QuestionDto? Value { get; set; }
@@ -66,9 +72,20 @@ namespace EstudaKi.Web.Pages.Features.Questions.Components
 
         private string GetImageUrl(string key)
         {
-            // TODO: Implementar lógica de storage (S3, Azure Blob, etc.)
-            // Por enquanto retorna um placeholder ou URL local
-            return $"/api/images/{key}";
+            if (Value?.PublicNotice == null)
+            {
+                return $"/api/images/{key}";
+            }
+
+            // Criar um PublicNotice a partir do DTO para usar a extension
+            var notice = new PublicNotice
+            {
+                Id = Value.PublicNotice.Id,
+                Year = Value.PublicNotice.Year,
+                ExamBoard = Value.PublicNotice.ExamBoard ?? string.Empty
+            };
+
+            return notice.GetImageUrl(key, StorageService);
         }
     }
 }

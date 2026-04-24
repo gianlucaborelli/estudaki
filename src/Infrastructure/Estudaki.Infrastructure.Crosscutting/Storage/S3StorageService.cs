@@ -19,7 +19,7 @@ public class S3StorageService : IStorageService
     
     public string GetFileUrl()
     {
-        // Completa o caminho com base na configuração
-        return $"{_settings.BaseUrl.TrimEnd('/')}/{_settings.ExamsFolder.TrimStart('/')}";
-    }    
+        // Retorna apenas a URL base do bucket
+        return _settings.BaseUrl.TrimEnd('/');
+    }
 }
