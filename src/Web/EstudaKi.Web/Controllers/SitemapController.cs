@@ -2,6 +2,7 @@ using Estudaki.Commons.Core.CQRS;
 using Estudaki.Modules.Questions.Application.DTOs;
 using Estudaki.Modules.Questions.Application.Queries.SearchQuestions;
 using Estudaki.Modules.Questions.Domain.Common;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Text;
 
@@ -9,6 +10,7 @@ namespace EstudaKi.Controllers
 {
     [Route("[controller]")]
     [ApiController]
+    [AllowAnonymous]
     public class SitemapController : ControllerBase
     {
         protected IQueryDispatcher _queryDispatcher { get; set; } = default!;

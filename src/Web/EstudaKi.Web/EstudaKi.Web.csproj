@@ -11,16 +11,21 @@
 
 
   <ItemGroup>
-    <PackageReference Include="CodeBeam.MudBlazor.Extensions" Version="8.2.0" />
-    <PackageReference Include="Microsoft.VisualStudio.Azure.Containers.Tools.Targets" Version="1.21.0" />
-    <PackageReference Include="MongoDB.Driver" Version="3.7.1" />
-    <PackageReference Include="MudBlazor" Version="8.*" />
+	  <PackageReference Include="Microsoft.AspNetCore.Diagnostics.EntityFrameworkCore" Version="9.*" />
+	  <PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="9.*" />
+	  <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="9.*" />
+	  <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="9.*" />
+	  <PackageReference Include="MudBlazor" Version="8.*" />
+	  <PackageReference Include="CodeBeam.MudBlazor.Extensions" Version="8.2.0" />
+	  <PackageReference Include="MongoDB.Driver" Version="3.7.1" />
+	  <PackageReference Include="Extensions.MudBlazor.StaticInput" Version="3.*" />
+	  <PackageReference Include="Npgsql" Version="10.0.2" />
+	  <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="9.0.4" />
   </ItemGroup>
 
-
-  <ItemGroup>
-    <ProjectReference Include="..\..\Infrastructure\Estudaki.Infrastructure.Crosscutting\Estudaki.Infrastructure.Crosscutting.csproj" />
-    <ProjectReference Include="..\..\Infrastructure\Estudaki.Infrastructure.Observability\Estudaki.Infrastructure.Observability.csproj" />
-    <ProjectReference Include="..\..\Modules\Questions\Estudaki.Modules.Questions.Infrastructure\Estudaki.Modules.Questions.Infrastructure.csproj" />
-  </ItemGroup>
+	<ItemGroup>
+		<ProjectReference Include="..\..\Infrastructure\Estudaki.Infrastructure.Crosscutting\Estudaki.Infrastructure.Crosscutting.csproj" />
+		<ProjectReference Include="..\..\Infrastructure\Estudaki.Infrastructure.Observability\Estudaki.Infrastructure.Observability.csproj" />
+		<ProjectReference Include="..\..\Modules\Identity\Estudaki.Modules.Identity.Domain\Estudaki.Modules.Identity.Domain.csproj" />
+	</ItemGroup>
 </Project>

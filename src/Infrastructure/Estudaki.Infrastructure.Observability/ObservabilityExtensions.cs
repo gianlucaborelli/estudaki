@@ -21,7 +21,7 @@ public static class ObservabilityExtensions
 
     public static void UseObservability(this WebApplication app)
     {
-        app.UseErrorLogging();
-        app.UseMiddleware<ObservabilityMiddleware>();
+        //app.UseErrorLogging();
+        //app.UseMiddleware<ObservabilityMiddleware>();
     }
 }

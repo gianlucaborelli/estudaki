@@ -100,7 +100,7 @@ public class QuestionRepository : BaseRepository<Question>, IQuestionRepository
     {
         var filterBuilder = Builders<Question>.Filter;
         var filters = new List<FilterDefinition<Question>>();
-
+        
         if (searchParameter.IsPublished)
         {
             filters.Add(filterBuilder.Eq(q => q.IsPublished, true));

@@ -1,5 +1,4 @@
-﻿using Amazon;
-using Amazon.Runtime;
+﻿using Amazon.Runtime;
 using Amazon.S3;
 using Estudaki.Commons.Core.CQRS.Extensions;
 using Estudaki.Commons.Core.Data.Context;
@@ -7,6 +6,7 @@ using Estudaki.Commons.Core.Storage;
 using Estudaki.Infrastructure.Crosscutting.Storage;
 using Estudaki.Modules.Comunications.Infrastructure.Extensions;
 using Estudaki.Modules.Questions.Infrastructure.Extensions;
+using Estudaki.Modules.Identity.Infrastructure;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
@@ -58,5 +58,6 @@ public static class ConfigureExtensions
         // Modules
         services.AddQuestionsModule();
         services.AddComunicationsInfrastructure();
+        services.AddIdentityModule(configuration);  
     }
 }

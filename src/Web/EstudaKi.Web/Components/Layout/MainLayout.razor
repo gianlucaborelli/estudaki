@@ -1,0 +1,27 @@
+﻿@using Estudaki.Infrastructure.Observability.Helpers
+@using EstudaKi.Web.Components.Layout.Components
+@inherits MainLayoutPage
+@inject NavigationTracker Tracker
+
+<MudThemeProvider Theme="@_theme" IsDarkMode="_isDarkMode" />
+<MudPopoverProvider />
+<MudDialogProvider />
+<MudSnackbarProvider />
+<CascadingValue Value="this">
+<CascadingValue Value="_theme" Name="Theme">
+<CascadingValue Value="_isDarkMode" Name="IsDarkModeValue">
+<MudLayout>
+    <AppBarCustom @bind-IsDarkMode="_isDarkMode" />
+    <MudBreakpointProvider OnBreakpointChanged="OnBreakpointChanged" />
+    <MudMainContent Class="pa-4">
+        <MudGrid>
+            <MudItem xs="12" md="12">                
+                @Body                
+            </MudItem>            
+        </MudGrid>
+        <AppFooter />
+    </MudMainContent>
+</MudLayout>
+</CascadingValue>
+</CascadingValue>
+</CascadingValue>

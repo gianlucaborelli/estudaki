@@ -18,6 +18,7 @@
   <ItemGroup>
     <ProjectReference Include="..\..\Core\Estudaki.Commons.Core\Estudaki.Commons.Core.csproj" />
     <ProjectReference Include="..\..\Modules\Comunications\Estudaki.Modules.Comunications.Infrastructure\Estudaki.Modules.Comunications.Infrastructure.csproj" />
+    <ProjectReference Include="..\..\Modules\Identity\Estudaki.Modules.Identity.Infrastructure\Estudaki.Modules.Identity.Infrastructure.csproj" />
     <ProjectReference Include="..\..\Modules\Questions\Estudaki.Modules.Questions.Infrastructure\Estudaki.Modules.Questions.Infrastructure.csproj" />
   </ItemGroup>
 

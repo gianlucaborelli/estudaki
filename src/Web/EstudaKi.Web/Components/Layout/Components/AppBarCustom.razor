@@ -1,0 +1,184 @@
+﻿@using EstudaKi.Web.Helpers
+@using MudExtensions
+
+@inherits AppBarCustomBase
+
+<style>
+    .my-custom-textfield .mud-icon-root.mud-svg-icon {
+        fill: #b0b6a8 !important;
+    }
+
+    .my-custom-textfield .mud-input-outlined-border {
+        border-radius: 24px !important;
+        border-width: 2.4px !important;
+        border-color: #b0b6a8 !important;       
+    }
+
+    .my-custom-textfield .mud-input-root {
+        color: #b0b6a8 !important;
+        font-weight: 800 !important;
+    }
+
+    .my-custom-textfield .mud-input-label,
+    .my-custom-textfield .mud-input-label-text {
+        color: #b0b6a8 !important;
+    }
+</style>
+
+@if (_showFilters)
+{
+    <div @onclick="CloseFilters" style="position: fixed; top: 0; left: 0; right: 0; bottom: 0; z-index: 1;"></div>
+}
+
+<MudPaper Elevation="2" Style="@AppBarStyle" @onclick:stopPropagation="true">
+    <MudContainer MaxWidth="MaxWidth.Large" Class="pa-4">
+
+        <MudStack Row="true" AlignItems="AlignItems.Center" Spacing="2" Justify="Justify.SpaceBetween">
+
+            <!-- ESQUERDA -->
+            <MudText Typo="Typo.h5" Class="pa-2">EstudaKi</MudText>
+
+            <!-- CENTRO -->
+            <div style="flex: 1; max-width: 600px;">
+                <MudTextField Class="my-custom-textfield"
+                              @bind-Value="_wordKey"
+                              Placeholder="Buscar questões..."
+                              Adornment="Adornment.Start"
+                              AdornmentIcon="@Icons.Material.Filled.Search"
+                              Variant="Variant.Outlined"
+                              Margin="Margin.Dense"
+                              FullWidth="true"
+                              Clearable="true"
+                              OnKeyDown="@(e => { if (e.Key == "Enter") SearchQuestions(); })" />
+            </div>
+
+            <!-- DIREITA -->
+            <MudStack Row="true" AlignItems="AlignItems.Center" Spacing="1">
+
+                <DarkModeToggleSwitch IsDarkMode="@IsDarkMode" IsDarkModeChanged="@OnDarkModeChanged" />
+
+                <AuthorizeView>
+                    <Authorized>
+                        <MudNavLink Href="Account/Manage" Match="NavLinkMatch.Prefix"
+                                    Icon="@Icons.Material.Filled.Person">
+                            @context.User.Identity?.Name
+                        </MudNavLink>
+
+                        <form action="Account/Logout" method="post" class="d-flex align-center">
+                            <AntiforgeryToken />
+                            <input type="hidden" name="ReturnUrl" value="@currentUrl" />
+
+                            <button type="submit" class="mud-nav-link mud-ripple d-flex align-center">
+                                <MudIcon Icon="@Icons.Material.Filled.Logout"
+                                         Color="Color.Info"
+                                         Class="mr-1" />
+                                Logout
+                            </button>
+                        </form>
+                    </Authorized>
+
+                    <NotAuthorized>
+                        <MudNavLink Href="Account/Register"
+                                    Match="NavLinkMatch.Prefix"
+                                    Icon="@Icons.Material.Filled.Person">
+                            Register
+                        </MudNavLink>
+
+                        <MudNavLink Href="Account/Login"
+                                    Match="NavLinkMatch.Prefix"
+                                    Icon="@Icons.Material.Filled.Password">
+                            Login
+                        </MudNavLink>
+                    </NotAuthorized>
+                </AuthorizeView>
+
+            </MudStack>
+
+        </MudStack>
+
+        <div class="d-flex justify-center mt-1">
+            <MudButton Variant="Variant.Text"
+                       Class="pa-0"
+                       OnClick="ToggleFilters">
+                @(_showFilters ? "Ocultar filtros" : "Mostrar filtros")
+            </MudButton>
+        </div>
+
+        <MudCollapse Expanded="_showFilters">
+            <MudGrid Class="mt-2">
+
+                <MudItem xs="12" md="3">
+                    <MudSelect T="string" Class="my-custom-textfield"
+                               @bind-SelectedValues="_questionTypeSelected"
+                               MultiSelection="true"
+                               Label="Tipo de Questão"
+                               Variant="Variant.Outlined"
+                               Margin="Margin.Dense"
+                               Clearable="true"
+                               AnchorOrigin="Origin.BottomCenter"
+                               TransformOrigin="Origin.TopCenter"
+                               ToStringFunc="@(value => QuestionTypeHelper.GetDisplayName(value))">
+                        @foreach (var type in _questionTypeDisplay)
+                        {
+                            <MudSelectItem T="string" Value="@type.Value">@type.DisplayName</MudSelectItem>
+                        }
+                    </MudSelect>
+                </MudItem>
+
+                <MudItem xs="12" md="3">
+                    <MudSelect T="string" Class="my-custom-textfield"
+                               @bind-SelectedValues="_examCategorySelected"
+                               MultiSelection="true"
+                               Label="Tipo de Prova"
+                               Variant="Variant.Outlined"
+                               Margin="Margin.Dense"
+                               Clearable="true"
+                               AnchorOrigin="Origin.BottomCenter"
+                               TransformOrigin="Origin.TopCenter"
+                               ToStringFunc="@(value => ExamCategoryHelper.GetDisplayName(value))">
+                        @foreach (var category in _examCategoryDisplay)
+                        {
+                            <MudSelectItem T="string" Value="@category.Value">@category.DisplayName</MudSelectItem>
+                        }
+                    </MudSelect>
+                </MudItem>
+
+                <MudItem xs="12" md="3">
+                    <MudSelectExtended T="string" Class="my-custom-textfield my-custom-select"
+                                       ItemCollection="_mainArea"
+                                       @bind-SelectedValues="_mainAreaSelected"
+                                       MultiSelection="true"          
+                                       Label="Área de conhecimento"
+                                       Variant="Variant.Outlined"
+                                       Margin="Margin.Dense"
+                                       Clearable="true"
+                                       AnchorOrigin="Origin.BottomCenter"
+                                       TransformOrigin="Origin.TopCenter" />
+                </MudItem>
+
+                <MudItem xs="12" md="3">
+                    <MudSelectExtended T="string" Class="my-custom-textfield"
+                                       ItemCollection="_subArea"
+                                       @bind-SelectedValues="_subAreaSelected"
+                                       MultiSelection="true"
+                                       OnClearButtonClick="LoadingFilterParameters"
+                                       OnClose="LoadingFilterParameters"
+                                       Label="Subárea"
+                                       Variant="Variant.Outlined"
+                                       Margin="Margin.Dense"
+                                       Clearable="true"
+                                       AnchorOrigin="Origin.BottomCenter"
+                                       TransformOrigin="Origin.TopCenter" />
+                </MudItem>
+
+                <MudItem xs="12" Class="d-flex justify-center mt-2">
+                    <MudButton Variant="Variant.Outlined"
+                               StartIcon="@Icons.Material.Filled.Search"                               
+                               OnClick="SearchQuestions">
+                        Pesquisar
+                    </MudButton>
+                </MudItem>
+            </MudGrid>
+        </MudCollapse>
+    </MudContainer>
+</MudPaper>

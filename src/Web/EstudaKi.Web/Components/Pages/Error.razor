@@ -1,0 +1,99 @@
+﻿@page "/Error"
+@page "/Error/{code:int}"
+@using System.Diagnostics
+
+<PageTitle>Erro - EstudaKi</PageTitle>
+
+<HeadContent>
+    <meta name="robots" content="noindex, nofollow" />
+    <meta name="googlebot" content="noindex, nofollow" />
+</HeadContent>
+
+<MudContainer MaxWidth="MaxWidth.Medium" Class="mt-10">
+    <MudPaper Class="pa-8" Elevation="2">
+        <MudStack AlignItems="AlignItems.Center" Spacing="4">
+            <MudIcon Icon="@Icons.Material.Filled.Error" Color="Color.Error" Size="Size.Large" Style="font-size: 80px;" />
+
+            <MudText Typo="Typo.h4" Align="Align.Center">
+                Ops! Algo deu errado
+            </MudText>
+
+            <MudText Typo="Typo.body1" Align="Align.Center" Color="Color.Secondary">
+                @GetErrorMessage()
+            </MudText>
+
+            @if (!string.IsNullOrEmpty(TraceId))
+            {
+                <MudDivider />
+
+                <MudStack Spacing="2" Class="full-width">
+                    <MudText Typo="Typo.body2" Align="Align.Center" Color="Color.Default">
+                        Código de rastreamento:
+                    </MudText>
+                    <MudChip T="string"
+                             Color="Color.Default"
+                             Variant="Variant.Outlined"
+                             Size="Size.Medium"
+                             Label="true">
+                        @TraceId
+                    </MudChip>
+                    <MudText Typo="Typo.caption" Align="Align.Center" Color="Color.Secondary">
+                        Forneça este código ao suporte se precisar de ajuda.
+                    </MudText>
+                </MudStack>
+            }
+
+            <MudDivider />
+
+            <MudStack Row="true" Spacing="2" Class="mt-4">
+                <MudButton Variant="Variant.Filled"
+                           Color="Color.Primary"
+                           StartIcon="@Icons.Material.Filled.Home"
+                           Href="/">
+                    Voltar para o Início
+                </MudButton>
+                <MudButton Variant="Variant.Outlined"
+                           Color="Color.Primary"
+                           StartIcon="@Icons.Material.Filled.Refresh"
+                           OnClick="@(() => NavigationManager.Refresh(true))">
+                    Tentar Novamente
+                </MudButton>
+            </MudStack>
+        </MudStack>
+    </MudPaper>
+</MudContainer>
+
+@code {
+    [CascadingParameter]
+    private HttpContext? HttpContext { get; set; }
+
+    [Parameter]
+    public int? Code { get; set; }
+
+    [Inject]
+    private NavigationManager NavigationManager { get; set; } = default!;
+
+    private string? TraceId { get; set; }
+
+    protected override void OnInitialized()
+    {
+        TraceId = Activity.Current?.Id ?? HttpContext?.TraceIdentifier;
+    }
+
+    private string GetErrorMessage()
+    {
+        return Code switch
+        {
+            400 => "Solicitação inválida. Verifique os dados enviados.",
+            401 => "Você precisa estar autenticado para acessar este recurso.",
+            403 => "Você não tem permissão para acessar este recurso.",
+            404 => "A página que você procura não foi encontrada.",
+            408 => "A solicitação demorou muito tempo. Tente novamente.",
+            500 => "Ocorreu um erro interno no servidor. Nossa equipe já foi notificada.",
+            502 => "Serviço temporariamente indisponível. Tente novamente em instantes.",
+            503 => "Serviço em manutenção. Voltaremos em breve.",
+            504 => "O servidor demorou muito para responder. Tente novamente.",
+            _ => "Ocorreu um erro inesperado. Estamos trabalhando para resolver."
+        };
+    }
+}
