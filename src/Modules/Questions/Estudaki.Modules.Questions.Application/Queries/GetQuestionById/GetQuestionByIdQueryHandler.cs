@@ -12,20 +12,17 @@ public class GetQuestionByIdQueryHandler : IQueryHandler<GetQuestionByIdQuery, Q
     private readonly IPublicNoticeRepository _publicNoticeRepository;
     private readonly IQuestionSupportRepository _questionSupportRepository;
     private readonly IStorageService _storageService;
-    private readonly StorageSettings _storageSettings;
 
     public GetQuestionByIdQueryHandler(
         IQuestionRepository questionRepository,
         IPublicNoticeRepository publicNoticeRepository,
         IQuestionSupportRepository questionSupportRepository,
-        IStorageService storageService,
-        StorageSettings storageSettings)
+        IStorageService storageService)
     {
         _questionRepository = questionRepository;
         _publicNoticeRepository = publicNoticeRepository;
         _questionSupportRepository = questionSupportRepository;
         _storageService = storageService;
-        _storageSettings = storageSettings;
     }
 
     public async Task<QuestionDto?> HandleAsync(GetQuestionByIdQuery query, CancellationToken cancellationToken = default)
@@ -43,6 +40,6 @@ public class GetQuestionByIdQueryHandler : IQueryHandler<GetQuestionByIdQuery, Q
             ? await _questionSupportRepository.GetByIds(question.QuestionSupports)
             : null;
 
-        return question.ToDto(publicNotice, questionSupports, _storageService, _storageSettings);
+        return question.ToDto(publicNotice, questionSupports, _storageService);
     }
 }

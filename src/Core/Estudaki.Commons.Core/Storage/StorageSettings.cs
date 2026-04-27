@@ -9,5 +9,4 @@ public class StorageSettings
     public string AccessKey { get; set; } = string.Empty;
     public string SecretKey { get; set; } = string.Empty;
     public string BaseUrl { get; set; } = string.Empty;
-    public string ExamsFolder { get; set; } = "exam-booklets";
 }

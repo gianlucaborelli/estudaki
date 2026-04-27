@@ -7,7 +7,7 @@ namespace Estudaki.Modules.Questions.Application.Mappers;
 
 public static class PublicNoticeMapper
 {
-    public static PublicNoticeDto ToDto(this PublicNotice notice, IStorageService storageService, StorageSettings s3Settings)
+    public static PublicNoticeDto ToDto(this PublicNotice notice, IStorageService storageService)
     {
         return new PublicNoticeDto
         {
@@ -16,11 +16,19 @@ public static class PublicNoticeMapper
             Year = notice.Year,
             ExamPhase = notice.ExamPhase,
             ExamBoard = notice.ExamBoard,
+            ExamCategory = notice.ExamCategory,
+            IsReviewed = notice.IsReviewed,
+            IsPublished = notice.IsPublished,
             Position = notice.Position,
             ExamBookletUrl = notice.GetQuestionFolder(storageService),
             AnswerKeyUrl = notice.GetAnswerKeyFolder(storageService),
             CreatedAt = notice.CreatedAt,
             HasAttachments = notice.HasAttachments
         };
+    }
+
+    public static List<PublicNoticeDto> ToDtoList(this List<PublicNotice> notices, IStorageService storageService)
+    {
+        return notices.Select(notice => notice.ToDto(storageService)).ToList();
     }
 }

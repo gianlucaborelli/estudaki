@@ -11,17 +11,16 @@ public static class QuestionMapper
         this Question question, 
         PublicNotice? publicNotice, 
         List<QuestionSupport>? questionSupports,
-        IStorageService storageService, 
-        StorageSettings s3Settings)
+        IStorageService storageService)
     {
         return new QuestionDto
         {
             Id = question.Id,
             PublicNoticeId = question.PublicNoticeId,
-            PublicNotice = publicNotice?.ToDto(storageService, s3Settings),
+            PublicNotice = publicNotice?.ToDto(storageService),
             QuestionSupports = questionSupports?.Select(qs => qs.ToDto()).ToList() ?? [],
             CreatedAt = question.CreatedAt,
-            IsPublished = question.IsPublished,
+            IsPublished = question.IsPublished,            
             IsNullified = question.IsNullified,
             QuestionNumber = question.QuestionNumber,
             QuestionType = question.Type,
@@ -30,5 +29,20 @@ public static class QuestionMapper
             QuestionContents = question.QuestionContents,
             Choices = question.Choices
         };
+    }
+
+    public static List<QuestionDto> ToDtoList(
+        this List<Question> questions, 
+        PublicNotice publicNotice, 
+        List<QuestionSupport>? questionSupports,
+        IStorageService storageService)
+    {
+        return questions.Select(q => 
+            q.ToDto(
+                publicNotice, 
+                questionSupports,
+                storageService
+            )
+        ).ToList();
     }
 }

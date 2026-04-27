@@ -8,5 +8,5 @@ public interface IQuestionRepository : IRepository<Question>
 {
     Task<FilterParameters> FindFilterParametersAsync(FilterParameters filterParameters);
     Task<PageResult<Question>> FindQuestionsPaginatedAsync(SearchParameters searchParameter);
-    
+    Task<List<Question>> GetByPublicNoticeId(string publicNoticeId);
 }

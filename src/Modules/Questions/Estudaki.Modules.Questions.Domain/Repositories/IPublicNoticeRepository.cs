@@ -6,4 +6,5 @@ namespace Estudaki.Modules.Questions.Domain.Repositories;
 public interface IPublicNoticeRepository : IRepository<PublicNotice>
 {
     Task<List<PublicNotice>> GetByIds(List<string> ids);
+    Task<List<PublicNotice>> GetPublicNoticesList();
 }

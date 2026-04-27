@@ -13,7 +13,13 @@ public class QuestionRepository : BaseRepository<Question>, IQuestionRepository
 {
     public QuestionRepository(IMongoContext context) : base(context)
     {
-    }        
+    }
+
+    public async Task<List<Question>> GetByPublicNoticeId(string publicNoticeId)
+    {
+        var filter = Builders<Question>.Filter.Eq(q => q.PublicNoticeId, publicNoticeId);
+        return await DbSet.Find(filter).ToListAsync();
+    }
 
     public async Task<FilterParameters> FindFilterParametersAsync(FilterParameters filterParameters)
     {

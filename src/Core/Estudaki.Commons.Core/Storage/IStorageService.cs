@@ -7,4 +7,29 @@ public interface IStorageService
     /// </summary>
     /// <returns>URL completa para acesso ao arquivo</returns>
     string GetFileUrl();
+
+    /// <summary>
+    /// Faz upload de um arquivo para o S3
+    /// </summary>
+    Task<string> UploadFileAsync(Stream fileStream, string fileName, string contentType);
+
+    /// <summary>
+    /// Verifica se um arquivo existe no S3
+    /// </summary>
+    Task<bool> FileExistsAsync(string fileName);
+
+    /// <summary>
+    /// Deleta um arquivo do S3
+    /// </summary>
+    Task DeleteFileAsync(string fileName);
+
+    /// <summary>
+    /// Lista todos os arquivos em uma pasta do S3
+    /// </summary>
+    Task<List<string>> ListFilesAsync(string folderPath);
+
+    /// <summary>
+    /// Upload de imagem local para S3 com novo nome (GUID)
+    /// </summary>
+    Task<string> UploadImageFromLocalAsync(string localFilePath, string s3FolderPath);
 }

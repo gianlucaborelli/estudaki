@@ -1,0 +1,189 @@
+﻿@page "/Backoffice/ExamManager/{id}"
+@using EstudaKi.Web.Components.Pages.Features.Questions.Components
+@using Estudaki.Modules.Questions.Application.DTOs
+@using Estudaki.Modules.Questions.Domain.Entities
+
+@inherits ExamManagerBase
+@attribute [Authorize(Roles = "Admin,Backoffice")]
+
+<style>
+    .selected {
+        background-color: #1E88E5 !important;
+    }
+
+    .selected > td {
+        color: white !important;
+    }
+
+    .selected > td .mud-input {
+        color: white !important;
+    }
+</style>
+
+<MudText Typo="Typo.h5" Align="Align.Center">Gerenciar Prova</MudText>
+
+@if (IsLoading)
+{
+    <MudProgressLinear Color="Color.Primary" Indeterminate="true" Class="my-7" />
+}
+else
+{
+    <MudToolBar Dense="true">
+        <MudTooltip Text="Anexar Arquivos" Arrow="true" Placement="Placement.Top">
+            <MudIconButton Icon="@Icons.Material.Filled.AttachFile" />
+        </MudTooltip>
+        <MudTooltip Text="Editar Prova" Arrow="true" Placement="Placement.Top">
+            <MudIconButton Icon="@Icons.Material.Filled.Edit" />
+        </MudTooltip>
+    </MudToolBar>
+
+    <MudPaper Class="pa-6 ma-2" Elevation="1">
+
+    @if (PublicNotice == null)
+    {
+        <MudProgressLinear Indeterminate="true" />
+    }
+    else
+    {
+        <MudStack>
+            <MudStack Row="true" AlignItems="AlignItems.Center">
+                <MudText Typo="Typo.h5" Class="fw-bold">
+                     @ExamCategories.GetDisplayName(PublicNotice.ExamCategory!)
+                </MudText>
+
+                <MudSpacer />
+
+                <MudChip T="string" Color="Color.Primary" Variant="Variant.Filled">
+                    Nº @PublicNotice.Number
+                </MudChip>
+                <MudChip T="string" Color="Color.Secondary" Variant="Variant.Outlined">
+                    @((PublicNotice.Year > 0) ? PublicNotice.Year.ToString() : "Ano não definido")
+                </MudChip>
+            </MudStack>
+
+            <MudGrid>
+                <MudItem xs="12" sm="4">
+                    <MudText Typo="Typo.subtitle2">Banca</MudText>
+                    <MudText>@(PublicNotice.ExamBoard ?? "Não definido")</MudText>
+                </MudItem>
+
+                <MudItem xs="12" sm="4">
+                    <MudText Typo="Typo.subtitle2">Fase</MudText>
+                    <MudText>@(PublicNotice.ExamPhase ?? "Não definido")</MudText>
+                </MudItem>
+
+                <MudItem xs="12" sm="4">
+                    <MudText Typo="Typo.subtitle2">Cargo</MudText>
+                    <MudText>@(PublicNotice.Position ?? "Não definido")</MudText>
+                </MudItem>
+            </MudGrid>
+
+            <MudDivider />
+
+            <MudStack Row="true" AlignItems="AlignItems.Center">
+
+                <MudChip T="string" Color="Color.Info" Variant="Variant.Filled">
+                    Total: @(QuestionList?.Count ?? 0)
+                </MudChip>
+                <MudChip T="string" Color="Color.Primary" Variant="Variant.Outlined">
+                    Múltipla: @(QuestionList.Count(q => q.QuestionType == "multiple-choice"))
+                </MudChip>
+                <MudChip T="string" Color="Color.Secondary" Variant="Variant.Outlined">
+                    Aberta: @(QuestionList.Count(q => q.QuestionType == "open-ended"))
+                </MudChip>
+                <MudChip T="string" Color="Color.Tertiary" Variant="Variant.Outlined">
+                    Redação: @(QuestionList.Count(q => q.QuestionType == "redaction"))
+                </MudChip>
+
+                <MudSpacer />
+
+                @if (PublicNotice.HasAttachments)
+                {
+                    <MudButton Variant="Variant.Outlined"
+                               StartIcon="@Icons.Material.Filled.Description"
+                               Href="@PublicNotice.ExamBookletUrl"
+                               Target="_blank">
+                        Caderno
+                    </MudButton>
+
+                    <MudButton Variant="Variant.Outlined"
+                               StartIcon="@Icons.Material.Filled.TaskAlt"
+                               Href="@PublicNotice.AnswerKeyUrl"
+                               Target="_blank">
+                        Gabarito
+                    </MudButton>
+                }
+                else
+                {
+                    <MudText Color="Color.Secondary">
+                        Arquivos não disponíveis
+                    </MudText>
+                }
+            </MudStack>
+        </MudStack>
+    }
+    </MudPaper>
+
+
+
+    <MudTabs Elevation="2" Rounded="true" ApplyEffectsToContainer="true" TabPanelsClass="pa-6">
+        <MudTabPanel Text="Questões">
+            <MudGrid>
+                <!-- Ocupa 1/4 -->
+                <MudItem xs="12" md="3">
+                    <MudTable T="QuestionDto" 
+                        @bind-SelectedItem="SelectedQuestion" 
+                        Items="@QuestionList.OrderBy(q => q.QuestionNumber)" 
+                        Hover="true"                         
+                        Breakpoint="Breakpoint.Sm" 
+                        Loading="@IsLoading"
+                        OnRowClick="@QuestionsRowClickEvent"
+                        RowClassFunc="@SelectedQuestionRowClassFunc"
+                        LoadingProgressColor="Color.Info">
+                        <HeaderContent>
+                            <MudTh>Nr</MudTh>
+                            <MudTh>Tipo</MudTh>
+                            <MudTh>Qt. Alt</MudTh>
+                        </HeaderContent>
+                        <RowTemplate>
+                            <MudTd DataLabel="Nr">@context.QuestionNumber</MudTd>
+                            <MudTd DataLabel="Tipo">@context.QuestionType</MudTd>
+                            <MudTd DataLabel="Qt. Alt">@context.Choices?.Count()</MudTd>
+                        </RowTemplate>
+                    </MudTable>
+                </MudItem>
+
+                <!-- Ocupa 3/4 -->
+                <MudItem xs="12" md="9">
+                    <QuestionComponent Value="SelectedQuestion" />
+                </MudItem>
+            </MudGrid>
+
+        </MudTabPanel>
+        <MudTabPanel Text="Suporte de Questões">
+            <MudText>Content Two</MudText>
+        </MudTabPanel>
+        <MudTabPanel Text="Imagens">
+            <MudText>Content Two</MudText>
+        </MudTabPanel>
+    </MudTabs>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+}

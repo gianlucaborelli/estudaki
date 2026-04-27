@@ -13,20 +13,17 @@ public class SearchQuestionsPaginatedQueryHandler : IQueryHandler<SearchQuestion
     private readonly IPublicNoticeRepository _publicNoticeRepository;
     private readonly IQuestionSupportRepository _questionSupportRepository;
     private readonly IStorageService _storageService;
-    private readonly StorageSettings _storageSettings;
 
     public SearchQuestionsPaginatedQueryHandler(
         IQuestionRepository questionRepository,
         IPublicNoticeRepository publicNoticeRepository,
         IQuestionSupportRepository questionSupportRepository,
-        IStorageService storageService,
-        StorageSettings storageSettings)
+        IStorageService storageService)
     {
         _questionRepository = questionRepository;
         _publicNoticeRepository = publicNoticeRepository;
         _questionSupportRepository = questionSupportRepository;
         _storageService = storageService;
-        _storageSettings = storageSettings;
     }
 
     public async Task<PageResult<QuestionDto>> HandleAsync(SearchQuestionsPaginatedQuery query, CancellationToken cancellationToken = default)
@@ -71,7 +68,7 @@ public class SearchQuestionsPaginatedQueryHandler : IQueryHandler<SearchQuestion
                     .ToList()
                 : null;
 
-            return question.ToDto(publicNotice, supports, _storageService, _storageSettings);
+            return question.ToDto(publicNotice, supports, _storageService);
         }).ToList();
 
         return new PageResult<QuestionDto>

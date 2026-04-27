@@ -12,6 +12,11 @@ public class PublicNoticeRepository : BaseRepository<PublicNotice>, IPublicNotic
     {
     }
 
+    public async Task<List<PublicNotice>> GetPublicNoticesList()
+    {
+        return await DbSet.Find(_ => true).ToListAsync();
+    }
+
     public async Task<List<PublicNotice>> GetByIds(List<string> ids)
     {
         if (ids == null || ids.Count == 0)

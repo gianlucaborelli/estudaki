@@ -1,0 +1,75 @@
+﻿@page "/Backoffice/ExamManager"
+@using Estudaki.Modules.Questions.Application.DTOs
+
+@inherits ExamListBase
+@attribute [Authorize(Roles = "Admin,Backoffice")]
+
+<MudText Typo="Typo.h5" Align="Align.Center">Lista de Provas</MudText>
+
+<MudToolBar>    
+    <MudSpacer />
+    @if (SelectedItems.Count > 0)
+    {
+        <MudText Typo="Typo.subtitle1" Align="Align.Center">@SelectedItems.Count item(s) selecionado(s)</MudText>
+        <MudTooltip Text="Publicar" Arrow="true" Placement="Placement.Top">
+            <MudIconButton Icon="@Icons.Material.Filled.Publish" /> @* Publica *@
+        </MudTooltip>
+        <MudTooltip Text="Despublicar" Arrow="true" Placement="Placement.Top">
+            <MudIconButton Icon="@Icons.Material.Filled.Download" />   @* Despublica *@
+        </MudTooltip>
+        <MudTooltip Text="Deletar" Arrow="true" Placement="Placement.Top">
+            <MudIconButton Icon="@Icons.Material.Filled.Delete" />   @* Deleta *@
+        </MudTooltip>
+    }
+</MudToolBar>
+
+<MudTable 
+    Items="@PublicNoticeList" 
+    T="PublicNoticeDto" 
+    MultiSelection="true" 
+    SelectedItemsChanged="OnSelectedItemsChanged"
+    Hover="true" 
+    Dense="true"
+    Breakpoint="Breakpoint.Sm" 
+    Loading="@IsLoading" 
+    LoadingProgressColor="Color.Info">
+    <HeaderContent>
+        <MudTh>Nr</MudTh>
+        <MudTh>Categoria</MudTh>
+        <MudTh>Banca</MudTh>
+        <MudTh>Position</MudTh>
+        <MudTh>Publicado</MudTh>
+        <MudTh>Revisado</MudTh>
+        <MudTh>Criado em</MudTh>
+        <MudTh>Ações</MudTh>
+    </HeaderContent>
+    <RowTemplate>
+        <MudTd DataLabel="Nr">@context.Number</MudTd>
+        <MudTd DataLabel="ExamCategory">@context.ExamCategory</MudTd>
+        <MudTd DataLabel="ExamBoard">@context.ExamBoard</MudTd>
+        <MudTd DataLabel="Position">@context.Position</MudTd>
+        <MudTd DataLabel="Publicado">
+            <MudIcon Icon="@(context.IsPublished ? Icons.Material.Filled.CheckCircle : Icons.Material.Filled.Cancel)"
+                     Color="@(context.IsPublished ? Color.Success : Color.Error)" />
+        </MudTd>
+        <MudTd DataLabel="Revisado">
+            <MudIcon Icon="@(context.IsPublished ? Icons.Material.Filled.CheckCircle : Icons.Material.Filled.Cancel)"
+                     Color="@(context.IsPublished ? Color.Success : Color.Error)" />
+        </MudTd>
+        <MudTd DataLabel="CreatedAt">@context.CreatedAt</MudTd>
+        <MudTd DataLabel="Ações">
+
+            <MudIconButton Icon="@Icons.Material.Filled.Edit"
+                           Color="Color.Primary"
+                           OnClick="@(() => Edit(context))" />
+
+            <MudIconButton Icon="@Icons.Material.Filled.Delete"
+                           Color="Color.Error"
+                           OnClick="@(() => Delete(context))" />
+
+        </MudTd>
+    </RowTemplate>
+</MudTable>
+
+
+
