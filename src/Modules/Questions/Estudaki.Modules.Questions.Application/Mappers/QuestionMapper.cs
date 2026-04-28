@@ -18,7 +18,10 @@ public static class QuestionMapper
             Id = question.Id,
             PublicNoticeId = question.PublicNoticeId,
             PublicNotice = publicNotice?.ToDto(storageService),
-            QuestionSupports = questionSupports?.Select(qs => qs.ToDto()).ToList() ?? [],
+            QuestionSupports = questionSupports?
+                    .Where(qs => question.QuestionSupports.Contains(qs.Id))
+                    .Select(qs => qs.ToDto())
+                    .ToList() ?? [],
             CreatedAt = question.CreatedAt,
             IsPublished = question.IsPublished,            
             IsNullified = question.IsNullified,

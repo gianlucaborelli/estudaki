@@ -30,7 +30,7 @@ else
 {
     <MudToolBar Dense="true">
         <MudTooltip Text="Anexar Arquivos" Arrow="true" Placement="Placement.Top">
-            <MudIconButton Icon="@Icons.Material.Filled.AttachFile" />
+            <MudIconButton Icon="@Icons.Material.Filled.AttachFile" OnClick="() => OpenDialogAsync()" />
         </MudTooltip>
         <MudTooltip Text="Editar Prova" Arrow="true" Placement="Placement.Top">
             <MudIconButton Icon="@Icons.Material.Filled.Edit" />

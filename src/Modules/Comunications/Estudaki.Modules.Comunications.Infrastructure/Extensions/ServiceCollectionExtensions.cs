@@ -13,8 +13,7 @@ public static class ServiceCollectionExtensions
     {
         services.AddScoped<IContactMessageRepository, ContactMessageRepository>();
 
-
-        services.AddValidatorsFromAssembly(typeof(CreateContactMessageCommandValidator).Assembly);
+        services.AddValidatorsFromAssembly(typeof(CreateContactMessageCommandValidator).Assembly);        
 
         services.AddCQRSHandlers(typeof(CreateContactMessageCommandHandler).Assembly);
     }

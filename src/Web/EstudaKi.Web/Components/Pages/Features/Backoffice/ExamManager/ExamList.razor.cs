@@ -58,7 +58,7 @@ public class ExamListBase : ComponentBase
 
     protected async void Delete(PublicNoticeDto item)
     {
-        bool? result = await DialogService.ShowMessageBox(
+        bool? result = await DialogService.ShowMessageBoxAsync(
         "ATENÇÃO",
         "Deseja realmente deletar este item?",
         yesText: "Continuar", cancelText: "Cancelar");

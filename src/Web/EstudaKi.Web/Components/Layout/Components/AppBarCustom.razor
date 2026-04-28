@@ -34,14 +34,18 @@
 
         <AuthorizeView>
             <Authorized>                
+                @{
+                    var userName = context.User.Identity?.Name;
+                    var firstLetter = userName?.Substring(0, 1).ToUpper() ?? "?";
+                }
                 <MudMenu Dense
                          Variant="Variant.Text"
                          Size="Size.Medium"
                          Color="Color.Inherit">
 
-                    <ActivatorContent>
+                    <ActivatorContent Context="activator">
                         <MudAvatar Color="Color.Primary" Style="cursor:pointer;">
-                            @context.User.Identity?.Name?.Substring(0,1).ToUpper()
+                            @firstLetter
                         </MudAvatar>
                     </ActivatorContent>
 

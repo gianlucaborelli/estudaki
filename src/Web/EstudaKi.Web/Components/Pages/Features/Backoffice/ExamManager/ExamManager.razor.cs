@@ -2,8 +2,10 @@
 using Estudaki.Modules.Questions.Application.DTOs;
 using Estudaki.Modules.Questions.Application.Queries.GetPublicNoticeById;
 using Estudaki.Modules.Questions.Application.Queries.GetQuestionsByPublicNoticeId;
+using EstudaKi.Web.Components.Pages.Features.Backoffice.ExamManager.Components;
 using Microsoft.AspNetCore.Components;
 using MudBlazor;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace EstudaKi.Web.Components.Pages.Features.Backoffice.ExamManager
 {
@@ -15,6 +17,8 @@ namespace EstudaKi.Web.Components.Pages.Features.Backoffice.ExamManager
         [Inject]
         public NavigationManager NavigationManager { get; set; } = default!;
         [Inject]
+        protected IDialogService Dialog { get; set; } = default!;
+        [Inject]
         protected IQueryDispatcher QueryDispatcher { get; set; } = default!;
 
         protected bool IsLoading { get; set; } = false;
@@ -23,6 +27,11 @@ namespace EstudaKi.Web.Components.Pages.Features.Backoffice.ExamManager
         protected QuestionDto? SelectedQuestion { get; set; } = null;
 
         protected override async Task OnInitializedAsync()
+        {
+            await LoadContent();
+        }
+
+        private async Task LoadContent()
         {
             IsLoading = true;
             try
@@ -41,7 +50,8 @@ namespace EstudaKi.Web.Components.Pages.Features.Backoffice.ExamManager
                 var questions = await QueryDispatcher
                                             .DispatchAsync<GetQuestionsByPublicNoticeIdQuery, List<QuestionDto>>(questionsQuery);
                 QuestionList = questions;
-            }catch (Exception ex)
+            }
+            catch (Exception ex)
             {
                 Console.WriteLine("Error loading data: " + ex.Message);
                 NavigationManager.NavigateTo("/Error/500");
@@ -55,6 +65,24 @@ namespace EstudaKi.Web.Components.Pages.Features.Backoffice.ExamManager
         protected void QuestionsRowClickEvent(TableRowClickEventArgs<QuestionDto> tableRowClickEventArgs)
         {
             SelectedQuestion = tableRowClickEventArgs.Item;
+        }
+
+        protected async Task OpenDialogAsync()
+        {
+            var parameters = new DialogParameters<UploadExamFilesModal>();
+            parameters.Add(nameof(UploadExamFilesModal.Notice), PublicNotice);
+            
+            var options = new DialogOptions { CloseButton = true, MaxWidth = MaxWidth.Medium, FullWidth = true };
+
+            var dialog = await Dialog.ShowAsync<UploadExamFilesModal>("Upload de Arquivos do Edital", parameters, options);           
+
+            var result = await dialog.Result;
+
+            if (result is not null && !result.Canceled)
+            {
+                await LoadContent();
+            }
+            return ;
         }
 
         protected string SelectedQuestionRowClassFunc(QuestionDto question, int rowNumber)

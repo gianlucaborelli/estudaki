@@ -1,7 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk.Web">
 
   <PropertyGroup>
-    <TargetFramework>net9.0</TargetFramework>
+    <TargetFramework>net10.0</TargetFramework>
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
     <UserSecretsId>c40b97de-b12e-42d8-b4fa-55859f9fd0b9</UserSecretsId>
@@ -11,19 +11,22 @@
 
 
   <ItemGroup>
-	  <PackageReference Include="Microsoft.AspNetCore.Diagnostics.EntityFrameworkCore" Version="9.*" />
-	  <PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="9.*" />
-	  <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="9.*" />
-	  <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="9.*" />
-	  <PackageReference Include="MudBlazor" Version="8.*" />
-	  <PackageReference Include="CodeBeam.MudBlazor.Extensions" Version="8.2.0" />
-	  <PackageReference Include="MongoDB.Driver" Version="3.7.1" />
-	  <PackageReference Include="Extensions.MudBlazor.StaticInput" Version="3.*" />
+	  <PackageReference Include="Microsoft.AspNetCore.Diagnostics.EntityFrameworkCore" Version="10.0.7" />
+	  <PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="10.0.7" />
+	  <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="10.0.7">
+	    <PrivateAssets>all</PrivateAssets>
+	    <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+	  </PackageReference>
+	  <PackageReference Include="MudBlazor" Version="9.4.0" />
+	  <PackageReference Include="CodeBeam.MudBlazor.Extensions" Version="9.0.5" />
+	  <PackageReference Include="MongoDB.Driver" Version="3.8.0" />
+	  <PackageReference Include="Extensions.MudBlazor.StaticInput" Version="4.1.0" />
 	  <PackageReference Include="Npgsql" Version="10.0.2" />
-	  <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="9.0.4" />
+	  <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="10.0.1" />
   </ItemGroup>
 
 	<ItemGroup>
+		<ProjectReference Include="..\..\Core\Estudaki.Commons.Core\Estudaki.Commons.Core.csproj" />
 		<ProjectReference Include="..\..\Infrastructure\Estudaki.Infrastructure.Crosscutting\Estudaki.Infrastructure.Crosscutting.csproj" />
 		<ProjectReference Include="..\..\Infrastructure\Estudaki.Infrastructure.Observability\Estudaki.Infrastructure.Observability.csproj" />
 		<ProjectReference Include="..\..\Modules\Identity\Estudaki.Modules.Identity.Domain\Estudaki.Modules.Identity.Domain.csproj" />

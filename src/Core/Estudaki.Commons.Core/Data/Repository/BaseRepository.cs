@@ -32,13 +32,13 @@ public abstract class BaseRepository<TEntity> : IRepository<TEntity> where TEnti
         return all.ToList();
     }
 
-    public virtual void Update(TEntity obj)
+    public virtual async Task Update(TEntity obj)
     {
-        DbSet.ReplaceOneAsync(Builders<TEntity>.Filter.Eq("_id", obj.Id), obj);
+        await DbSet.ReplaceOneAsync(Builders<TEntity>.Filter.Eq(x => x.Id, obj.Id), obj);
     }
 
-    public virtual void Remove(Guid id)
+    public virtual async Task Remove(string id)
     {
-        DbSet.DeleteOneAsync(Builders<TEntity>.Filter.Eq("_id", id));
+        await DbSet.DeleteOneAsync(Builders<TEntity>.Filter.Eq(x => x.Id, id));
     }
 }
