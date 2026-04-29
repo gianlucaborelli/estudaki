@@ -67,7 +67,7 @@ namespace EstudaKi.Web.Components.Pages.Features.Backoffice.ExamManager
             SelectedQuestion = tableRowClickEventArgs.Item;
         }
 
-        protected async Task OpenDialogAsync()
+        protected async Task OpenUploadFileDialogAsync()
         {
             var parameters = new DialogParameters<UploadExamFilesModal>();
             parameters.Add(nameof(UploadExamFilesModal.Notice), PublicNotice);
@@ -78,6 +78,21 @@ namespace EstudaKi.Web.Components.Pages.Features.Backoffice.ExamManager
 
             var result = await dialog.Result;
 
+            if (result is not null && !result.Canceled)
+            {
+                await LoadContent();
+            }
+            return ;
+        }
+
+        protected async Task OpenEditPublicNoticeDialogAsync()
+        {
+            var parameters = new DialogParameters<EditPublicNoticeModal>();
+            parameters.Add(nameof(EditPublicNoticeModal.OriginalNoticePublic), PublicNotice);
+            
+            var options = new DialogOptions { CloseButton = true, MaxWidth = MaxWidth.Medium, FullWidth = true };
+            var dialog = await Dialog.ShowAsync<EditPublicNoticeModal>("Editar Edital", parameters, options);           
+            var result = await dialog.Result;
             if (result is not null && !result.Canceled)
             {
                 await LoadContent();

@@ -28,16 +28,18 @@
 }
 else
 {
-    <MudToolBar Dense="true">
-        <MudTooltip Text="Anexar Arquivos" Arrow="true" Placement="Placement.Top">
-            <MudIconButton Icon="@Icons.Material.Filled.AttachFile" OnClick="() => OpenDialogAsync()" />
-        </MudTooltip>
-        <MudTooltip Text="Editar Prova" Arrow="true" Placement="Placement.Top">
-            <MudIconButton Icon="@Icons.Material.Filled.Edit" />
-        </MudTooltip>
-    </MudToolBar>
+    <MudPaper Elevation="25">
+        <MudToolBar Dense="true">
+            <MudTooltip Text="Anexar Arquivos" Arrow="true" Placement="Placement.Top">
+                <MudIconButton Icon="@Icons.Material.Filled.AttachFile" OnClick="() => OpenUploadFileDialogAsync()" />
+            </MudTooltip>
+            <MudTooltip Text="Editar Prova" Arrow="true" Placement="Placement.Top">
+                <MudIconButton Icon="@Icons.Material.Filled.Edit" OnClick="() => OpenEditPublicNoticeDialogAsync()"/>
+            </MudTooltip>
+        </MudToolBar>
+    </MudPaper>
 
-    <MudPaper Class="pa-6 ma-2" Elevation="1">
+    <MudPaper Class="pa-6 my-2" Elevation="1">
 
     @if (PublicNotice == null)
     {
@@ -126,7 +128,7 @@ else
 
 
 
-    <MudTabs Elevation="2" Rounded="true" ApplyEffectsToContainer="true" TabPanelsClass="pa-6">
+    <MudTabs Elevation="2" Rounded="true" ApplyEffectsToContainer="true">
         <MudTabPanel Text="Questões">
             <MudGrid>
                 <!-- Ocupa 1/4 -->
@@ -134,7 +136,8 @@ else
                     <MudTable T="QuestionDto" 
                         @bind-SelectedItem="SelectedQuestion" 
                         Items="@QuestionList.OrderBy(q => q.QuestionNumber)" 
-                        Hover="true"                         
+                        Hover="true"     
+                        Dense="true"
                         Breakpoint="Breakpoint.Sm" 
                         Loading="@IsLoading"
                         OnRowClick="@QuestionsRowClickEvent"
@@ -147,7 +150,7 @@ else
                         </HeaderContent>
                         <RowTemplate>
                             <MudTd DataLabel="Nr">@context.QuestionNumber</MudTd>
-                            <MudTd DataLabel="Tipo">@context.QuestionType</MudTd>
+                            <MudTd DataLabel="Tipo">@QuestionType.GetDisplayName(context.QuestionType)</MudTd>
                             <MudTd DataLabel="Qt. Alt">@context.Choices?.Count()</MudTd>
                         </RowTemplate>
                     </MudTable>
