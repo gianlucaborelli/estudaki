@@ -1,4 +1,5 @@
 ﻿@using Estudaki.Modules.Questions.Domain.Entities
+@using Microsoft.AspNetCore.Components.Forms
 @inherits UploadImagesModalBase
 
 <MudDialog>
@@ -27,131 +28,88 @@
         </MudStack>
             
         <MudDivider />
-        
-        <MudFileUpload @bind-Files="SelectedFiles"
-                        T="IReadOnlyList<IBrowserFile>"
-                        Multiple="true"
-                        id="fileInput"
-                        DragAndDrop="true"
-                        Disabled="@IsUploading"
-                        Accept="image/*">
-            <CustomContent>
+
+        <InputFile @ref="fileInputComponent" 
+                   OnChange="OnFilesChanged" 
+                   multiple 
+                   accept="image/*" 
+                   style="display: none;" 
+                   id="hiddenFileInput" />
+
+        <MudPaper Class="pa-4 my-4" Outlined="true" Style="cursor: pointer;">
+            <MudStack AlignItems="AlignItems.Center" Spacing="2">
+                <MudIcon Icon="@Icons.Material.Filled.CloudUpload" Size="Size.Large" Color="Color.Primary" />
                 <MudButton Variant="Variant.Filled"
                             Color="Color.Primary"
-                            OnClick="@context.OpenFilePickerAsync"
+                            OnClick="OpenFilePicker"
                             StartIcon="@Icons.Material.Filled.CloudUpload">
                     Selecione o Arquivo do Gabarito para Upload
                 </MudButton>
-            </CustomContent>
-        </MudFileUpload>     
+                <MudText Typo="Typo.body2" Color="Color.Secondary">
+                    Ou arraste e solte arquivos aqui
+                </MudText>
+            </MudStack>
+        </MudPaper>
         
         <MudDivider /> 
-        
-        <div class="mb-4">
-            <div class="card border-primary"
-                    style="border-style: dashed; border-width: 2px; cursor: pointer;"
-                    id="pasteArea"
-                    tabindex="0"
-                    @onclick="FocusPasteArea">
-                <div class="card-body text-center py-4">
-                    <i class="bi bi-clipboard-check" style="font-size: 2rem; color: var(--bs-primary);"></i>
-                    <h6 class="mt-2">Cole Imagens Aqui (Ctrl+V)</h6>
-                    <p class="text-muted mb-0">
-                        <small>
-                            Clique nesta área e pressione <kbd>Ctrl</kbd> + <kbd>V</kbd> para colar imagens da área de transferência
-                        </small>
-                    </p>
-                    @if (pasteAreaFocused)
-                    {
-                        <div class="mt-2">
-                            <span class="badge bg-success">
-                                <i class="bi bi-check-circle me-1"></i>Pronto para colar!
-                            </span>
-                        </div>
-                    }
-                </div>
-            </div>
-        </div>
 
-        @if (SelectedFiles.Any())
+        <MudPaper Class="pa-4 my-4" Outlined="true" Style="border-style: dashed; border-width: 2px; cursor: pointer;"
+                  id="pasteArea"
+                  tabindex="0"
+                  @onclick="FocusPasteArea">
+            <MudStack AlignItems="AlignItems.Center" Spacing="2">
+                <MudIcon Icon="@Icons.Material.Filled.ContentPaste" Size="Size.Large" Color="Color.Primary" />
+                <MudText Typo="Typo.h6">Cole Imagens Aqui (Ctrl+V)</MudText>
+                <MudText Typo="Typo.body2" Color="Color.Secondary" Align="Align.Center">
+                    Clique nesta área e pressione <MudChip T="string" Size="Size.Small" Variant="Variant.Text">Ctrl</MudChip> + <MudChip T="string" Size="Size.Small" Variant="Variant.Text">V</MudChip> para colar imagens da área de transferência
+                </MudText>
+                @if (pasteAreaFocused)
+                {
+                    <MudChip T="string" Color="Color.Success" Icon="@Icons.Material.Filled.CheckCircle" Size="Size.Small">
+                        Pronto para colar!
+                    </MudChip>
+                }
+            </MudStack>
+        </MudPaper>
+
+        @if (SelectedFiles?.Any() == true)
         {
-            <div class="mb-3">
-                <h6>Arquivos Selecionados (@SelectedFiles.Count)</h6>
-                <div class="table-responsive">
-                    <table class="table table-sm table-bordered">
-                        <thead class="table-light">
-                            <tr>
-                                <th style="width: 50px;">#</th>
-                                <th>Nome do Arquivo</th>
-                                <th style="width: 120px;">Tamanho</th>
-                                <th style="width: 100px;">Status</th>
-                                <th style="width: 80px;">Ações</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            @foreach (var (file, index) in SelectedFiles.Select((f, i) => (f, i)))
+            <MudPaper Class="pa-3 my-3" Outlined="true">
+                <MudText Typo="Typo.h6" Class="mb-3">Arquivos Selecionados (@SelectedFiles.Count)</MudText>
+                <MudTable Items="@SelectedFiles.Select((f, i) => new { File = f, Index = i })" 
+                          Hover="true" 
+                          Dense="true" 
+                          Bordered="true"
+                          Striped="true">
+                    <HeaderContent>
+                        <MudTh Style="width: 50px;">#</MudTh>
+                        <MudTh>Nome do Arquivo</MudTh>
+                        <MudTh Style="width: 120px;">Tamanho</MudTh>
+                        <MudTh Style="width: 150px;">Status</MudTh>
+                        <MudTh Style="width: 80px;">Ações</MudTh>
+                    </HeaderContent>
+                    <RowTemplate>
+                        <MudTd DataLabel="#">@(context.Index + 1)</MudTd>
+                        <MudTd DataLabel="Nome do Arquivo">
+                            <MudStack Row="true" AlignItems="AlignItems.Center" Spacing="1">
+                                <MudIcon Icon="@Icons.Material.Filled.Image" Size="Size.Small" />
+                                <MudText>@context.File.Name</MudText>
+                            </MudStack>
+                        </MudTd>
+                        <MudTd DataLabel="Tamanho">@FormatFileSize(context.File.Size)</MudTd>                        
+                        <MudTd DataLabel="Ações">
+                            @if (!IsLoading)
                             {
-                                <tr>
-                                    <td>@(index + 1)</td>
-                                    <td>
-                                        <i class="bi bi-file-image me-1"></i>
-                                        @file.Name
-                                    </td>
-                                    <td>@FormatFileSize(file.Size)</td>
-                                    <td>
-                                        @if (uploadResults.ContainsKey(file.Name))
-                                        {
-                                            var result = uploadResults[file.Name];
-                                            if (result.Success)
-                                            {
-                                                <span class="badge bg-success">
-                                                    <i class="bi bi-check-circle me-1"></i>
-                                                    Enviado
-                                                </span>
-                                            }
-                                            else
-                                            {
-                                                <span class="badge bg-danger">
-                                                    <i class="bi bi-x-circle me-1"></i>
-                                                    Erro
-                                                </span>
-                                            }
-                                        }
-                                        else if (IsLoading)
-                                        {
-                                            <span class="badge bg-warning">
-                                                <span class="spinner-border spinner-border-sm me-1" role="status"></span>
-                                                Aguardando...
-                                            </span>
-                                        }
-                                        else
-                                        {
-                                            <span class="badge bg-secondary">Pendente</span>
-                                        }
-                                    </td>
-                                    <td>
-                                        @if (!IsLoading && !uploadResults.ContainsKey(file.Name))
-                                        {
-                                            <button type="button" class="btn btn-sm btn-danger" @onclick="() => RemoveFile(file.Name)">
-                                                <i class="bi bi-trash"></i>
-                                            </button>
-                                        }
-                                    </td>
-                                </tr>
-                                @if (uploadResults.ContainsKey(file.Name) && !uploadResults[file.Name].Success)
-                                {
-                                    <tr>
-                                        <td colspan="5" class="table-danger">
-                                            <small><i class="bi bi-exclamation-triangle me-1"></i>@uploadResults[file.Name].ErrorMessage</small>
-                                        </td>
-                                    </tr>
-                                }
+                                <MudIconButton Icon="@Icons.Material.Filled.Delete" 
+                                               Color="Color.Error" 
+                                               Size="Size.Small"
+                                               OnClick="() => RemoveFile(context.File.Name)" />
                             }
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-        }         
+                        </MudTd>
+                    </RowTemplate>                    
+                </MudTable>
+            </MudPaper>
+        }
     </DialogContent>
     <DialogActions>
         <MudButton OnClick="Dialog.Cancel" Disabled="@(IsUploading || CanUpload())">Cancelar</MudButton>
@@ -162,7 +120,7 @@
             }
             else
             {
-                @($"Enviar (@SelectedFiles.Count arquivo(s))");
+                @($"Enviar (@(SelectedFiles?.Count ?? 0) arquivo(s))")
             }
         </MudButton>
     </DialogActions>

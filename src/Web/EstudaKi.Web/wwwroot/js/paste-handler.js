@@ -1,30 +1,30 @@
 // paste-handler.js - Handle clipboard paste events for image upload
 
 let pasteHandler = null;
+let fileInputElement = null;
 
 export function initialize(pasteAreaId, fileInputId) {
     const pasteArea = document.getElementById(pasteAreaId);
-    const fileInput = document.getElementById(fileInputId);
+    fileInputElement = document.getElementById(fileInputId);
 
-    if (!pasteArea || !fileInput) {
+    if (!pasteArea) {
+        console.error('PasteHandler: pasteArea not found');
+        return;
+    }
+
+    if (!fileInputElement) {
+        console.error('PasteHandler: fileInput not found with id:', fileInputId);
         return;
     }
 
     if (pasteHandler) {
-        document.removeEventListener('paste', pasteHandler);
         pasteArea.removeEventListener('paste', pasteHandler);
     }
 
-    pasteHandler = async (e) => {
-        const target = e.target;
-        const isEditableElement = target.tagName === 'INPUT' || 
-                                   target.tagName === 'TEXTAREA' || 
-                                   target.isContentEditable ||
-                                   target.closest('input, textarea, [contenteditable="true"]');
+    console.log('PasteHandler: Initialized successfully');
 
-        if (target !== pasteArea && !pasteArea.contains(target) && isEditableElement) {
-            return; 
-        }
+    pasteHandler = async (e) => {
+        e.preventDefault();
 
         const items = e.clipboardData?.items;
         if (!items) return;
@@ -40,8 +40,6 @@ export function initialize(pasteAreaId, fileInputId) {
         if (!hasImages) {
             return;
         }
-
-        e.preventDefault();
 
         const imageFiles = [];
         let pastedCount = 0;
@@ -64,27 +62,32 @@ export function initialize(pasteAreaId, fileInputId) {
         }
 
         if (imageFiles.length > 0) {
-            const dataTransfer = new DataTransfer();
-
-            if (fileInput.files) {
-                for (let i = 0; i < fileInput.files.length; i++) {
-                    dataTransfer.items.add(fileInput.files[i]);
-                }
+            if (!fileInputElement) {
+                console.error('PasteHandler: File input element not available');
+                return;
             }
 
+            const dataTransfer = new DataTransfer();
+
+            // Adicionar APENAS as novas imagens coladas (não manter as existentes)
             imageFiles.forEach(file => {
                 dataTransfer.items.add(file);
             });
 
-            fileInput.files = dataTransfer.files;
+            // Atualizar files do input
+            fileInputElement.files = dataTransfer.files;
 
-            const event = new Event('change', { bubbles: true });
-            fileInput.dispatchEvent(event);
+            // Disparar evento change com bubbles para Blazor detectar
+            const changeEvent = new Event('change', { bubbles: true, cancelable: true });
+            fileInputElement.dispatchEvent(changeEvent);
+
+            console.log(`PasteHandler: ${imageFiles.length} imagem(ns) colada(s) com sucesso`);
         }
     };
 
+    // Adicionar event listener apenas no pasteArea para evitar duplicação
     pasteArea.addEventListener('paste', pasteHandler);
-    document.addEventListener('paste', pasteHandler);    
+    console.log('PasteHandler: Event listener added to pasteArea');
 }
 
 export function dispose() {
@@ -93,7 +96,7 @@ export function dispose() {
         if (pasteArea) {
             pasteArea.removeEventListener('paste', pasteHandler);
         }
-        document.removeEventListener('paste', pasteHandler);
         pasteHandler = null;
     }
+    fileInputElement = null;
 }

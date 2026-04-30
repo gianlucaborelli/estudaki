@@ -36,6 +36,7 @@ public static class ServiceCollectionExtensions
         services.AddCQRSHandlers(typeof(GetQuestionsByPublicNoticeIdQueryHandler).Assembly);
 
         services.AddCQRSHandlers(typeof(UploadPublicNoticeFilesCommandHandler).Assembly);
+        services.AddCQRSHandlers(typeof(UploadQuestionImagesCommandHandler).Assembly);
 
         return services;
     }

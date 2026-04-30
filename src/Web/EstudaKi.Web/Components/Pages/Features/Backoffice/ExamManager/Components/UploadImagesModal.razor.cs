@@ -1,6 +1,8 @@
-﻿using Estudaki.Commons.Core.Storage;
+﻿using Estudaki.Commons.Core.CQRS;
+using Estudaki.Commons.Core.Models.DTOs;
+using Estudaki.Modules.Questions.Application.Commands;
 using Estudaki.Modules.Questions.Application.DTOs;
-using Estudaki.Modules.Questions.Domain.Entities;
+using FluentValidation.Results;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Forms;
 using Microsoft.JSInterop;
@@ -13,35 +15,57 @@ namespace EstudaKi.Web.Components.Pages.Features.Backoffice.ExamManager.Componen
         [CascadingParameter]
         protected IMudDialogInstance Dialog { get; set; } = default!;
         [Inject]
-        public IStorageService StorageService { get; set; } = default!;
-        [Inject]
         public IJSRuntime JSRuntime { get; set; } = default!;
+        [Inject]
+        public ISnackbar Snackbar { get; set; } = default!;
+        [Inject]
+        public ICommandDispatcher CommandDispatcher { get; set; } = default!;
+        [Inject]
+        public ILogger<UploadImagesModalBase> Logger { get; set; } = default!;
 
         [Parameter]
         public PublicNoticeDto? Notice { get; set; }
 
         protected IReadOnlyList<IBrowserFile> SelectedFiles { get; set; } = [];
-        protected Dictionary<string, UploadResult> uploadResults = new();
         protected bool IsLoading = false;
         protected bool IsUploading = false;
-        protected int uploadedCount = 0;
-        protected string? errorMessage;
-        protected string? successMessage;
         protected bool pasteAreaFocused = false;
         protected IJSObjectReference? pasteModule;
+        protected InputFile? fileInputComponent;
+
         protected override async Task OnAfterRenderAsync(bool firstRender)
         {
-            if (pasteModule == null)
+            if (firstRender && pasteModule == null)
             {
                 try
                 {
                     pasteModule = await JSRuntime.InvokeAsync<IJSObjectReference>("import", "./js/paste-handler.js");
-                    await pasteModule.InvokeVoidAsync("initialize", "pasteArea", "fileInput");
+                    await pasteModule.InvokeVoidAsync("initialize", "pasteArea", "hiddenFileInput");
                 }
                 catch (Exception ex)
                 {
                     Console.WriteLine($"Paste module not loaded: {ex.Message}");
                 }
+            }
+        }
+
+        protected async Task OnFilesChanged(InputFileChangeEventArgs e)
+        {
+            var newFiles = e.GetMultipleFiles(100).ToList();
+
+            // Combinar arquivos existentes com os novos
+            var existingFiles = SelectedFiles?.ToList() ?? [];
+            existingFiles.AddRange(newFiles);
+
+            SelectedFiles = existingFiles;
+            await InvokeAsync(StateHasChanged);
+        }
+
+        protected async Task OpenFilePicker()
+        {
+            if (fileInputComponent?.Element != null)
+            {
+                await JSRuntime.InvokeVoidAsync("eval", $"document.getElementById('hiddenFileInput').click()");
             }
         }
 
@@ -60,19 +84,19 @@ namespace EstudaKi.Web.Components.Pages.Features.Backoffice.ExamManager.Componen
 
         protected void RemoveFile(string fileName)
         {
-            var file = SelectedFiles.FirstOrDefault(f => f.Name == fileName);
+            var file = SelectedFiles?.FirstOrDefault(f => f.Name == fileName);
             if (file != null)
             {
-                //selectedFiles.Remove(file);
+                var fileList = SelectedFiles?.ToList() ?? [];
+                fileList.Remove(file);
+                SelectedFiles = fileList;
             }
         }
 
         protected bool CanUpload()
         {
-            return Notice != null && SelectedFiles.Any() && !IsLoading;
-        }
-
-        
+            return Notice != null && SelectedFiles?.Any() == true && !IsLoading;
+        }        
 
         protected string FormatFileSize(long bytes)
         {
@@ -83,125 +107,33 @@ namespace EstudaKi.Web.Components.Pages.Features.Backoffice.ExamManager.Componen
 
         protected async Task UploadFiles()
         {
-            if (!CanUpload() || Notice == null)
+            if (!CanUpload() || Notice == null || SelectedFiles == null)
                 return;
-
-            IsLoading = true;
-            uploadedCount = 0;
-            uploadResults.Clear();
-            errorMessage = null;
-            successMessage = null;
-            StateHasChanged();
-
-            var s3ImagesFolder = "";//Notice.GetImagesFolder();
-            var successCount = 0;
-            var failCount = 0;
-
+            
             try
             {
-                foreach (var file in SelectedFiles)
-                {
-                    var result = new UploadResult { FileName = file.Name };
+                List<UploadFileDto> images = (await Task.WhenAll(SelectedFiles
+                        .Select(async file => await UploadFileDto.CreateAsync(file))))
+                        .ToList();
 
-                    try
-                    {
-                        // Validar tamanho
-                        if (file.Size > 10 * 1024 * 1024) // 10 MB
-                        {
-                            result.Success = false;
-                            result.ErrorMessage = "Arquivo muito grande (máximo 10 MB)";
-                            uploadResults[file.Name] = result;
-                            failCount++;
-                            continue;
-                        }
+                var command = new UploadQuestionImagesCommand(images, Notice.Id);
 
-                        // Validar extensão
-                        var extension = Path.GetExtension(file.Name).ToLowerInvariant();
-                        if (extension is not (".png" or ".jpg" or ".jpeg" or ".gif" or ".webp" or ".bmp" or ".svg"))
-                        {
-                            result.Success = false;
-                            result.ErrorMessage = "Formato de arquivo não suportado";
-                            uploadResults[file.Name] = result;
-                            failCount++;
-                            continue;
-                        }
-
-                        // Upload para S3
-                        using var stream = file.OpenReadStream(maxAllowedSize: 10 * 1024 * 1024);
-
-                        // Gerar GUID para o arquivo
-                        var guid = Guid.NewGuid().ToString();
-                        var newFileName = $"{guid}{extension}";
-                        var s3Key = $"{s3ImagesFolder}/{newFileName}";
-
-                        var contentType = extension switch
-                        {
-                            ".png" => "image/png",
-                            ".jpg" or ".jpeg" => "image/jpeg",
-                            ".gif" => "image/gif",
-                            ".webp" => "image/webp",
-                            ".svg" => "image/svg+xml",
-                            _ => "image/*"
-                        };
-
-                        // await StorageService.UploadFileAsync(stream, s3Key, contentType);
-
-                        result.Success = true;
-                        result.NewKey = guid;
-                        result.S3Url = $"{StorageService.GetFileUrl()}/{s3Key}";
-                        uploadResults[file.Name] = result;
-                        successCount++;
-                    }
-                    catch (Exception ex)
-                    {
-                        result.Success = false;
-                        result.ErrorMessage = ex.Message;
-                        uploadResults[file.Name] = result;
-                        failCount++;
-                    }
-
-                    uploadedCount++;
-                    StateHasChanged();
-                }
-
-                successMessage = $"Upload concluído: {successCount} arquivo(s) enviado(s), {failCount} falha(s)";
-                                
+                var result = await CommandDispatcher
+                    .DispatchAsync<UploadQuestionImagesCommand, ValidationResult>(command);
+                
+                Snackbar.Add("Upload concluído com sucesso!", Severity.Success);
+                Dialog.Close();
             }
             catch (Exception ex)
             {
-                errorMessage = $"Erro geral no upload: {ex.Message}";
+                Logger.LogError(ex, "Erro geral no upload de imagens.");
+                Snackbar.Add($"Erro geral no upload: {ex.Message}", Severity.Error);
             }
             finally
             {
                 IsLoading = false;
                 StateHasChanged();
             }
-        }
-               
-
-        public async ValueTask DisposeAsync()
-        {
-            if (pasteModule != null)
-            {
-                try
-                {
-                    await pasteModule.InvokeVoidAsync("dispose");
-                    await pasteModule.DisposeAsync();
-                }
-                catch
-                {
-                    // Ignorar erros ao fazer dispose
-                }
-            }
-        }
-
-        protected class UploadResult
-        {
-            public string FileName { get; set; } = string.Empty;
-            public bool Success { get; set; }
-            public string? ErrorMessage { get; set; }
-            public string? NewKey { get; set; }
-            public string? S3Url { get; set; }
-        }
+        }                      
     }
 }
