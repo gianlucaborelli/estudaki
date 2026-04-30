@@ -1,0 +1,169 @@
+﻿@using Estudaki.Modules.Questions.Domain.Entities
+@inherits UploadImagesModalBase
+
+<MudDialog>
+    <DialogContent>
+        @if (IsUploading)
+        {
+            <MudText Typo="Typo.h6" Align="Align.Center" Class="mb-3">
+                Fazendo upload dos arquivos ...
+            </MudText>
+            <MudProgressLinear Color="Color.Primary" Indeterminate="true" Class="my-7" />
+        }
+
+        <MudStack Row="true" AlignItems="AlignItems.Center">
+            <MudText Typo="Typo.h5" Class="fw-bold">
+                @ExamCategories.GetDisplayName(Notice!.ExamCategory!)
+            </MudText>
+
+            <MudSpacer />
+
+            <MudChip T="string" Color="Color.Primary" Variant="Variant.Filled">
+                Nº @Notice!.Number
+            </MudChip>
+            <MudChip T="string" Color="Color.Secondary" Variant="Variant.Outlined">
+                @((Notice!.Year > 0) ? Notice.Year.ToString() : "Ano não definido")
+            </MudChip>
+        </MudStack>
+            
+        <MudDivider />
+        
+        <MudFileUpload @bind-Files="SelectedFiles"
+                        T="IReadOnlyList<IBrowserFile>"
+                        Multiple="true"
+                        id="fileInput"
+                        DragAndDrop="true"
+                        Disabled="@IsUploading"
+                        Accept="image/*">
+            <CustomContent>
+                <MudButton Variant="Variant.Filled"
+                            Color="Color.Primary"
+                            OnClick="@context.OpenFilePickerAsync"
+                            StartIcon="@Icons.Material.Filled.CloudUpload">
+                    Selecione o Arquivo do Gabarito para Upload
+                </MudButton>
+            </CustomContent>
+        </MudFileUpload>     
+        
+        <MudDivider /> 
+        
+        <div class="mb-4">
+            <div class="card border-primary"
+                    style="border-style: dashed; border-width: 2px; cursor: pointer;"
+                    id="pasteArea"
+                    tabindex="0"
+                    @onclick="FocusPasteArea">
+                <div class="card-body text-center py-4">
+                    <i class="bi bi-clipboard-check" style="font-size: 2rem; color: var(--bs-primary);"></i>
+                    <h6 class="mt-2">Cole Imagens Aqui (Ctrl+V)</h6>
+                    <p class="text-muted mb-0">
+                        <small>
+                            Clique nesta área e pressione <kbd>Ctrl</kbd> + <kbd>V</kbd> para colar imagens da área de transferência
+                        </small>
+                    </p>
+                    @if (pasteAreaFocused)
+                    {
+                        <div class="mt-2">
+                            <span class="badge bg-success">
+                                <i class="bi bi-check-circle me-1"></i>Pronto para colar!
+                            </span>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+
+        @if (SelectedFiles.Any())
+        {
+            <div class="mb-3">
+                <h6>Arquivos Selecionados (@SelectedFiles.Count)</h6>
+                <div class="table-responsive">
+                    <table class="table table-sm table-bordered">
+                        <thead class="table-light">
+                            <tr>
+                                <th style="width: 50px;">#</th>
+                                <th>Nome do Arquivo</th>
+                                <th style="width: 120px;">Tamanho</th>
+                                <th style="width: 100px;">Status</th>
+                                <th style="width: 80px;">Ações</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var (file, index) in SelectedFiles.Select((f, i) => (f, i)))
+                            {
+                                <tr>
+                                    <td>@(index + 1)</td>
+                                    <td>
+                                        <i class="bi bi-file-image me-1"></i>
+                                        @file.Name
+                                    </td>
+                                    <td>@FormatFileSize(file.Size)</td>
+                                    <td>
+                                        @if (uploadResults.ContainsKey(file.Name))
+                                        {
+                                            var result = uploadResults[file.Name];
+                                            if (result.Success)
+                                            {
+                                                <span class="badge bg-success">
+                                                    <i class="bi bi-check-circle me-1"></i>
+                                                    Enviado
+                                                </span>
+                                            }
+                                            else
+                                            {
+                                                <span class="badge bg-danger">
+                                                    <i class="bi bi-x-circle me-1"></i>
+                                                    Erro
+                                                </span>
+                                            }
+                                        }
+                                        else if (IsLoading)
+                                        {
+                                            <span class="badge bg-warning">
+                                                <span class="spinner-border spinner-border-sm me-1" role="status"></span>
+                                                Aguardando...
+                                            </span>
+                                        }
+                                        else
+                                        {
+                                            <span class="badge bg-secondary">Pendente</span>
+                                        }
+                                    </td>
+                                    <td>
+                                        @if (!IsLoading && !uploadResults.ContainsKey(file.Name))
+                                        {
+                                            <button type="button" class="btn btn-sm btn-danger" @onclick="() => RemoveFile(file.Name)">
+                                                <i class="bi bi-trash"></i>
+                                            </button>
+                                        }
+                                    </td>
+                                </tr>
+                                @if (uploadResults.ContainsKey(file.Name) && !uploadResults[file.Name].Success)
+                                {
+                                    <tr>
+                                        <td colspan="5" class="table-danger">
+                                            <small><i class="bi bi-exclamation-triangle me-1"></i>@uploadResults[file.Name].ErrorMessage</small>
+                                        </td>
+                                    </tr>
+                                }
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        }         
+    </DialogContent>
+    <DialogActions>
+        <MudButton OnClick="Dialog.Cancel" Disabled="@(IsUploading || CanUpload())">Cancelar</MudButton>
+        <MudButton Color="Color.Primary" OnClick="UploadFiles" Disabled="@IsUploading">
+            @if (IsLoading)
+            {
+                @("Enviando...");
+            }
+            else
+            {
+                @($"Enviar (@SelectedFiles.Count arquivo(s))");
+            }
+        </MudButton>
+    </DialogActions>
+</MudDialog>

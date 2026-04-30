@@ -5,7 +5,6 @@ using Estudaki.Modules.Questions.Application.Queries.GetQuestionsByPublicNoticeI
 using EstudaKi.Web.Components.Pages.Features.Backoffice.ExamManager.Components;
 using Microsoft.AspNetCore.Components;
 using MudBlazor;
-using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace EstudaKi.Web.Components.Pages.Features.Backoffice.ExamManager
 {
@@ -92,6 +91,21 @@ namespace EstudaKi.Web.Components.Pages.Features.Backoffice.ExamManager
             
             var options = new DialogOptions { CloseButton = true, MaxWidth = MaxWidth.Medium, FullWidth = true };
             var dialog = await Dialog.ShowAsync<EditPublicNoticeModal>("Editar Edital", parameters, options);           
+            var result = await dialog.Result;
+            if (result is not null && !result.Canceled)
+            {
+                await LoadContent();
+            }
+            return ;
+        }
+
+        protected async Task OpenUploadImagesDialogAsync()
+        {           
+            var parameters = new DialogParameters<UploadImagesModal>();
+            parameters.Add(nameof(UploadImagesModal.Notice), PublicNotice);
+            
+            var options = new DialogOptions { CloseButton = true, MaxWidth = MaxWidth.Medium, FullWidth = true };
+            var dialog = await Dialog.ShowAsync<UploadImagesModal>("Adicionar Imagens", parameters, options);           
             var result = await dialog.Result;
             if (result is not null && !result.Canceled)
             {
