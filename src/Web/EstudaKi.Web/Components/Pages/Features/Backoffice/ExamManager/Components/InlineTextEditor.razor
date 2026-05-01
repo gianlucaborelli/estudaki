@@ -1,0 +1,16 @@
+﻿@inherits InlineTextEditorBase
+
+<MudTextField T="string"
+              @bind-Value="Value.Text"
+              Label="Texto"
+              FullWidth="true"
+              Lines="3"
+              Variant="Variant.Outlined"/>
+<MudGrid>
+    <MudItem>
+        <MudCheckBox @bind-Value="Value.Bold" Label="Negrito" />
+    </MudItem>
+    <MudItem>
+        <MudCheckBox @bind-Value="Value.Italic" Label="Itálico" />
+    </MudItem>    
+</MudGrid>

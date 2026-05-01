@@ -84,6 +84,9 @@ namespace EstudaKi.Web.Components.Pages.Features.Backoffice.ExamManager
             return ;
         }
 
+
+
+
         protected async Task OpenEditPublicNoticeDialogAsync()
         {
             var parameters = new DialogParameters<EditPublicNoticeModal>();
@@ -111,6 +114,30 @@ namespace EstudaKi.Web.Components.Pages.Features.Backoffice.ExamManager
             {
                 await LoadContent();
             }
+            return ;
+        }
+
+        protected async Task OpenQuestionEditorModalAsync()
+        {
+            if (SelectedQuestion is null)
+            {
+                return;
+            }
+            var parameters = new DialogParameters<QuestionEditorModal>();
+            parameters.Add(nameof(QuestionEditorModal.Question), SelectedQuestion);
+            
+            var options = new DialogOptions { CloseButton = true, MaxWidth = MaxWidth.Medium, FullWidth = true };
+            var dialog = await Dialog.ShowAsync<QuestionEditorModal>("Editar Questão", parameters, options);           
+            var result = await dialog.Result;
+            if (result is not null && !result.Canceled)
+            {
+                await LoadContent();
+            }
+            return ;
+        }
+
+        protected async Task OpenDeleteQuestionDialogAsync()
+        {           
             return ;
         }
 

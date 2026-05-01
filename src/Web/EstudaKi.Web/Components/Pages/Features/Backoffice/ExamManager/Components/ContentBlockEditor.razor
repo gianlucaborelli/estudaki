@@ -1,0 +1,116 @@
+﻿@using Estudaki.Modules.Questions.Domain.ValueObjects
+
+@inherits ContentBlockEditorBase
+
+<MudButton Size="Size.Small"
+            Variant="Variant.Filled"
+            Color="Color.Primary"
+            StartIcon="@Icons.Material.Filled.Add"
+            OnClick="() => AddContentBlock(ContentBlockType.Paragraph)">
+    Parágrafo
+</MudButton>
+<MudButton Size="Size.Small"
+            Variant="Variant.Filled"
+            Color="Color.Secondary"
+            StartIcon="@Icons.Material.Filled.Image"            
+            OnClick="() => AddContentBlock(ContentBlockType.Image)">
+    Imagem
+</MudButton>
+
+@if (ContentBlocks.Any())
+{
+    <MudDivider Class="my-3"/>
+
+    <MudStack Row="false">
+    @foreach (var block in ContentBlocks)
+    {           
+        var index = ContentBlocks.IndexOf(block);
+        
+            <MudPaper Elevation="2" Class="pa-3">
+                <MudGrid>
+                    <!-- Campos -->
+                    <MudItem xs="12" md="10">
+                        @if (block is ParagraphBlock paragraph)
+                        {
+                            <MudGrid>
+                                <MudItem xs="12" md="6">
+                                    <MudTextField @bind-Value="paragraph.Title"
+                                                  Label="Título (opcional)"
+                                                  FullWidth="true" />
+                                </MudItem>
+
+                                <MudItem xs="12" md="6">
+                                    <MudTextField @bind-Value="paragraph.Source"
+                                                  Label="Fonte (opcional)"
+                                                  FullWidth="true" />
+                                </MudItem>
+                            </MudGrid>
+                        }
+                        else if (block is ImageBlock)
+                        {
+                            <MudText>Ordem @block.Order</MudText>
+                        }
+                    </MudItem>
+
+                    <!-- Botões -->
+                    <MudItem xs="12" md="2" Class="d-flex justify-end">
+                        <MudButtonGroup Size="Size.Small">
+                            <MudIconButton Icon="@Icons.Material.Filled.ArrowUpward"
+                                           Size="Size.Small"
+                                           Style="border: none !important;"
+                                           Disabled="@(index == 0)"
+                                           OnClick="() => MoveContentBlockUp(index)" />
+
+                            <MudIconButton Icon="@Icons.Material.Filled.ArrowDownward"
+                                           Size="Size.Small"
+                                           Style="border: none !important;"
+                                           Disabled="@(index == ContentBlocks.Count - 1)"
+                                           OnClick="() => MoveContentBlockDown(index)" />
+
+                            <MudIconButton Icon="@Icons.Material.Filled.Delete"
+                                           Size="Size.Small"
+                                           Color="Color.Error"
+                                           Style="border: none !important;"
+                                           OnClick="() => RemoveContentBlock(index)" />
+                        </MudButtonGroup>
+                    </MudItem>
+                </MudGrid>
+
+                @if (block is ParagraphBlock paragraph)
+                {
+                    <MudDivider Class="my-2" />
+                    <ContentInlineEditor Inlines="paragraph.Inlines"></ContentInlineEditor>
+                }
+                else if (block is ImageBlock imageBlock)
+                {
+                    <MudDivider Class="my-2" />
+
+                    <MudTextField @bind-Value="imageBlock.Key" 
+                            Label="Chave da Imagem" 
+                            Variant="Variant.Text" 
+                            Adornment="Adornment.End" 
+                            AdornmentIcon="@Icons.Material.Filled.Search" 
+                            OnAdornmentClick="() => OpenImageSelectorForBlock(index)"
+                            AdornmentAriaLabel=" Pesquisar Arquivos" />
+
+                    <MudTextField @bind-Value="imageBlock.Title"
+                                  Label="Título" />
+
+                    <MudTextField @bind-Value="imageBlock.Source"
+                                  Label="Fonte"/>
+
+                    <MudTextField @bind-Value="imageBlock.Description"
+                                  Label="Descrição"/>                                
+                }
+            </MudPaper>
+        
+    }
+    </MudStack>
+}
+else
+{
+    <div class="alert alert-info">
+        <i class="bi bi-info-circle me-2"></i>
+        Nenhum conteúdo adicionado. Clique nos botões acima para adicionar parágrafos ou imagens.
+    </div>
+}

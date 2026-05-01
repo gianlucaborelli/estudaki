@@ -1,4 +1,5 @@
 using Estudaki.Modules.Questions.Domain.ValueObjects;
+using System.Net.Mime;
 
 namespace Estudaki.Modules.Questions.Application.DTOs;
 
@@ -17,4 +18,58 @@ public class QuestionDto
     public string[] SubAreas { get; set; } = [];
     public List<ContentBlock> QuestionContents { get; set; } = [];
     public List<Choice>? Choices { get; set; }
+
+    public static QuestionDto Clone(QuestionDto original)
+    {
+        return new QuestionDto
+        {
+            Id = original.Id,
+            PublicNoticeId = original.PublicNoticeId,
+            PublicNotice = original.PublicNotice != null ? PublicNoticeDto.Clone(original.PublicNotice) : null,            
+            CreatedAt = original.CreatedAt,
+            IsPublished = original.IsPublished,
+            IsNullified = original.IsNullified,
+            QuestionNumber = original.QuestionNumber,
+            QuestionType = original.QuestionType,
+            MainArea = original.MainArea,
+            SubAreas = (string[])original.SubAreas.Clone(),
+            QuestionSupports = original.QuestionSupports
+                        .Select(s => new QuestionSupportDto
+                        {
+                            Contents = s.Contents,
+                            Id = s.Id,
+                            PublicNoticeId = s.PublicNoticeId
+                        }).ToList(),
+            QuestionContents = original.QuestionContents
+                        .Select<ContentBlock, ContentBlock>(c => c switch
+                        {
+                            ParagraphBlock p => new ParagraphBlock
+                            {
+                                Inlines = p.Inlines,
+                                Title = p.Title,
+                                Order = p.Order
+                            },
+
+                            ImageBlock i => new ImageBlock
+                            {
+                                Key = i.Key,
+                                Title = i.Title,
+                                Source = i.Source,
+                                Description = i.Description,
+                                Order = i.Order
+                            },
+
+                            _ => throw new NotSupportedException()
+                        }).ToList(),
+
+            Choices = original.Choices?
+                        .Select(c => 
+                            new Choice
+                            {
+                                Option = c.Option,
+                                Content = c.Content,
+                                IsCorrect = c.IsCorrect
+                            }).ToList()
+        };
+    }
 }

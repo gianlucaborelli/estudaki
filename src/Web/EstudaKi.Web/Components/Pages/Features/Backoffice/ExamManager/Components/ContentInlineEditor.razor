@@ -1,0 +1,87 @@
+﻿@using Estudaki.Modules.Questions.Domain.ValueObjects
+@inherits ContentInlineEditorBase
+
+<MudStack Row="false">
+    @foreach (var inline in Inlines)
+    {
+        var index = Inlines.IndexOf(inline);
+        
+        <MudGrid>
+        
+            <MudItem xs="11">
+                @if (inline is TextInline textInline)
+                {
+                    <InlineTextEditor Value="@textInline"/>
+                }
+                else if (inline is ImageInline imageInline)
+                {
+                    <InlineImageEditor Value="@imageInline"/>
+                }
+                else if (inline is MathInline mathInline)
+                {
+                
+                    <InlineMathEditor Latex="@mathInline.Latex"
+                                    LatexChanged="@((newLatex) => mathInline.Latex = newLatex)" />
+                }
+                else if (inline is ChemicalFormulaInline chemicalInline)
+                {
+                    <InlineChemicalFormulaEditor Formula="@chemicalInline.Formula"
+                                            FormulaChanged="@((newFormula) => chemicalInline.Formula = newFormula)" />             
+                }
+            </MudItem>
+
+            <MudItem xs="1" Class="d-flex justify-end">
+                <div class="d-flex flex-column">
+                    <MudIconButton Icon="@Icons.Material.Filled.ArrowUpward"
+                                   Size="Size.Small"
+                                   Disabled="@(index == 0)"
+                                   OnClick="() => MoveInlineUp(index)" />
+                    <MudSpacer />
+                    <MudIconButton Icon="@Icons.Material.Filled.Delete"
+                                   Size="Size.Small"
+                                   Color="Color.Error"
+                                   OnClick="() => RemoveInline(index)" />
+                    <MudSpacer />
+                    <MudIconButton Icon="@Icons.Material.Filled.ArrowDownward"
+                                   Size="Size.Small"
+                                   Disabled="@(index == Inlines.Count - 1)"
+                                   OnClick="() => MoveInlineDown(index)" />
+                </div>  
+            </MudItem>
+        </MudGrid>
+        <MudDivider Class="my-2" />
+    }
+</MudStack>
+
+@* Botões para adicionar inlines *@
+
+<MudButton Size="Size.Small"
+            Variant="Variant.Outlined"
+            StartIcon="@Icons.Material.Filled.Add"
+            OnClick="() => AddInlineContent(InlineType.Text)">
+    Adicionar Texto
+</MudButton>
+<MudButton Size="Size.Small"
+            Variant="Variant.Outlined"
+            StartIcon="@Icons.Material.Filled.Image"
+            Class="ms-2"
+            OnClick="() => AddInlineContent(InlineType.Image)">
+    Adicionar Imagem
+</MudButton>
+<MudButton Size="Size.Small"
+            Variant="Variant.Outlined"
+            StartIcon="@Icons.Material.Filled.Functions"
+            Class="ms-2"
+            Color="Color.Secondary"
+            OnClick="() => AddInlineContent(InlineType.Math)">
+    Adicionar Fórmula
+</MudButton>
+<MudButton Size="Size.Small"
+            Variant="Variant.Outlined"
+            StartIcon="@Icons.Material.Filled.Science"
+            Class="ms-2"
+            Color="Color.Tertiary"
+            OnClick="() => AddInlineContent(InlineType.Chemical)">
+    Adicionar Química
+</MudButton>
+

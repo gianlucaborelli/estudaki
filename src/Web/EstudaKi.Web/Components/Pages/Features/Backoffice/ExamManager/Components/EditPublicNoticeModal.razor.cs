@@ -27,10 +27,7 @@ namespace EstudaKi.Web.Components.Pages.Features.Backoffice.ExamManager.Componen
 
         protected async Task SavePublicNotice()
         {
-            // Lógica para salvar o edital
+            // TODO: Lógica para salvar o edital
         }
-
-        
-
     }
 }

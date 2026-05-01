@@ -1,0 +1,69 @@
+@using Microsoft.JSInterop
+@inject IJSRuntime JSRuntime
+@* @implements IAsyncDisposable *@
+
+
+<MudTextField @bind-Value="Latex"
+              @oninput="OnLatexInput"
+              Variant="Variant.Outlined"
+              Immediate="true"
+              Label="Fórmula LaTeX"
+              Lines="2"/>      
+
+<div class="mb-2">
+    <label class="form-label fw-bold">Preview (Renderizado):</label>
+    <div class="math-preview border rounded p-3 bg-light" 
+            id="@previewId" 
+            style="min-height: 60px; font-size: 1.2rem;">
+    </div>
+</div>
+
+
+@code {
+    [Parameter] public string? Latex { get; set; }
+    [Parameter] public EventCallback<string> LatexChanged { get; set; }
+        
+    private string previewId = $"math-preview-{Guid.NewGuid()}";
+    private bool isRendered = false;
+
+    protected override void OnParametersSet()
+    {   
+        _ = UpdatePreview();
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            isRendered = true;
+            await UpdatePreview();
+        }
+    }
+        
+    private async Task OnLatexInput(ChangeEventArgs e)
+    {
+        var lastrenderedValue = Latex;        
+        var newValue = e.Value?.ToString() ?? string.Empty;
+
+        if(lastrenderedValue == newValue)
+            return;
+
+        Latex = newValue;
+        await UpdatePreview();        
+    }
+
+    private async Task UpdatePreview()
+    {
+        if (!isRendered) return;
+
+        try
+        {
+            await JSRuntime.InvokeVoidAsync("MathQuillHelper.renderStatic", previewId, Latex);
+            await LatexChanged.InvokeAsync(Latex);
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Erro ao renderizar MathQuill: {ex.Message}");
+        }
+    }
+}

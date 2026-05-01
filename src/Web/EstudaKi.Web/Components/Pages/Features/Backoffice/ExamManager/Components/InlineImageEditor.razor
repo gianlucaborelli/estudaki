@@ -1,0 +1,30 @@
+﻿@inherits InlineImageEditorBase
+
+
+<MudDivider Class="my-2" />
+
+<MudTextField @bind-Value="Value.Key"
+              Label="Chave da Imagem"
+              Variant="Variant.Text"
+              Adornment="Adornment.End"
+              AdornmentIcon="@Icons.Material.Filled.Search"
+              OnAdornmentClick="() => OpenImageSelectorForInline()"
+              AdornmentAriaLabel=" Pesquisar Arquivos" />
+
+<MudTextField @bind-Value="Value.Alt"
+              Label="Texto Alternativo" />
+
+<MudGrid>
+    <MudItem xs="12" md="6">
+        <MudTextField @bind-Value="Value.Width"
+                      Label="Largura"
+                      Variant="Variant.Text"
+                      Type="number" />
+    </MudItem>
+    <MudItem xs="12" md="6">
+        <MudTextField @bind-Value="Value.Height"
+                      Label="Altura"
+                      Variant="Variant.Text"
+                      Type="number" />
+    </MudItem>
+</MudGrid>

@@ -161,6 +161,14 @@ else
 
                 <!-- Ocupa 3/4 -->
                 <MudItem xs="12" md="9">
+                    <MudToolBar Dense="true">                        
+                        <MudTooltip Text="Editar Questão" Arrow="true" Placement="Placement.Top">
+                            <MudIconButton Icon="@Icons.Material.Filled.Edit" Disabled="@(SelectedQuestion == null)" OnClick="() => OpenQuestionEditorModalAsync()" />
+                        </MudTooltip>
+                        <MudTooltip Text="Remover Questão" Arrow="true" Placement="Placement.Top">
+                            <MudIconButton Icon="@Icons.Material.Filled.Delete" Disabled="@(SelectedQuestion == null)" OnClick="() => OpenDeleteQuestionDialogAsync()" />
+                        </MudTooltip>
+                    </MudToolBar>
                     <QuestionComponent Value="SelectedQuestion" />
                 </MudItem>
             </MudGrid>

@@ -1,0 +1,361 @@
+@using Estudaki.Modules.Questions.Application.DTOs
+@using Estudaki.Modules.Questions.Domain.Entities
+@using Estudaki.Modules.Questions.Domain.ValueObjects
+
+@inherits QuestionEditorModalBase
+
+<MudDialog>
+    <DialogContent>
+        <EditForm Model="@Question">          
+                
+            <MudGrid Spacing="3">
+                <MudItem xs="12" md="6">
+                    <MudTextField @bind-Value="EditedQuestion.QuestionNumber" Label="Número" />
+                </MudItem>
+                <MudItem xs="12" md="6">
+                    <MudTextField @bind-Value="EditedQuestion.MainArea" Label="Área Principal" />
+                </MudItem>
+                <MudItem xs="12" md="6">
+                    <MudTextField @bind-Value="EditedQuestion.SubAreas" Label="Subareas" />
+                </MudItem>                    
+                <MudItem xs="12" md="6">
+                    <MudSelect @bind-Value="EditedQuestion.QuestionType" Label="Tipo de questão">
+                        @foreach (var type in QuestionType.All)
+                        {
+                            <MudSelectItem Value="@type">@QuestionType.GetDisplayName(type)</MudSelectItem>
+                        }
+                    </MudSelect>
+                </MudItem>
+                <MudItem xs="12">
+                    <MudGrid Class="py-5">
+                        <MudCheckBox @bind-Value="EditedQuestion.IsNullified" Label="Anulada Pela Banca" />
+                        <MudSpacer />
+                        <MudCheckBox @bind-Value="EditedQuestion.IsPublished" Label="Publicado" />                            
+                    </MudGrid>
+                </MudItem>
+            </MudGrid>
+
+            <MudTabs Elevation="2" Rounded="true" ApplyEffectsToContainer="true" TabPanelsClass="pa-6">
+                <MudTabPanel Text="Enunciado">
+                    <ContentBlockEditor ContentBlocks="@Question!.QuestionContents" />
+                </MudTabPanel>
+                <MudTabPanel Text="@($"Alternativas ({Question!.Choices?.Count ?? 0})")">
+                    <MudButton Size="Size.Small"                                
+                                Variant="Variant.Filled"
+                                Color="Color.Success"
+                                StartIcon="@Icons.Material.Filled.Add"
+                                OnClick="AddChoice">
+                        Adicionar Alternativa
+                    </MudButton>
+                    
+                    @if (Question.Choices != null && Question.Choices.Any())
+                    {
+                        @for (int i = 0; i < Question.Choices.Count; i++)
+                        {
+                            var choiceIndex = i;
+                            var choice = Question.Choices[choiceIndex];
+
+                            <div class="border rounded p-3 mb-3 @(choice.IsCorrect ? "border-success bg-light" : "")">
+                                <div class="d-flex justify-content-between align-items-start mb-2">
+                                    <div class="flex-grow-1">
+                                        <div class="row g-2 mb-2">
+                                            <div class="col-md-2">
+                                                <label class="form-label">Opção</label>
+                                                <input type="text"
+                                                        @bind="choice.Option"
+                                                        class="form-control"
+                                                        placeholder="A" />
+                                            </div>
+                                            <div class="col-md-10">
+                                                <div class="form-check form-switch mt-4">
+                                                    <input type="checkbox"
+                                                            @bind="choice.IsCorrect"
+                                                            class="form-check-input"
+                                                            id="@($"correct-{choiceIndex}")">
+                                                    <label class="form-check-label fw-bold text-success" for="@($"correct-{choiceIndex}")">
+                                                        <i class="bi bi-check-circle me-1"></i>Alternativa Correta
+                                                    </label>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        @* Conteúdo da Alternativa (Inlines) *@
+                                        <div class="mt-2">
+                                            <label class="form-label fw-bold">Conteúdo:</label>
+                                            @for (int j = 0; j < choice.Content.Count; j++)
+                                            {
+                                                var inlineIndex = j;
+                                                var inline = choice.Content[inlineIndex];
+
+                                                <div class="border rounded p-2 mb-2 bg-white">
+                                                    <div class="d-flex justify-content-between align-items-start mb-2">
+                                                        <span class="badge bg-secondary">
+                                                            @if (inline is TextInline)
+                                                            {
+                                                                <text>Texto</text>
+                                                            }
+                                                            else if (inline is ImageInline)
+                                                            {
+                                                                <text>Imagem</text>
+                                                            }
+                                                            else if (inline is MathInline)
+                                                            {
+                                                                <text>Fórmula</text>
+                                                            }
+                                                            else if (inline is ChemicalFormulaInline)
+                                                            {
+                                                                <text>Química</text>
+                                                            }
+                                                        </span>
+                                                        <MudButtonGroup Size="Size.Small" Variant="Variant.Text">
+                                                            <MudIconButton Icon="@Icons.Material.Filled.ArrowUpward"
+                                                                            Size="Size.Small"
+                                                                            Disabled="@(inlineIndex == 0)"
+                                                                            OnClick="() => MoveChoiceInlineUp(choiceIndex, inlineIndex)" />
+                                                            <MudIconButton Icon="@Icons.Material.Filled.ArrowDownward"
+                                                                            Size="Size.Small"
+                                                                            Disabled="@(inlineIndex == choice.Content.Count - 1)"
+                                                                            OnClick="() => MoveChoiceInlineDown(choiceIndex, inlineIndex)" />
+                                                            <MudIconButton Icon="@Icons.Material.Filled.Delete"
+                                                                            Size="Size.Small"
+                                                                            Color="Color.Error"
+                                                                            OnClick="() => RemoveChoiceInline(choiceIndex, inlineIndex)" />
+                                                        </MudButtonGroup>
+                                                    </div>
+
+                                                    @if (inline is TextInline textInline)
+                                                    {
+                                                        <div class="mb-2">
+                                                            <textarea @bind="textInline.Text"
+                                                                        class="form-control"
+                                                                        rows="2"></textarea>
+                                                        </div>
+                                                        <div class="form-check form-check-inline">
+                                                            <input type="checkbox"
+                                                                    @bind="textInline.Bold"
+                                                                    class="form-check-input"
+                                                                    id="@($"choice-bold-{choiceIndex}-{inlineIndex}")">
+                                                            <label class="form-check-label" for="@($"choice-bold-{choiceIndex}-{inlineIndex}")">
+                                                                <strong>Negrito</strong>
+                                                            </label>
+                                                        </div>
+                                                        <div class="form-check form-check-inline">
+                                                            <input type="checkbox"
+                                                                    @bind="textInline.Italic"
+                                                                    class="form-check-input"
+                                                                    id="@($"choice-italic-{choiceIndex}-{inlineIndex}")">
+                                                            <label class="form-check-label" for="@($"choice-italic-{choiceIndex}-{inlineIndex}")">
+                                                                <em>Itálico</em>
+                                                            </label>
+                                                        </div>
+                                                    }
+                                                    else if (inline is ImageInline imageInline)
+                                                    {
+                                                        <div class="row g-2">
+                                                            <div class="col-md-6">
+                                                                <label class="form-label">Chave</label>
+                                                                <input type="text"
+                                                                        @bind="imageInline.Key"
+                                                                        class="form-control" />
+                                                            </div>
+                                                            <div class="col-md-6">
+                                                                <label class="form-label">Alt</label>
+                                                                <input type="text"
+                                                                        @bind="imageInline.Alt"
+                                                                        class="form-control" />
+                                                            </div>
+                                                            <div class="col-md-6">
+                                                                <label class="form-label">Largura</label>
+                                                                <input type="number"
+                                                                        @bind="imageInline.Width"
+                                                                        class="form-control" />
+                                                            </div>
+                                                            <div class="col-md-6">
+                                                                <label class="form-label">Altura</label>
+                                                                <input type="number"
+                                                                        @bind="imageInline.Height"
+                                                                        class="form-control" />
+                                                            </div>
+                                                        </div>
+                                                    }
+                                                    else if (inline is MathInline mathInline)
+                                                    {
+                                                        <div class="math-inline-editor">
+                                                            <InlineMathEditor Latex="@mathInline.Latex"
+                                                                        LatexChanged="@((newLatex) => mathInline.Latex = newLatex)" />
+                                                        </div>
+                                                    }
+                                                    else if (inline is ChemicalFormulaInline chemicalInline)
+                                                    {
+                                                        <div class="chemical-inline-editor">
+                                                            <InlineChemicalFormulaEditor Formula="@chemicalInline.Formula"
+                                                                                    FormulaChanged="@((newFormula) => chemicalInline.Formula = newFormula)" />
+                                                        </div>
+                                                    }
+                                                </div>
+                                            }
+
+                                            @* Botões para adicionar conteúdo à alternativa *@
+                                            <div class="mt-2">
+                                                <MudButton Size="Size.Small"
+                                                            Variant="Variant.Text"
+                                                            StartIcon="@Icons.Material.Filled.Add"
+                                                            OnClick="() => AddChoiceInlineContent(choiceIndex, InlineType.Text)">
+                                                    Texto
+                                                </MudButton>
+                                                <MudButton Size="Size.Small"
+                                                            Variant="Variant.Text"
+                                                            StartIcon="@Icons.Material.Filled.Image"
+                                                            OnClick="() => AddChoiceInlineContent(choiceIndex, InlineType.Image)">
+                                                    Imagem
+                                                </MudButton>
+                                                <MudButton Size="Size.Small"
+                                                            Variant="Variant.Text"
+                                                            StartIcon="@Icons.Material.Filled.Functions"
+                                                            Color="Color.Secondary"
+                                                            OnClick="() => AddChoiceInlineContent(choiceIndex, InlineType.Math)">
+                                                    Fórmula
+                                                </MudButton>
+                                                <MudButton Size="Size.Small"
+                                                            Variant="Variant.Text"
+                                                            StartIcon="@Icons.Material.Filled.Science"
+                                                            Color="Color.Tertiary"
+                                                            OnClick="() => AddChoiceInlineContent(choiceIndex, InlineType.Chemical)">
+                                                    Química
+                                                </MudButton>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="ms-2">
+                                        <MudButtonGroup Vertical="true" Size="Size.Small" Variant="Variant.Outlined">
+                                            <MudIconButton Icon="@Icons.Material.Filled.ArrowUpward"
+                                                            Size="Size.Small"
+                                                            Disabled="@(choiceIndex == 0)"
+                                                            OnClick="() => MoveChoiceUp(choiceIndex)" />
+                                            <MudIconButton Icon="@Icons.Material.Filled.ArrowDownward"
+                                                            Size="Size.Small"
+                                                            Disabled="@(choiceIndex == Question.Choices.Count - 1)"
+                                                            OnClick="() => MoveChoiceDown(choiceIndex)" />
+                                            <MudIconButton Icon="@Icons.Material.Filled.Delete"
+                                                            Size="Size.Small"
+                                                            Color="Color.Error"
+                                                            OnClick="() => RemoveChoice(choiceIndex)" />
+                                        </MudButtonGroup>
+                                    </div>
+                                </div>
+                            </div>
+                        }
+                    }
+                    else
+                    {
+                        <div class="alert alert-info">
+                            <i class="bi bi-info-circle me-2"></i>
+                            Nenhuma alternativa adicionada. Clique no botão acima para adicionar alternativas.
+                        </div>
+                    }
+                </MudTabPanel>
+                <MudTabPanel Text="Conteúdo de Apoio">
+                    <div class="card mb-3">
+                        <div class="card-header bg-light d-flex justify-content-between align-items-center">
+                            <h6 class="mb-0"><i class="bi bi-file-text me-2"></i>Textos de Apoio Vinculados (@(Question.QuestionSupports?.Count ?? 0))</h6>
+                            @if (AvailableQuestionSupports != null && AvailableQuestionSupports.Any())
+                            {
+                                <MudButton Size="Size.Small"
+                                           Variant="Variant.Filled"
+                                           Color="Color.Info"
+                                           StartIcon="@Icons.Material.Filled.Link"
+                                           OnClick="OpenLinkSupportDialog">
+                                    Vincular Texto de Apoio
+                                </MudButton>
+                            }
+                        </div>
+                        <div class="card-body">
+                            @if (Question.QuestionSupports != null && Question.QuestionSupports.Any())
+                            {
+                                <div class="list-group">
+                                    @foreach (var supportId in Question.QuestionSupports)
+                                    {
+                                        var support = AvailableQuestionSupports?.FirstOrDefault(s => s.Id == supportId.Id);
+                                        if (support != null)
+                                        {
+                                            var index = AvailableQuestionSupports.IndexOf(support) + 1;
+                                            var preview = GetSupportPreview(support);
+                                            <div class="list-group-item">
+                                                <div class="d-flex justify-content-between align-items-start">
+                                                    <div class="flex-grow-1 me-3">
+                                                        <div class="d-flex align-items-center mb-1">
+                                                            <strong class="me-2">Texto de Apoio #@index</strong>
+                                                            <span class="badge bg-success">Vinculado</span>
+                                                        </div>
+                                                        <small class="text-muted d-block mb-2">@support.Contents.Count bloco(s) de conteúdo</small>
+                                                        @if (!string.IsNullOrEmpty(preview))
+                                                        {
+                                                            <div class="bg-light border rounded p-2" style="font-size: 0.85rem;">
+                                                                <strong class="text-primary">Preview:</strong>
+                                                                <div class="text-muted" style="white-space: pre-wrap; max-height: 50px; overflow: hidden; text-overflow: ellipsis;">@preview</div>
+                                                            </div>
+                                                        }
+                                                    </div>
+                                                    <div>
+                                                        <MudButton Size="Size.Small"
+                                                                   Variant="Variant.Filled"
+                                                                   Color="Color.Error"
+                                                                   StartIcon="@Icons.Material.Filled.LinkOff"
+                                                                   OnClick="() => UnlinkQuestionSupport(supportId.Id)">
+                                                            Desvincular
+                                                        </MudButton>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        }
+                                        else
+                                        {
+                                            @* Exibir aviso quando o suporte não é encontrado *@
+                                            <div class="list-group-item list-group-item-warning">
+                                                <div class="d-flex justify-content-between align-items-center">
+                                                    <div>
+                                                        <i class="bi bi-exclamation-triangle me-2"></i>
+                                                        <strong>Texto de Apoio não encontrado</strong>
+                                                        <br />
+                                                        <small class="text-muted">ID: @supportId</small>
+                                                    </div>
+                                                    <MudButton Size="Size.Small"
+                                                               Variant="Variant.Filled"
+                                                               Color="Color.Error"
+                                                               StartIcon="@Icons.Material.Filled.Delete"
+                                                               OnClick="() => UnlinkQuestionSupport(supportId.Id)">
+                                                        Remover Vínculo
+                                                    </MudButton>
+                                                </div>
+                                            </div>
+                                        }
+                                    }
+                                </div>
+                            }
+                            else
+                            {
+                                <div class="alert alert-info">
+                                    <i class="bi bi-info-circle me-2"></i>
+                                    Nenhum texto de apoio vinculado.
+                                    @if (AvailableQuestionSupports == null || !AvailableQuestionSupports.Any())
+                                    {
+                                        <span>Não há textos de apoio disponíveis para esta prova.</span>
+                                    }
+                                    else
+                                    {
+                                        <span>Clique no botão acima para vincular textos de apoio.</span>
+                                    }
+                                </div>
+                            }
+                        </div>
+                    </div>
+                </MudTabPanel>
+            </MudTabs>            
+        </EditForm>
+    </DialogContent>
+    <DialogActions>
+        <MudButton Variant="Variant.Text" Color="Color.Secondary" OnClick="() => Dialog.Cancel()">Cancelar</MudButton>
+        <MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="() => Dialog.Close(DialogResult.Ok(true))">Salvar</MudButton>
+    </DialogActions>
+</MudDialog>
