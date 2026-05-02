@@ -14,4 +14,10 @@ public static class QuestionSupportMapper
             Contents = questionSupport.Contents
         };
     }
+
+
+    public static List<QuestionSupportDto> ToDtoList(this List<QuestionSupport> questionSupports)
+    {
+        return questionSupports.Select(q => q.ToDto()).ToList();
+    }
 }

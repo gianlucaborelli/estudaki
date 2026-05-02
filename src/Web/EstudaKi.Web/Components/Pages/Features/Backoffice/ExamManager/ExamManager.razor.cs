@@ -2,7 +2,9 @@
 using Estudaki.Modules.Questions.Application.DTOs;
 using Estudaki.Modules.Questions.Application.Queries.GetPublicNoticeById;
 using Estudaki.Modules.Questions.Application.Queries.GetQuestionsByPublicNoticeId;
+using Estudaki.Modules.Questions.Application.Queries.GetQuestionSupportsByPublicNoticeId;
 using EstudaKi.Web.Components.Pages.Features.Backoffice.ExamManager.Components;
+using EstudaKi.Web.Components.Shared;
 using Microsoft.AspNetCore.Components;
 using MudBlazor;
 
@@ -12,7 +14,6 @@ namespace EstudaKi.Web.Components.Pages.Features.Backoffice.ExamManager
     {
         [Parameter]
         public string Id { get; set; } = string.Empty;
-
         [Inject]
         public NavigationManager NavigationManager { get; set; } = default!;
         [Inject]
@@ -23,7 +24,9 @@ namespace EstudaKi.Web.Components.Pages.Features.Backoffice.ExamManager
         protected bool IsLoading { get; set; } = false;
         protected PublicNoticeDto PublicNotice { get; set; } = default!;
         protected List<QuestionDto> QuestionList { get; set; } = [];
+        protected List<QuestionSupportDto> QuestionSupports { get; set; } = [];
         protected QuestionDto? SelectedQuestion { get; set; } = null;
+        protected QuestionSupportDto? SelectedQuestionSupport { get; set; }
 
         protected override async Task OnInitializedAsync()
         {
@@ -46,9 +49,12 @@ namespace EstudaKi.Web.Components.Pages.Features.Backoffice.ExamManager
                 PublicNotice = publicNotice;
 
                 var questionsQuery = new GetQuestionsByPublicNoticeIdQuery(Id);
-                var questions = await QueryDispatcher
-                                            .DispatchAsync<GetQuestionsByPublicNoticeIdQuery, List<QuestionDto>>(questionsQuery);
-                QuestionList = questions;
+                QuestionList = await QueryDispatcher
+                                            .DispatchAsync<GetQuestionsByPublicNoticeIdQuery, List<QuestionDto>>(questionsQuery);                
+
+                var questionSupportsQuery = new GetQuestionSupportsByPublicNoticeIdQuery(PublicNotice.Id);
+                QuestionSupports = await QueryDispatcher
+                                            .DispatchAsync<GetQuestionSupportsByPublicNoticeIdQuery, List<QuestionSupportDto>>(questionSupportsQuery);
             }
             catch (Exception ex)
             {
@@ -61,20 +67,14 @@ namespace EstudaKi.Web.Components.Pages.Features.Backoffice.ExamManager
             }
         }
 
-        protected void QuestionsRowClickEvent(TableRowClickEventArgs<QuestionDto> tableRowClickEventArgs)
-        {
-            SelectedQuestion = tableRowClickEventArgs.Item;
-        }
-
         protected async Task OpenUploadFileDialogAsync()
         {
-            var parameters = new DialogParameters<UploadExamFilesModal>();
-            parameters.Add(nameof(UploadExamFilesModal.Notice), PublicNotice);
+            var parameters = new DialogParameters<UploadExamFilesModal> {
+                { x => x.Notice, PublicNotice }
+            };
             
             var options = new DialogOptions { CloseButton = true, MaxWidth = MaxWidth.Medium, FullWidth = true };
-
             var dialog = await Dialog.ShowAsync<UploadExamFilesModal>("Upload de Arquivos do Edital", parameters, options);           
-
             var result = await dialog.Result;
 
             if (result is not null && !result.Canceled)
@@ -84,36 +84,33 @@ namespace EstudaKi.Web.Components.Pages.Features.Backoffice.ExamManager
             return ;
         }
 
-
-
-
         protected async Task OpenEditPublicNoticeDialogAsync()
         {
-            var parameters = new DialogParameters<EditPublicNoticeModal>();
-            parameters.Add(nameof(EditPublicNoticeModal.OriginalNoticePublic), PublicNotice);
+            var parameters = new DialogParameters<EditPublicNoticeModal> {
+                { x => x.OriginalNoticePublic, PublicNotice }
+            };
             
             var options = new DialogOptions { CloseButton = true, MaxWidth = MaxWidth.Medium, FullWidth = true };
             var dialog = await Dialog.ShowAsync<EditPublicNoticeModal>("Editar Edital", parameters, options);           
             var result = await dialog.Result;
-            if (result is not null && !result.Canceled)
-            {
-                await LoadContent();
-            }
+
+            if (result is not null && !result.Canceled) await LoadContent();
+
             return ;
         }
 
         protected async Task OpenUploadImagesDialogAsync()
         {           
-            var parameters = new DialogParameters<UploadImagesModal>();
-            parameters.Add(nameof(UploadImagesModal.Notice), PublicNotice);
+            var parameters = new DialogParameters<UploadImagesModal> {
+                { x => x.Notice, PublicNotice }
+            };
             
             var options = new DialogOptions { CloseButton = true, MaxWidth = MaxWidth.Medium, FullWidth = true };
             var dialog = await Dialog.ShowAsync<UploadImagesModal>("Adicionar Imagens", parameters, options);           
             var result = await dialog.Result;
-            if (result is not null && !result.Canceled)
-            {
-                await LoadContent();
-            }
+
+            if (result is not null && !result.Canceled) await LoadContent();
+
             return ;
         }
 
@@ -123,9 +120,11 @@ namespace EstudaKi.Web.Components.Pages.Features.Backoffice.ExamManager
             {
                 return;
             }
-            var parameters = new DialogParameters<QuestionEditorModal>();
-            parameters.Add(nameof(QuestionEditorModal.Question), SelectedQuestion);
-            
+            var parameters = new DialogParameters<QuestionEditorModal>{
+                { x => x.Question, SelectedQuestion },
+                { x => x.AvailableQuestionSupports, QuestionSupports  }
+            };
+
             var options = new DialogOptions { CloseButton = true, MaxWidth = MaxWidth.Medium, FullWidth = true };
             var dialog = await Dialog.ShowAsync<QuestionEditorModal>("Editar Questão", parameters, options);           
             var result = await dialog.Result;
@@ -136,12 +135,86 @@ namespace EstudaKi.Web.Components.Pages.Features.Backoffice.ExamManager
             return ;
         }
 
-        protected async Task OpenDeleteQuestionDialogAsync()
-        {           
+        protected async Task OpenQuestionSupportEditorModalAsync(bool isNew = false)
+        {
+            if (isNew) SelectedQuestionSupport = new QuestionSupportDto();
+
+            if (SelectedQuestionSupport is null) return;
+
+            var parameters = new DialogParameters<QuestionSupportEditorModal>{
+                { x => x.QuestionSupport, SelectedQuestionSupport  },
+                { x => x.Notice, PublicNotice  },
+            };
+            var options = new DialogOptions { CloseButton = true, MaxWidth = MaxWidth.Medium, FullWidth = true };
+            var dialog = await Dialog.ShowAsync<QuestionSupportEditorModal>("Editar Suporte de Questão", parameters, options);           
+            var result = await dialog.Result;
+            if (result is not null && !result.Canceled)
+            {
+                await LoadContent();
+            }
             return ;
+        }
+
+        protected async Task DeleteQuestionAsync()
+        {
+            if (SelectedQuestion == null) return;
+            var parameters = new DialogParameters<CustomDialog>
+            {
+                { x => x.ContentText, "Deseja realmente excluir esta questão? Este processo não pode ser desfeito." },
+                { x => x.ButtonText, "Excluir" },
+                { x => x.Color, Color.Error }
+            };
+            var options = new DialogOptions() { CloseButton = true, MaxWidth = MaxWidth.ExtraSmall };
+            var dialog = await Dialog.ShowAsync<CustomDialog>("Confirmar Delete", parameters, options);
+            var result = await dialog.Result;
+
+            if (result is not null && !result.Canceled)
+            {
+                // Call your delete method here, e.g.:
+                // await YourDeleteMethod(SelectedQuestion.Id);
+                await LoadContent();
+            }
+
+            return;
+        }
+
+        protected async Task DeleteQuestionSupportAsync()
+        {
+            if (SelectedQuestionSupport == null) return;
+            var parameters = new DialogParameters<CustomDialog>
+            {
+                { x => x.ContentText, "Deseja realmente excluir este suporte de questão? Este processo não pode ser desfeito." },
+                { x => x.ButtonText, "Excluir" },
+                { x => x.Color, Color.Error }
+            };
+            var options = new DialogOptions() { CloseButton = true, MaxWidth = MaxWidth.ExtraSmall };
+            var dialog = await Dialog.ShowAsync<CustomDialog>("Confirmar Delete", parameters, options);
+            var result = await dialog.Result;
+
+            if (result is not null && !result.Canceled)
+            {
+                // Call your delete method here, e.g.:
+                // await YourDeleteMethod(SelectedQuestionSupport.Id);
+                await LoadContent();
+            }
+
+            return;
+        }
+
+        protected void QuestionsRowClickEvent(TableRowClickEventArgs<QuestionDto> tableRowClickEventArgs)
+        {
+            SelectedQuestion = tableRowClickEventArgs.Item;
+        }
+
+        protected void QuestionSupportRowClickEvent(TableRowClickEventArgs<QuestionSupportDto> tableRowClickEventArgs)
+        {
+            SelectedQuestionSupport = tableRowClickEventArgs.Item;
         }
 
         protected string SelectedQuestionRowClassFunc(QuestionDto question, int rowNumber)
             => SelectedQuestion == question ? "selected" : string.Empty;
+
+        protected string SelectedQuestionSupportRowClassFunc(QuestionSupportDto questionSupport, int rowNumber)
+            => SelectedQuestionSupport == questionSupport ? "selected" : string.Empty;
     }
 }

@@ -1,5 +1,3 @@
-using System.Runtime.CompilerServices;
-
 namespace Estudaki.Modules.Questions.Application.DTOs;
 
 public class PublicNoticeDto
@@ -9,6 +7,7 @@ public class PublicNoticeDto
     public int Year { get; set; }
     public string? ExamPhase { get; set; }
     public string? ExamBoard { get; set; }
+    public string? ExamRequester { get; set; }
     public string? ExamCategory { get; set; }
     public string? Position { get; set; }
     public bool IsReviewed { get; set; }
@@ -16,7 +15,6 @@ public class PublicNoticeDto
     public string? ExamBookletUrl { get; set; }
     public string? AnswerKeyUrl { get; set; }
     public bool HasAttachments { get; set; }
-
     public DateTime CreatedAt { get; set; }
 
 
@@ -29,6 +27,7 @@ public class PublicNoticeDto
             Year = original.Year,
             ExamPhase = original.ExamPhase,
             ExamBoard = original.ExamBoard,
+            ExamRequester = original.
             ExamCategory = original.ExamCategory,
             Position = original.Position,
             IsReviewed = original.IsReviewed,

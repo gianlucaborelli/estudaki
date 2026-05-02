@@ -16,6 +16,7 @@ public static class PublicNoticeMapper
             Year = notice.Year,
             ExamPhase = notice.ExamPhase,
             ExamBoard = notice.ExamBoard,
+            ExamRequester = notice.ExamRequester,
             ExamCategory = notice.ExamCategory,
             IsReviewed = notice.IsReviewed,
             IsPublished = notice.IsPublished,

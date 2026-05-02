@@ -14,11 +14,12 @@ public class QuestionEditorModalBase : ComponentBase
     protected ILogger<QuestionEditorModalBase> Logger { get; set; } = default!;
 
     [Parameter]
+    public List<QuestionSupportDto> AvailableQuestionSupports { get; set; } = [];
+
+    [Parameter]
     public QuestionDto? Question { get; set; }
     public QuestionDto EditedQuestion { get; set; } = new QuestionDto();
 
-    [Parameter]
-    public List<QuestionSupport>? AvailableQuestionSupports { get; set; }
 
     // Enums
     protected enum InlineType { Text, Image, Math, Chemical }
@@ -46,11 +47,6 @@ public class QuestionEditorModalBase : ComponentBase
         Logger.LogInformation("Questão salva: {QuestionId}", EditedQuestion.Id);
     }
 
-
-
-
-
-
     // ==================== MÉTODOS DE GERENCIAMENTO DE QUESTION SUPPORTS ====================
 
     protected void OpenLinkSupportDialog()
@@ -66,27 +62,44 @@ public class QuestionEditorModalBase : ComponentBase
         Logger.LogDebug("Dialog de vincular textos de apoio fechado");
         StateHasChanged();
     }
-
-    protected void ToggleQuestionSupport(string supportId)
+    
+    protected void ToggleQuestionSupportLink(QuestionSupportDto support, bool isChecked)
     {
-        // if (Question == null || string.IsNullOrEmpty(supportId)) 
-        // {
-        //     Logger.LogWarning("Tentativa de vincular/desvincular suporte com ID inválido");
-        //     return;
-        // }
+        if (isChecked)
+        {
+            EditedQuestion.QuestionSupports ??= new List<QuestionSupportDto>();
+            if (!EditedQuestion.QuestionSupports.Contains(support))
+            {
+                EditedQuestion.QuestionSupports.Add(support);
+            }
+        }
+        else
+        {
+            var supportInList = EditedQuestion.QuestionSupports.FirstOrDefault(x => x.Id == support.Id);
+            if (supportInList != null)
+            {
+                EditedQuestion.QuestionSupports.Remove(supportInList);
+            }
+        }
 
-        // if (Question.QuestionSupports.Contains(supportId))
-        // {
-        //     Question.QuestionSupports.Remove(supportId);
-        //     Logger.LogDebug("QuestionSupport {SupportId} desvinculado da questão. Total: {Count}", supportId, Question.QuestionSupports.Count);
-        // }
-        // else
-        // {
-        //     Question.QuestionSupports.Add(supportId);
-        //     Logger.LogDebug("QuestionSupport {SupportId} vinculado à questão. Total: {Count}", supportId, Question.QuestionSupports.Count);
-        // }
+            // if (Question == null || string.IsNullOrEmpty(supportId)) 
+            // {
+            //     Logger.LogWarning("Tentativa de vincular/desvincular suporte com ID inválido");
+            //     return;
+            // }
 
-        StateHasChanged();
+            // if (Question.QuestionSupports.Contains(supportId))
+            // {
+            //     Question.QuestionSupports.Remove(supportId);
+            //     Logger.LogDebug("QuestionSupport {SupportId} desvinculado da questão. Total: {Count}", supportId, Question.QuestionSupports.Count);
+            // }
+            // else
+            // {
+            //     Question.QuestionSupports.Add(supportId);
+            //     Logger.LogDebug("QuestionSupport {SupportId} vinculado à questão. Total: {Count}", supportId, Question.QuestionSupports.Count);
+            // }
+
+            StateHasChanged();
     }
 
     protected void UnlinkQuestionSupport(string supportId)
@@ -98,7 +111,7 @@ public class QuestionEditorModalBase : ComponentBase
         StateHasChanged();
     }
 
-    protected string GetSupportPreview(QuestionSupport support)
+    protected string GetSupportPreview(QuestionSupportDto support)
     {
         if (support == null || !support.Contents.Any()) return string.Empty;
 
@@ -143,157 +156,44 @@ public class QuestionEditorModalBase : ComponentBase
         return string.Join(" ", previewTexts).Trim();
     }
 
- 
-
-    
-
     // ==================== MÉTODOS DE GERENCIAMENTO DE ALTERNATIVAS ====================
 
     protected void AddChoice()
     {
-        if (Question == null) return;
+        EditedQuestion.Choices ??= new List<Choice>();
 
-        Question.Choices ??= new List<Choice>();
-
-        var nextOption = Question.Choices.Count > 0
-            ? ((char)(Question.Choices.Last().Option?[0] ?? 'A' + 1)).ToString()
+        var nextOption = EditedQuestion.Choices.Count > 0
+            ? ((char)(EditedQuestion.Choices.Last().Option?[0] ?? 'A' + 1)).ToString()
             : "A";
 
-        Question.Choices.Add(new Choice
+        EditedQuestion.Choices.Add(new Choice
         {
             Option = nextOption,
             IsCorrect = false,
             Content = new List<InlineContent>()
         });
 
-        Logger.LogDebug("Alternativa adicionada: {Option}", nextOption);
         StateHasChanged();
     }
 
-    protected void RemoveChoice(int index)
+    protected void RemoveChoice(Choice choice)
     {
-        if (Question?.Choices == null || index < 0 || index >= Question.Choices.Count) return;
-
-        Question.Choices.RemoveAt(index);
-        Logger.LogDebug("Alternativa removida no índice {Index}", index);
+        if (EditedQuestion?.Choices == null || choice == null) return;        
+        EditedQuestion.Choices.Remove(choice);
         StateHasChanged();
     }
-
-    protected void MoveChoiceUp(int index)
-    {
-        if (Question?.Choices == null || index <= 0 || index >= Question.Choices.Count) return;
-
-        var choice = Question.Choices[index];
-        Question.Choices.RemoveAt(index);
-        Question.Choices.Insert(index - 1, choice);
-        StateHasChanged();
-    }
-
-    protected void MoveChoiceDown(int index)
-    {
-        if (Question?.Choices == null || index < 0 || index >= Question.Choices.Count - 1) return;
-
-        var choice = Question.Choices[index];
-        Question.Choices.RemoveAt(index);
-        Question.Choices.Insert(index + 1, choice);
-        StateHasChanged();
-    }
-
-    // ==================== MÉTODOS DE GERENCIAMENTO DE CONTEÚDO DAS ALTERNATIVAS ====================
-
-    protected void AddChoiceInlineContent(int choiceIndex, InlineType type)
-    {
-        if (Question?.Choices == null || choiceIndex < 0 || choiceIndex >= Question.Choices.Count) return;
-
-        var choice = Question.Choices[choiceIndex];
-
-        if (type == InlineType.Text)
-        {
-            choice.Content.Add(new TextInline
-            {
-                Text = "",
-                Bold = false,
-                Italic = false
-            });
-        }
-        else if (type == InlineType.Image)
-        {
-            choice.Content.Add(new ImageInline
-            {
-                Key = $"img-{Guid.NewGuid()}",
-                Alt = "",
-                Width = 0,
-                Height = 0
-            });
-        }
-        else if (type == InlineType.Math)
-        {
-            choice.Content.Add(new MathInline
-            {
-                Latex = ""
-            });
-        }
-        else if (type == InlineType.Chemical)
-        {
-            choice.Content.Add(new ChemicalFormulaInline
-            {
-                Formula = ""
-            });
-        }
-
-        Logger.LogDebug("Conteúdo inline adicionado à alternativa {ChoiceIndex}: {Type}", choiceIndex, type);
-        StateHasChanged();
-    }
-
-    protected void RemoveChoiceInline(int choiceIndex, int inlineIndex)
-    {
-        if (Question?.Choices == null || choiceIndex < 0 || choiceIndex >= Question.Choices.Count) return;
-
-        var choice = Question.Choices[choiceIndex];
-        if (inlineIndex < 0 || inlineIndex >= choice.Content.Count) return;
-
-        choice.Content.RemoveAt(inlineIndex);
-        Logger.LogDebug("Conteúdo inline removido da alternativa {ChoiceIndex}, índice {InlineIndex}", choiceIndex, inlineIndex);
-        StateHasChanged();
-    }
-
-    protected void MoveChoiceInlineUp(int choiceIndex, int inlineIndex)
-    {
-        if (Question?.Choices == null || choiceIndex < 0 || choiceIndex >= Question.Choices.Count) return;
-
-        var choice = Question.Choices[choiceIndex];
-        if (inlineIndex <= 0 || inlineIndex >= choice.Content.Count) return;
-
-        var inline = choice.Content[inlineIndex];
-        choice.Content.RemoveAt(inlineIndex);
-        choice.Content.Insert(inlineIndex - 1, inline);
-        StateHasChanged();
-    }
-
-    protected void MoveChoiceInlineDown(int choiceIndex, int inlineIndex)
-    {
-        if (Question?.Choices == null || choiceIndex < 0 || choiceIndex >= Question.Choices.Count) return;
-
-        var choice = Question.Choices[choiceIndex];
-        if (inlineIndex < 0 || inlineIndex >= choice.Content.Count - 1) return;
-
-        var inline = choice.Content[inlineIndex];
-        choice.Content.RemoveAt(inlineIndex);
-        choice.Content.Insert(inlineIndex + 1, inline);
-        StateHasChanged();
-    }
-
+   
     // ==================== MÉTODOS DE GERENCIAMENTO DO MODAL DE SELEÇÃO DE IMAGENS ====================    
 
     protected async Task OnImageSelectedFromModal(string imageKey)
     {
-        if (Question == null || currentEditingBlockIndex < 0 || currentEditingBlockIndex >= Question.QuestionContents.Count)
+        if (EditedQuestion == null || currentEditingBlockIndex < 0 || currentEditingBlockIndex >= EditedQuestion.QuestionContents.Count)
         {
             Logger.LogWarning("Índice de bloco inválido ao selecionar imagem");
             return;
         }
 
-        var block = Question.QuestionContents[currentEditingBlockIndex];
+        var block = EditedQuestion.QuestionContents[currentEditingBlockIndex];
 
         if (isEditingImageBlock)
         {

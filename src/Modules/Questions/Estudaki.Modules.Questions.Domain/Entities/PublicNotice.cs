@@ -21,6 +21,7 @@ public class PublicNotice : Entity
     public int Year { get; set; }
     public string? ExamPhase { get; set; }
     public string? ExamBoard { get; set; }
+    public string? ExamRequester { get; set; }
 
     /// <summary>
     /// Categoria do exame (armazenado como string no banco de dados)

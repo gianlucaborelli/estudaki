@@ -8,13 +8,9 @@ public class ContentBlockEditorBase : ComponentBase
 {
     [Inject]
     protected ILogger<ContentBlockEditorBase> Logger { get; set; } = default!;
-
     [Parameter]
     public List<ContentBlock> ContentBlocks { get; set; } = [];
-
     protected enum ContentBlockType { Paragraph, Image }
-
-    // ==================== MÉTODOS DE GERENCIAMENTO DE BLOCOS DE CONTEÚDO ====================
 
     protected void AddContentBlock(ContentBlockType type)
     {

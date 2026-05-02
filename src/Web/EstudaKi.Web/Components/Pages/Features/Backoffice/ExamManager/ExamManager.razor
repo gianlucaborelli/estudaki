@@ -29,21 +29,20 @@
 else
 {
     <MudPaper Elevation="25">
-        <MudToolBar Dense="true">
-            <MudTooltip Text="Anexar Arquivos" Arrow="true" Placement="Placement.Top">
-                <MudIconButton Icon="@Icons.Material.Filled.AttachFile" OnClick="() => OpenUploadFileDialogAsync()" />
-            </MudTooltip>
+        <MudToolBar Dense="true">            
             <MudTooltip Text="Editar Prova" Arrow="true" Placement="Placement.Top">
                 <MudIconButton Icon="@Icons.Material.Filled.Edit" OnClick="() => OpenEditPublicNoticeDialogAsync()"/>
             </MudTooltip>
             <MudTooltip Text="Adicionar Imagens" Arrow="true" Placement="Placement.Top">
                 <MudIconButton Icon="@Icons.Material.Filled.AddPhotoAlternate" OnClick="() => OpenUploadImagesDialogAsync()" />
             </MudTooltip>
+            <MudTooltip Text="Anexar Arquivos" Arrow="true" Placement="Placement.Top">
+                <MudIconButton Icon="@Icons.Material.Filled.AttachFile" OnClick="() => OpenUploadFileDialogAsync()" />
+            </MudTooltip>
         </MudToolBar>
     </MudPaper>
 
-    <MudPaper Class="pa-6 my-2" Elevation="1">
-
+    <MudPaper Class="pa-6 my-2" Elevation="2">
     @if (PublicNotice == null)
     {
         <MudProgressLinear Indeterminate="true" />
@@ -129,8 +128,6 @@ else
     }
     </MudPaper>
 
-
-
     <MudTabs Elevation="2" Rounded="true" ApplyEffectsToContainer="true">
         <MudTabPanel Text="Questões">
             <MudGrid>
@@ -166,7 +163,7 @@ else
                             <MudIconButton Icon="@Icons.Material.Filled.Edit" Disabled="@(SelectedQuestion == null)" OnClick="() => OpenQuestionEditorModalAsync()" />
                         </MudTooltip>
                         <MudTooltip Text="Remover Questão" Arrow="true" Placement="Placement.Top">
-                            <MudIconButton Icon="@Icons.Material.Filled.Delete" Disabled="@(SelectedQuestion == null)" OnClick="() => OpenDeleteQuestionDialogAsync()" />
+                            <MudIconButton Icon="@Icons.Material.Filled.Delete" Disabled="@(SelectedQuestion == null)" OnClick="() => DeleteQuestionAsync()" />
                         </MudTooltip>
                     </MudToolBar>
                     <QuestionComponent Value="SelectedQuestion" />
@@ -175,7 +172,49 @@ else
 
         </MudTabPanel>
         <MudTabPanel Text="Suporte de Questões">
-            <MudText>Content Two</MudText>
+            <MudGrid>
+                <MudItem xs="12" md="3">
+                    <MudTable T="QuestionSupportDto"
+                              @bind-SelectedItem="SelectedQuestionSupport"
+                              Items="QuestionSupports"
+                              Hover="true"
+                              Dense="true"
+                              Breakpoint="Breakpoint.Sm"
+                              Loading="@IsLoading"
+                              OnRowClick="@QuestionSupportRowClickEvent"
+                              RowClassFunc="@SelectedQuestionSupportRowClassFunc"
+                              LoadingProgressColor="Color.Info">
+                        <HeaderContent>
+                            <MudTh>Nr</MudTh>
+                            <MudTh>Itens</MudTh>
+                        </HeaderContent>
+                        <RowTemplate>
+                            <MudTd DataLabel="Nr">@context.Id</MudTd>
+                            <MudTd DataLabel="Itens">@context.Contents?.Count()</MudTd>
+                        </RowTemplate>
+                    </MudTable>
+                </MudItem>
+                <MudItem xs="12" md="9">
+                    <MudToolBar Dense="true">
+                        <MudTooltip Text="Adicionar Suporte" Arrow="true" Placement="Placement.Top">
+                            <MudIconButton Icon="@Icons.Material.Filled.Add" 
+                                            OnClick="() => OpenQuestionSupportEditorModalAsync(true)" />
+                        </MudTooltip>
+                        <MudTooltip Text="Editar Suporte" Arrow="true" Placement="Placement.Top">
+                            <MudIconButton Icon="@Icons.Material.Filled.Edit" 
+                                            Disabled="@(SelectedQuestionSupport == null)" 
+                                            OnClick="() => OpenQuestionSupportEditorModalAsync()" />
+                        </MudTooltip>
+                        <MudTooltip Text="Remover Suporte" Arrow="true" Placement="Placement.Top">
+                            <MudIconButton Icon="@Icons.Material.Filled.Delete" 
+                                            Disabled="@(SelectedQuestionSupport == null)" 
+                                            OnClick="() => DeleteQuestionSupportAsync()" />
+                        </MudTooltip>
+                    </MudToolBar>
+                    <QuestionSupportRenderer QuestionSupport="SelectedQuestionSupport" 
+                                             PublicNotice="PublicNotice" />
+                </MudItem>
+            </MudGrid>
         </MudTabPanel>
         <MudTabPanel Text="Imagens">
             <MudText>Content Two</MudText>

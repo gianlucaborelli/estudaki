@@ -1,0 +1,45 @@
+﻿@using Estudaki.Modules.Questions.Domain.Entities
+@* Dialog de Vincular Textos de Apoio *@
+
+@inherits QuestionSupportEditorModalBase
+
+<MudDialog>
+    <DialogContent>
+        @if (QuestionSupport != null || Notice != null)
+        {
+            <MudStack Row="true" AlignItems="AlignItems.Center">
+                <MudText Typo="Typo.h5" Class="fw-bold">
+                    @ExamCategories.GetDisplayName(Notice!.ExamCategory!)
+                </MudText>
+
+                <MudSpacer />
+
+                <MudChip T="string" Color="Color.Primary" Variant="Variant.Filled">
+                    Nº @Notice!.Number
+                </MudChip>
+                <MudChip T="string" Color="Color.Secondary" Variant="Variant.Outlined">
+                    @((Notice!.Year > 0) ? Notice.Year.ToString() : "Ano não definido")
+                </MudChip>
+            </MudStack>
+            <MudPaper Class="ma-4">
+                <ContentBlockEditor ContentBlocks="QuestionSupport!.Contents" />
+            </MudPaper>
+    
+        }
+        else
+        {
+            <div class="alert alert-warning">
+                <i class="bi bi-exclamation-triangle me-2"></i>
+                Erro ao carregar o texto de apoio.
+            </div>
+        }
+
+    </DialogContent>
+    <DialogActions>
+        <MudButton OnClick="Save">Salvar</MudButton>
+        <MudButton OnClick="Dialog.Cancel">Fechar</MudButton>
+    </DialogActions>
+
+</MudDialog>
+
+
