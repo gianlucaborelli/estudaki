@@ -179,9 +179,7 @@
 .chemical-preview {
     display: flex;
     align-items: center;
-    justify-content: center;
-    min-height: 50px;
-    background-color: white;
+    justify-content: center;        
     border: 1px solid #dee2e6;
     border-radius: 0.25rem;
     padding: 1rem;
@@ -216,20 +214,14 @@
     visibility: visible !important;
 }
 
-/* Esconder o "X" fantasma do mhchem */
+/* Esconder o "X" fantasma do mhchem em inline display */
 .chemical-inline-display .mord.rlap {
     display: none !important;
 }
 
-/* Esconder phantom X */
+/* Esconder phantom X em inline display */
 .chemical-inline-display .mord.rlap .mord[style*="transparent"] {
     display: none !important;
-}
-
-/* Ajustes do KaTeX para fórmulas químicas */
-.chemical-preview .katex {
-    font-size: 1.2em !important;
-    color: #212529 !important;
 }
 
 /* Responsividade para fórmulas químicas */

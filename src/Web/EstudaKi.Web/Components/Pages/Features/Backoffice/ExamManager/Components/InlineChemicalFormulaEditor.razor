@@ -1,27 +1,28 @@
 @using Microsoft.JSInterop
 @inject IJSRuntime JSRuntime
-@implements IAsyncDisposable
 
-<div class="chemical-editor-container">
-    <div class="mb-2">
-        <label class="form-label fw-bold">Fórmula Química:</label>
-        <textarea class="form-control font-monospace" 
-                  rows="2"
-                  value="@currentFormula"
-                  @oninput="OnFormulaInput"
-                  placeholder="Digite a fórmula química. Ex: H2O, CO2, C6H12O6, H2SO4"
-                  style="font-size: 0.9rem;"></textarea>
-        <small class="text-muted">
-            Exemplos: <code>H2O</code>, <code>CO2</code>, <code>C6H12O6</code>, <code>H2SO4</code>, <code>NaCl</code>
-        </small>
-    </div>
+<style>
+    /* Esconder o "X" fantasma do mhchem no preview */
+    #@previewId .mord.rlap {
+        display: none !important;
+    }
 
-    <div class="mb-2">
-        <label class="form-label fw-bold">Preview (Renderizado):</label>
-        <div class="chemical-preview border rounded p-3 bg-light" 
-             id="@previewId" 
-             style="min-height: 50px; font-size: 1.2rem;">
-        </div>
+    /* Preview da fórmula química */
+   
+</style>
+
+<MudTextField Value="@Formula"
+              ValueChanged="@(async (string value) => await OnFormulaInput(value))"
+              Variant="Variant.Outlined"
+              Immediate="true"
+              Label="Fórmula Química"
+              Lines="2" />
+
+<div class="mb-2">
+    <label class="form-label fw-bold">Preview (Renderizado):</label>
+    <div class="chemical-preview border rounded p-3 bg-light" 
+            id="@previewId" 
+            style="min-height: 50px; font-size: 1.2rem;">
     </div>
 </div>
 
@@ -29,18 +30,13 @@
     [Parameter] public string? Formula { get; set; }
     [Parameter] public EventCallback<string> FormulaChanged { get; set; }
 
-    private string currentFormula = string.Empty;
     private string previewId = $"chemical-preview-{Guid.NewGuid()}";
     private bool isRendered = false;
 
     protected override void OnParametersSet()
     {
-        if (Formula != currentFormula)
-        {
-            currentFormula = Formula ?? string.Empty;
-            _ = UpdatePreview();
-        }
-    }
+        _ = UpdatePreview();        
+    }    
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
@@ -51,29 +47,19 @@
         }
     }
 
-    private async Task OnFormulaInput(ChangeEventArgs e)
+    private async Task OnFormulaInput(string newValue)
     {
-        currentFormula = e.Value?.ToString() ?? string.Empty;
+        if (Formula == newValue)
+            return;
+
+        Formula = newValue;
+        await FormulaChanged.InvokeAsync(Formula);
         await UpdatePreview();
     }
 
     private async Task UpdatePreview()
     {
         if (!isRendered) return;
-
-        try
-        {
-            await JSRuntime.InvokeVoidAsync("ChemicalHelper.renderStatic", previewId, currentFormula);
-            await FormulaChanged.InvokeAsync(currentFormula);
-        }
-        catch (Exception ex)
-        {
-            Console.WriteLine($"Erro ao renderizar fórmula química: {ex.Message}");
-        }
-    }
-
-    public async ValueTask DisposeAsync()
-    {
-        // Cleanup if needed
+            await JSRuntime.InvokeVoidAsync("ChemicalHelper.renderStatic", previewId, Formula ?? string.Empty);
     }
 }

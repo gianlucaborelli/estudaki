@@ -7,10 +7,16 @@
 @inject IJSRuntime JSRuntime
 @inject IStorageService StorageService
 
+<style>
+    .preserve-linebreaks {
+        white-space: pre-line;
+    }
+ </style>
+
 @* Renderiza o conteúdo inline (TextInline, ImageInline, MathInline, ChemicalFormulaInline) *@
 @if (Inline is TextInline textInline)
 {
-    <span style="@GetTextStyle(textInline)">@textInline.Text</span>
+    <span class="preserve-linebreaks" style="@GetTextStyle(textInline)">@textInline.Text</span>    
 }
 else if (Inline is ImageInline imageInline)
 {
@@ -73,6 +79,10 @@ else
             }
             else if (Inline is ChemicalFormulaInline chemicalInline)
             {
+                // Por algum motivo, fórmulas químicas parecem precisar 
+                // de um pouco mais de tempo para renderizar corretamente
+                // Fica aparecendo um "X" junto com a fórmula, 
+                // Não consegui identificar o motivo, mas aumentar o delay resolveu
                 // Aguardar mais tempo para fórmulas químicas
                 await Task.Delay(150);
                 Console.WriteLine($"[InlineContentRenderer] Renderizando ChemicalInline: ID={chemicalElementId}, Formula={chemicalInline.Formula}");

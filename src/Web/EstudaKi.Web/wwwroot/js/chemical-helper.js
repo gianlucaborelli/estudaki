@@ -26,8 +26,6 @@ window.ChemicalHelper = {
                 }
             }
 
-            console.log(`[ChemicalHelper] Elemento encontrado:`, element);
-
             element.innerHTML = '';
 
             if (!formula || formula.trim() === '') {
@@ -53,10 +51,7 @@ window.ChemicalHelper = {
                 maxSize: 500,    // Aumentar tamanho máximo
                 macros: {}       // Macros vazios (mhchem já está registrado globalmente)
             });
-
-            console.log(`[ChemicalHelper] ✓ Fórmula renderizada com sucesso! Conteúdo do elemento:`, element.innerHTML);
         } catch (error) {
-            console.error('ChemicalHelper: Erro ao renderizar fórmula química:', error);
             const element = document.getElementById(elementId);
             if (element) {
                 element.innerHTML = `<span class="text-danger">Erro: ${error.message}</span>`;

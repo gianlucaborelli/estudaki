@@ -40,10 +40,16 @@ public class QuestionEditorModalBase : ComponentBase
         }        
     }
 
+    protected void Save()
+    {
+        Dialog.Close(DialogResult.Ok(EditedQuestion));
+        Logger.LogInformation("Questão salva: {QuestionId}", EditedQuestion.Id);
+    }
 
 
 
-    
+
+
 
     // ==================== MÉTODOS DE GERENCIAMENTO DE QUESTION SUPPORTS ====================
 
