@@ -1,4 +1,7 @@
-﻿using Estudaki.Modules.Questions.Application.DTOs;
+﻿using Estudaki.Commons.Core.CQRS;
+using Estudaki.Modules.Questions.Application.Commands;
+using Estudaki.Modules.Questions.Application.DTOs;
+using FluentValidation.Results;
 using Microsoft.AspNetCore.Components;
 using MudBlazor;
 
@@ -8,6 +11,10 @@ public class QuestionSupportEditorModalBase : ComponentBase
 {
     [CascadingParameter]
     public IMudDialogInstance Dialog { get; set; } = default!;
+    [Inject]
+    protected ICommandDispatcher CommandDispatcher { get; set; } = default!;
+    [Inject]
+    protected ISnackbar Snackbar { get; set; } = default!;
 
     [Parameter]
     public PublicNoticeDto? Notice { get; set; }
@@ -24,17 +31,31 @@ public class QuestionSupportEditorModalBase : ComponentBase
         }
     }
 
-    protected void Save()
+    protected async Task Save()
     {
-        // Salvar as alterações e fechar o modal, retornando o QuestionSupport atualizado
+        if(QuestionSupport == null) return;
+
+        var validationResult = new ValidationResult();
         if (IsNew)
         {
-            // Cria novo
+            var newQuestionSupport = new CreateQuestionSupportCommand(QuestionSupport, Notice!.Id!);
+            validationResult = await CommandDispatcher
+                .DispatchAsync<CreateQuestionSupportCommand, ValidationResult>(newQuestionSupport);
         }
         else
         {
-            // Update existente
+            var updateQuestionSupport = new UpdateQuestionSupportCommand(QuestionSupport);
+            validationResult = await CommandDispatcher
+                .DispatchAsync<UpdateQuestionSupportCommand, ValidationResult>(updateQuestionSupport);
         }
+
+        if (!validationResult.IsValid)
+        {
+            Snackbar.Add("Erro ao salvar o suporte de questão. Verifique os dados e tente novamente.", Severity.Error);
+            return;
+        }
+
+        Snackbar.Add("Suporte de questão salvo com sucesso.", Severity.Success);
         Dialog.Close(DialogResult.Ok(QuestionSupport));
     }
 }

@@ -15,6 +15,16 @@ public static class QuestionSupportMapper
         };
     }
 
+    public static QuestionSupport ToEntity(this QuestionSupportDto questionSupportDto)
+    {
+        return new QuestionSupport
+        {
+            Id = questionSupportDto.Id,
+            PublicNoticeId = questionSupportDto.PublicNoticeId,
+            Contents = questionSupportDto.Contents
+        };
+    }
+
 
     public static List<QuestionSupportDto> ToDtoList(this List<QuestionSupport> questionSupports)
     {

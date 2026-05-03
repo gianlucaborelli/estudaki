@@ -87,8 +87,9 @@
                     <MudButton Size="Size.Small"
                                 Variant="Variant.Filled"
                                 Color="Color.Info"
-                                StartIcon="@Icons.Material.Filled.Link"
-                                OnClick="OpenLinkSupportDialog">
+                                Disabled="true"
+                                StartIcon="@Icons.Material.Filled.Link">
+                                
                         Adicionar Texto de Apoio
                     </MudButton>                   
                     
@@ -107,7 +108,7 @@
 
                                         <MudDivider Vertical="true" FlexItem="true" />
 
-                                        @GetSupportPreview(questionSupport)
+                                        @questionSupport.GetSupportPreview()
 
                                     </MudStack>
                                 </MudPaper>               

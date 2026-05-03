@@ -7,6 +7,26 @@ namespace Estudaki.Modules.Questions.Application.Mappers;
 
 public static class QuestionMapper
 {
+    public static Question ToEntity(this QuestionDto questionDto)
+    {
+        return new Question
+        {
+            Id = questionDto.Id,
+            PublicNoticeId = questionDto.PublicNoticeId,
+            CreatedAt = questionDto.CreatedAt,
+            IsPublished = questionDto.IsPublished,
+            IsNullified = questionDto.IsNullified,
+            QuestionNumber = questionDto.QuestionNumber,
+            Type = questionDto.QuestionType,
+            MainArea = questionDto.MainArea,
+            SubAreas = (string[])questionDto.SubAreas.Clone(),
+            QuestionSupports = questionDto.QuestionSupports
+                        .Select(s => s.Id).ToList(),
+            QuestionContents = questionDto.QuestionContents,
+            Choices = questionDto.Choices
+        };
+    }
+
     public static QuestionDto ToDto(
         this Question question, 
         PublicNotice? publicNotice, 

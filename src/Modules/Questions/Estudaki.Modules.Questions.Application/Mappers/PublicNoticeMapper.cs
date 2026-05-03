@@ -28,6 +28,25 @@ public static class PublicNoticeMapper
         };
     }
 
+    public static PublicNotice ToEntity(this PublicNoticeDto noticeDto)
+    {
+        return new PublicNotice
+        {
+            Id = noticeDto.Id,
+            Number = noticeDto.Number,
+            Year = noticeDto.Year,
+            ExamPhase = noticeDto.ExamPhase,
+            ExamBoard = noticeDto.ExamBoard,
+            ExamRequester = noticeDto.ExamRequester,
+            ExamCategory = noticeDto.ExamCategory!,
+            HasAttachments = noticeDto.HasAttachments,
+            IsReviewed = noticeDto.IsReviewed,
+            IsPublished = noticeDto.IsPublished,
+            Position = noticeDto.Position,
+            CreatedAt = noticeDto.CreatedAt
+        };
+    }
+
     public static List<PublicNoticeDto> ToDtoList(this List<PublicNotice> notices, IStorageService storageService)
     {
         return notices.Select(notice => notice.ToDto(storageService)).ToList();

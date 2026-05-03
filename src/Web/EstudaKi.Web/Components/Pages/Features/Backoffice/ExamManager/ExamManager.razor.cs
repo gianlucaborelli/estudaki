@@ -1,10 +1,12 @@
 ﻿using Estudaki.Commons.Core.CQRS;
+using Estudaki.Modules.Questions.Application.Commands;
 using Estudaki.Modules.Questions.Application.DTOs;
 using Estudaki.Modules.Questions.Application.Queries.GetPublicNoticeById;
 using Estudaki.Modules.Questions.Application.Queries.GetQuestionsByPublicNoticeId;
 using Estudaki.Modules.Questions.Application.Queries.GetQuestionSupportsByPublicNoticeId;
 using EstudaKi.Web.Components.Pages.Features.Backoffice.ExamManager.Components;
 using EstudaKi.Web.Components.Shared;
+using FluentValidation.Results;
 using Microsoft.AspNetCore.Components;
 using MudBlazor;
 
@@ -19,7 +21,11 @@ namespace EstudaKi.Web.Components.Pages.Features.Backoffice.ExamManager
         [Inject]
         protected IDialogService Dialog { get; set; } = default!;
         [Inject]
+        protected ISnackbar Snackbar { get; set; } = default!;
+        [Inject]
         protected IQueryDispatcher QueryDispatcher { get; set; } = default!;
+        [Inject]
+        protected ICommandDispatcher CommandDispatcher { get; set; } = default!;
 
         protected bool IsLoading { get; set; } = false;
         protected PublicNoticeDto PublicNotice { get; set; } = default!;
@@ -142,8 +148,9 @@ namespace EstudaKi.Web.Components.Pages.Features.Backoffice.ExamManager
             if (SelectedQuestionSupport is null) return;
 
             var parameters = new DialogParameters<QuestionSupportEditorModal>{
-                { x => x.QuestionSupport, SelectedQuestionSupport  },
-                { x => x.Notice, PublicNotice  },
+                { x => x.QuestionSupport, SelectedQuestionSupport },
+                { x => x.Notice, PublicNotice },
+                { x => x.IsNew, isNew }
             };
             var options = new DialogOptions { CloseButton = true, MaxWidth = MaxWidth.Medium, FullWidth = true };
             var dialog = await Dialog.ShowAsync<QuestionSupportEditorModal>("Editar Suporte de Questão", parameters, options);           
@@ -170,11 +177,17 @@ namespace EstudaKi.Web.Components.Pages.Features.Backoffice.ExamManager
 
             if (result is not null && !result.Canceled)
             {
-                // Call your delete method here, e.g.:
-                // await YourDeleteMethod(SelectedQuestion.Id);
-                await LoadContent();
+                var deleteQuery = new DeleteQuestionCommand(SelectedQuestion.Id);
+                var deleteResult = await CommandDispatcher.DispatchAsync<DeleteQuestionCommand, ValidationResult>(deleteQuery);
+                if (deleteResult.IsValid)
+                {
+                    Snackbar.Add("Questão excluída com sucesso!", Severity.Success);
+                    SelectedQuestion = null;
+                    await LoadContent();
+                }
+                else
+                    Snackbar.Add("Falha ao excluir a questão. Verifique se há dependências.", Severity.Error);
             }
-
             return;
         }
 
@@ -193,8 +206,15 @@ namespace EstudaKi.Web.Components.Pages.Features.Backoffice.ExamManager
 
             if (result is not null && !result.Canceled)
             {
-                // Call your delete method here, e.g.:
-                // await YourDeleteMethod(SelectedQuestionSupport.Id);
+                var deleteQuery = new DeleteQuestionSupportCommand(SelectedQuestionSupport.Id);
+                var deleteResult = await CommandDispatcher.DispatchAsync<DeleteQuestionSupportCommand, ValidationResult>(deleteQuery);
+                if (deleteResult.IsValid)
+                {
+                    Snackbar.Add("Suporte de questão excluído com sucesso!", Severity.Success);
+                    await LoadContent();
+                }
+                else
+                    Snackbar.Add("Falha ao excluir o suporte de questão. Verifique se há dependências.", Severity.Error);
                 await LoadContent();
             }
 

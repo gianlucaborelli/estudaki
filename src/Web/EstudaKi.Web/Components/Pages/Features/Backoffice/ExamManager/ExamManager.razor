@@ -153,6 +153,9 @@ else
                             <MudTd DataLabel="Tipo">@QuestionType.GetDisplayName(context.QuestionType)</MudTd>
                             <MudTd DataLabel="Qt. Alt">@context.Choices?.Count()</MudTd>
                         </RowTemplate>
+                        <PagerContent>
+                            <MudTablePager HidePageNumber="true" />
+                        </PagerContent>
                     </MudTable>
                 </MudItem>
 
@@ -166,11 +169,18 @@ else
                             <MudIconButton Icon="@Icons.Material.Filled.Delete" Disabled="@(SelectedQuestion == null)" OnClick="() => DeleteQuestionAsync()" />
                         </MudTooltip>
                     </MudToolBar>
-                    <QuestionComponent Value="SelectedQuestion" />
+                    @if (SelectedQuestion == null)
+                    {
+                        <MudText>Selecione uma questão para visualizar o conteúdo.</MudText>
+                    }
+                    else
+                    {
+                        <QuestionComponent Value="SelectedQuestion" />
+                    }                    
                 </MudItem>
             </MudGrid>
-
         </MudTabPanel>
+
         <MudTabPanel Text="Suporte de Questões">
             <MudGrid>
                 <MudItem xs="12" md="3">
@@ -192,6 +202,9 @@ else
                             <MudTd DataLabel="Nr">@context.Id</MudTd>
                             <MudTd DataLabel="Itens">@context.Contents?.Count()</MudTd>
                         </RowTemplate>
+                        <PagerContent>
+                            <MudTablePager HidePageNumber="true"/>
+                        </PagerContent>
                     </MudTable>
                 </MudItem>
                 <MudItem xs="12" md="9">
@@ -211,8 +224,29 @@ else
                                             OnClick="() => DeleteQuestionSupportAsync()" />
                         </MudTooltip>
                     </MudToolBar>
-                    <QuestionSupportRenderer QuestionSupport="SelectedQuestionSupport" 
-                                             PublicNotice="PublicNotice" />
+                    @if(SelectedQuestionSupport == null)
+                    {
+                        <MudText>Selecione um suporte de questão para visualizar o conteúdo.</MudText>
+                    }
+                    else
+                    {
+                        <MudStack Row="true" AlignItems="AlignItems.Center">
+                            <MudText Typo="Typo.h6" Class="fw-bold">Suporte de Questão - ID: @SelectedQuestionSupport.Id</MudText>
+                            <MudSpacer />
+                            <MudChip T="string" Color="Color.Info" Variant="Variant.Filled">
+                                Total de Itens: @(SelectedQuestionSupport.Contents?.Count() ?? 0)
+                            </MudChip>
+                        </MudStack>
+                    }
+                    @if (SelectedQuestionSupport != null)
+                    {
+                        <QuestionSupportRenderer QuestionSupport="SelectedQuestionSupport" 
+                                                 PublicNotice="PublicNotice" />
+                    }
+                    else
+                    {
+                        <MudText>Selecione um suporte de questão para visualizar o conteúdo.</MudText>
+                    }
                 </MudItem>
             </MudGrid>
         </MudTabPanel>

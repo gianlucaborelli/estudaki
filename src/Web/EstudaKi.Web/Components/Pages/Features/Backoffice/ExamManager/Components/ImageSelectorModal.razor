@@ -7,180 +7,178 @@
 @inject ILogger<ImageSelectorModal> Logger
 @implements IAsyncDisposable
 
-@if (IsVisible)
-{
-    <div class="modal fade show d-block" style="background-color: rgba(0,0,0,0.5);" tabindex="-1">
-        <div class="modal-dialog modal-xl modal-dialog-scrollable">
-            <div class="modal-content">
-                <div class="modal-header bg-primary text-white">
-                    <h5 class="modal-title">
-                        <i class="bi bi-images me-2"></i>Selecionar Imagem
-                    </h5>
-                    <button type="button" class="btn-close btn-close-white" @onclick="Close"></button>
-                </div>
-                <div class="modal-body">
-                    @if (isLoading)
-                    {
-                        <div class="text-center py-5">
-                            <div class="spinner-border text-primary" role="status">
-                                <span class="visually-hidden">Carregando...</span>
+<div class="modal fade show d-block" style="background-color: rgba(0,0,0,0.5);" tabindex="-1">
+    <div class="modal-dialog modal-xl modal-dialog-scrollable">
+        <div class="modal-content">
+            <div class="modal-header bg-primary text-white">
+                <h5 class="modal-title">
+                    <i class="bi bi-images me-2"></i>Selecionar Imagem
+                </h5>
+                <button type="button" class="btn-close btn-close-white" @onclick="Close"></button>
+            </div>
+            <div class="modal-body">
+                @if (isLoading)
+                {
+                    <div class="text-center py-5">
+                        <div class="spinner-border text-primary" role="status">
+                            <span class="visually-hidden">Carregando...</span>
+                        </div>
+                        <p class="mt-3 text-muted">Carregando imagens do S3...</p>
+                    </div>
+                }
+                else if (images.Count == 0)
+                {
+                    <div class="alert alert-warning">
+                        <i class="bi bi-exclamation-triangle me-2"></i>
+                        Nenhuma imagem encontrada no S3 para esta prova.
+                        <br />
+                        <small>Utilize a opção "Carregar Todas" ou "Upload Individual" para fazer upload de imagens.</small>
+                    </div>
+                }
+                else
+                {
+                    @* Área de Paste para Upload Rápido *@
+                    <div class="mb-3">
+                        @* InputFile oculto para receber imagens coladas *@
+                        <InputFile id="imageSelectorPasteInput" 
+                                    @ref="pasteInputFileRef"
+                                    OnChange="OnPastedImageSelected" 
+                                    style="display: none;" 
+                                    accept="image/*" />
+
+                        <div class="card border-success" 
+                                style="border-style: dashed; border-width: 2px; cursor: pointer;"
+                                id="imageSelectorPasteArea"
+                                tabindex="0"
+                                @onclick="FocusPasteArea">
+                            <div class="card-body text-center py-2">
+                                <i class="bi bi-clipboard-plus text-success" style="font-size: 1.5rem;"></i>
+                                <span class="ms-2">
+                                    <strong>Cole uma imagem aqui (Ctrl+V)</strong> para fazer upload e selecioná-la automaticamente
+                                </span>
+                                @if (isUploading)
+                                {
+                                    <div class="mt-2">
+                                        <span class="spinner-border spinner-border-sm text-success me-2"></span>
+                                        <span class="badge bg-warning">Enviando...</span>
+                                    </div>
+                                }
+                                else if (pasteAreaFocused)
+                                {
+                                    <div class="mt-1">
+                                        <span class="badge bg-success">
+                                            <i class="bi bi-check-circle me-1"></i>Pronto para colar!
+                                        </span>
+                                    </div>
+                                }
                             </div>
-                            <p class="mt-3 text-muted">Carregando imagens do S3...</p>
+                        </div>
+                    </div>
+
+                    @if (!string.IsNullOrEmpty(uploadMessage))
+                    {
+                        <div class="alert alert-info alert-dismissible fade show">
+                            <i class="bi bi-info-circle me-2"></i>@uploadMessage
+                            <button type="button" class="btn-close" @onclick="() => uploadMessage = null"></button>
                         </div>
                     }
-                    else if (images.Count == 0)
+
+                    @if (!string.IsNullOrEmpty(uploadError))
                     {
-                        <div class="alert alert-warning">
-                            <i class="bi bi-exclamation-triangle me-2"></i>
-                            Nenhuma imagem encontrada no S3 para esta prova.
-                            <br />
-                            <small>Utilize a opção "Carregar Todas" ou "Upload Individual" para fazer upload de imagens.</small>
+                        <div class="alert alert-danger alert-dismissible fade show">
+                            <i class="bi bi-exclamation-triangle me-2"></i>@uploadError
+                            <button type="button" class="btn-close" @onclick="() => uploadError = null"></button>
                         </div>
                     }
-                    else
-                    {
-                        @* Área de Paste para Upload Rápido *@
-                        <div class="mb-3">
-                            @* InputFile oculto para receber imagens coladas *@
-                            <InputFile id="imageSelectorPasteInput" 
-                                       @ref="pasteInputFileRef"
-                                       OnChange="OnPastedImageSelected" 
-                                       style="display: none;" 
-                                       accept="image/*" />
 
-                            <div class="card border-success" 
-                                 style="border-style: dashed; border-width: 2px; cursor: pointer;"
-                                 id="imageSelectorPasteArea"
-                                 tabindex="0"
-                                 @onclick="FocusPasteArea">
-                                <div class="card-body text-center py-2">
-                                    <i class="bi bi-clipboard-plus text-success" style="font-size: 1.5rem;"></i>
-                                    <span class="ms-2">
-                                        <strong>Cole uma imagem aqui (Ctrl+V)</strong> para fazer upload e selecioná-la automaticamente
-                                    </span>
-                                    @if (isUploading)
-                                    {
-                                        <div class="mt-2">
-                                            <span class="spinner-border spinner-border-sm text-success me-2"></span>
-                                            <span class="badge bg-warning">Enviando...</span>
-                                        </div>
-                                    }
-                                    else if (pasteAreaFocused)
-                                    {
-                                        <div class="mt-1">
-                                            <span class="badge bg-success">
-                                                <i class="bi bi-check-circle me-1"></i>Pronto para colar!
-                                            </span>
-                                        </div>
-                                    }
-                                </div>
-                            </div>
-                        </div>
+                    <div class="mb-3">
+                        <input type="text" 
+                                class="form-control" 
+                                placeholder="Buscar por nome da imagem..." 
+                                @bind="searchTerm"
+                                @bind:event="oninput"
+                                @onkeyup="FilterImages" />
+                    </div>
 
-                        @if (!string.IsNullOrEmpty(uploadMessage))
+                    <div class="row g-3">
+                        @foreach (var image in filteredImages)
                         {
-                            <div class="alert alert-info alert-dismissible fade show">
-                                <i class="bi bi-info-circle me-2"></i>@uploadMessage
-                                <button type="button" class="btn-close" @onclick="() => uploadMessage = null"></button>
-                            </div>
-                        }
-
-                        @if (!string.IsNullOrEmpty(uploadError))
-                        {
-                            <div class="alert alert-danger alert-dismissible fade show">
-                                <i class="bi bi-exclamation-triangle me-2"></i>@uploadError
-                                <button type="button" class="btn-close" @onclick="() => uploadError = null"></button>
-                            </div>
-                        }
-
-                        <div class="mb-3">
-                            <input type="text" 
-                                   class="form-control" 
-                                   placeholder="Buscar por nome da imagem..." 
-                                   @bind="searchTerm"
-                                   @bind:event="oninput"
-                                   @onkeyup="FilterImages" />
-                        </div>
-
-                        <div class="row g-3">
-                            @foreach (var image in filteredImages)
-                            {
-                                <div class="col-md-3">
-                                    <div class="card h-100 @(selectedImageKey == image.Key ? "border-primary border-3" : "")" 
-                                         style="cursor: pointer;"
-                                         @onclick="() => SelectImage(image.Key)">
-                                        <div class="card-body p-2 text-center">
-                                            <div class="position-relative" style="height: 150px; overflow: hidden; display: flex; align-items: center; justify-content: center; background-color: #f8f9fa;">
-                                                @if (image.IsLoaded)
+                            <div class="col-md-3">
+                                <div class="card h-100 @(selectedImageKey == image.Key ? "border-primary border-3" : "")" 
+                                        style="cursor: pointer;"
+                                        @onclick="() => SelectImage(image.Key)">
+                                    <div class="card-body p-2 text-center">
+                                        <div class="position-relative" style="height: 150px; overflow: hidden; display: flex; align-items: center; justify-content: center; background-color: #f8f9fa;">
+                                            @if (image.IsLoaded)
+                                            {
+                                                @if (image.HasError)
                                                 {
-                                                    @if (image.HasError)
-                                                    {
-                                                        <div class="text-center text-muted">
-                                                            <i class="bi bi-image" style="font-size: 3rem;"></i>
-                                                            <div><small>Erro ao carregar</small></div>
-                                                            <div><small class="text-truncate d-block" style="max-width: 150px;" title="@image.Url">@image.Url</small></div>
-                                                        </div>
-                                                    }
-                                                    else
-                                                    {
-                                                        <img src="@image.Url" 
-                                                             alt="@image.Key" 
-                                                             class="img-fluid"
-                                                             style="max-height: 150px; max-width: 100%; object-fit: contain;"
-                                                             @onerror="() => OnImageError(image)" />
-                                                    }
+                                                    <div class="text-center text-muted">
+                                                        <i class="bi bi-image" style="font-size: 3rem;"></i>
+                                                        <div><small>Erro ao carregar</small></div>
+                                                        <div><small class="text-truncate d-block" style="max-width: 150px;" title="@image.Url">@image.Url</small></div>
+                                                    </div>
                                                 }
                                                 else
                                                 {
-                                                    <div class="spinner-border spinner-border-sm text-secondary" role="status">
-                                                        <span class="visually-hidden">Carregando...</span>
-                                                    </div>
+                                                    <img src="@image.Url" 
+                                                            alt="@image.Key" 
+                                                            class="img-fluid"
+                                                            style="max-height: 150px; max-width: 100%; object-fit: contain;"
+                                                            @onerror="() => OnImageError(image)" />
                                                 }
-                                            </div>
-                                            <div class="mt-2">
-                                                <small class="text-muted d-block text-truncate" title="@image.Key">
-                                                    @image.Key
-                                                </small>
-                                                @if (selectedImageKey == image.Key)
-                                                {
-                                                    <span class="badge bg-primary mt-1">
-                                                        <i class="bi bi-check-circle me-1"></i>Selecionada
-                                                    </span>
-                                                }
-                                            </div>
+                                            }
+                                            else
+                                            {
+                                                <div class="spinner-border spinner-border-sm text-secondary" role="status">
+                                                    <span class="visually-hidden">Carregando...</span>
+                                                </div>
+                                            }
+                                        </div>
+                                        <div class="mt-2">
+                                            <small class="text-muted d-block text-truncate" title="@image.Key">
+                                                @image.Key
+                                            </small>
+                                            @if (selectedImageKey == image.Key)
+                                            {
+                                                <span class="badge bg-primary mt-1">
+                                                    <i class="bi bi-check-circle me-1"></i>Selecionada
+                                                </span>
+                                            }
                                         </div>
                                     </div>
                                 </div>
-                            }
-                        </div>
-
-                        @if (filteredImages.Count == 0 && !string.IsNullOrWhiteSpace(searchTerm))
-                        {
-                            <div class="alert alert-info mt-3">
-                                <i class="bi bi-info-circle me-2"></i>
-                                Nenhuma imagem encontrada com o termo "@searchTerm".
                             </div>
                         }
+                    </div>
+
+                    @if (filteredImages.Count == 0 && !string.IsNullOrWhiteSpace(searchTerm))
+                    {
+                        <div class="alert alert-info mt-3">
+                            <i class="bi bi-info-circle me-2"></i>
+                            Nenhuma imagem encontrada com o termo "@searchTerm".
+                        </div>
                     }
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" @onclick="Close">
-                        <i class="bi bi-x-circle me-1"></i>Cancelar
-                    </button>
-                    <button type="button" 
-                            class="btn btn-primary" 
-                            @onclick="Confirm"
-                            disabled="@(string.IsNullOrEmpty(selectedImageKey))">
-                        <i class="bi bi-check-circle me-1"></i>Confirmar
-                    </button>
-                </div>
+                }
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" @onclick="Close">
+                    <i class="bi bi-x-circle me-1"></i>Cancelar
+                </button>
+                <button type="button" 
+                        class="btn btn-primary" 
+                        @onclick="Confirm"
+                        disabled="@(string.IsNullOrEmpty(selectedImageKey))">
+                    <i class="bi bi-check-circle me-1"></i>Confirmar
+                </button>
             </div>
         </div>
     </div>
-}
+</div>
+
 
 @code {
-    [Parameter] public bool IsVisible { get; set; }
+    
     [Parameter] public PublicNotice? PublicNotice { get; set; }
     [Parameter] public EventCallback<string> OnImageSelected { get; set; }
     [Parameter] public EventCallback OnClose { get; set; }
@@ -208,19 +206,13 @@
     protected override async Task OnParametersSetAsync()
     {
         // Detectar quando o modal abre (transição de false para true)
-        if (IsVisible && !previousVisibility && PublicNotice != null)
+        if (PublicNotice != null)
         {
             Logger.LogInformation("Modal de seleção de imagens aberto - recarregando lista");
             // Reset e recarregar imagens toda vez que o modal abrir
             Reset();
             await LoadImagesAsync();
         }
-        else if (!IsVisible && previousVisibility)
-        {
-            Logger.LogInformation("Modal de seleção de imagens fechado");
-        }
-
-        previousVisibility = IsVisible;
     }
 
     private async Task LoadImagesAsync()
@@ -358,91 +350,89 @@
     }
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
-    {
-        if (IsVisible)
+    {        
+        try
         {
-            try
-            {
-                // Inicializar paste handler usando abordagem similar ao paste-handler.js
-                await JSRuntime.InvokeVoidAsync("eval", @"
-                    if (!window.imageSelectorPasteHandler) {
-                        console.log('[ImageSelectorModal] Criando paste handler');
+            // Inicializar paste handler usando abordagem similar ao paste-handler.js
+            await JSRuntime.InvokeVoidAsync("eval", @"
+                if (!window.imageSelectorPasteHandler) {
+                    console.log('[ImageSelectorModal] Criando paste handler');
 
-                        window.imageSelectorPasteHandler = (e) => {
-                            const pasteArea = document.getElementById('imageSelectorPasteArea');
-                            const fileInput = document.getElementById('imageSelectorPasteInput');
+                    window.imageSelectorPasteHandler = (e) => {
+                        const pasteArea = document.getElementById('imageSelectorPasteArea');
+                        const fileInput = document.getElementById('imageSelectorPasteInput');
 
-                            if (!pasteArea || !fileInput) {
-                                console.log('[ImageSelectorModal] Elementos não encontrados');
-                                return;
+                        if (!pasteArea || !fileInput) {
+                            console.log('[ImageSelectorModal] Elementos não encontrados');
+                            return;
+                        }
+
+                        // Só processar se for na área de paste
+                        if (e.target !== pasteArea && !pasteArea.contains(e.target)) {
+                            console.log('[ImageSelectorModal] Paste não está na área - ignorando');
+                            return;
+                        }
+
+                        const items = e.clipboardData?.items;
+                        if (!items) {
+                            console.log('[ImageSelectorModal] Clipboard vazio');
+                            return;
+                        }
+
+                        // Verificar se tem imagem
+                        let hasImage = false;
+                        for (let i = 0; i < items.length; i++) {
+                            if (items[i].type.indexOf('image') !== -1) {
+                                hasImage = true;
+                                break;
                             }
+                        }
 
-                            // Só processar se for na área de paste
-                            if (e.target !== pasteArea && !pasteArea.contains(e.target)) {
-                                console.log('[ImageSelectorModal] Paste não está na área - ignorando');
-                                return;
-                            }
+                        if (!hasImage) {
+                            console.log('[ImageSelectorModal] Sem imagem no clipboard');
+                            return;
+                        }
 
-                            const items = e.clipboardData?.items;
-                            if (!items) {
-                                console.log('[ImageSelectorModal] Clipboard vazio');
-                                return;
-                            }
+                        console.log('[ImageSelectorModal] Imagem detectada - processando');
+                        e.preventDefault();
 
-                            // Verificar se tem imagem
-                            let hasImage = false;
-                            for (let i = 0; i < items.length; i++) {
-                                if (items[i].type.indexOf('image') !== -1) {
-                                    hasImage = true;
-                                    break;
+                        // Criar DataTransfer e adicionar arquivos
+                        const dataTransfer = new DataTransfer();
+                        let fileCount = 0;
+
+                        for (let i = 0; i < items.length; i++) {
+                            if (items[i].type.indexOf('image') !== -1) {
+                                const blob = items[i].getAsFile();
+                                if (blob) {
+                                    const timestamp = Date.now();
+                                    const ext = blob.type.split('/')[1] || 'png';
+                                    const fileName = `pasted-image-${timestamp}.${ext}`;
+                                    const file = new File([blob], fileName, { type: blob.type });
+                                    dataTransfer.items.add(file);
+                                    fileCount++;
+                                    console.log('[ImageSelectorModal] Arquivo adicionado:', fileName, 'Tamanho:', blob.size);
                                 }
                             }
+                        }
 
-                            if (!hasImage) {
-                                console.log('[ImageSelectorModal] Sem imagem no clipboard');
-                                return;
-                            }
+                        if (fileCount > 0) {
+                            fileInput.files = dataTransfer.files;
+                            const event = new Event('change', { bubbles: true });
+                            fileInput.dispatchEvent(event);
+                            console.log('[ImageSelectorModal] Evento change disparado -', fileCount, 'arquivo(s)');
+                        }
+                    };
 
-                            console.log('[ImageSelectorModal] Imagem detectada - processando');
-                            e.preventDefault();
-
-                            // Criar DataTransfer e adicionar arquivos
-                            const dataTransfer = new DataTransfer();
-                            let fileCount = 0;
-
-                            for (let i = 0; i < items.length; i++) {
-                                if (items[i].type.indexOf('image') !== -1) {
-                                    const blob = items[i].getAsFile();
-                                    if (blob) {
-                                        const timestamp = Date.now();
-                                        const ext = blob.type.split('/')[1] || 'png';
-                                        const fileName = `pasted-image-${timestamp}.${ext}`;
-                                        const file = new File([blob], fileName, { type: blob.type });
-                                        dataTransfer.items.add(file);
-                                        fileCount++;
-                                        console.log('[ImageSelectorModal] Arquivo adicionado:', fileName, 'Tamanho:', blob.size);
-                                    }
-                                }
-                            }
-
-                            if (fileCount > 0) {
-                                fileInput.files = dataTransfer.files;
-                                const event = new Event('change', { bubbles: true });
-                                fileInput.dispatchEvent(event);
-                                console.log('[ImageSelectorModal] Evento change disparado -', fileCount, 'arquivo(s)');
-                            }
-                        };
-
-                        document.addEventListener('paste', window.imageSelectorPasteHandler);
-                        console.log('[ImageSelectorModal] Handler registrado');
-                    }
-                ");
-            }
-            catch (Exception ex)
-            {
-                Logger.LogError(ex, "Erro ao inicializar paste handler");
-            }
+                    document.addEventListener('paste', window.imageSelectorPasteHandler);
+                    console.log('[ImageSelectorModal] Handler registrado');
+                }
+            ");
         }
+        catch (Exception ex)
+        {
+            Logger.LogError(ex, "Erro ao inicializar paste handler");
+        }
+        
     }
 
     private async Task OnPastedImageSelected(InputFileChangeEventArgs e)

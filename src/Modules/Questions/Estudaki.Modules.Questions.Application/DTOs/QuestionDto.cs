@@ -1,3 +1,4 @@
+using Estudaki.Modules.Questions.Domain.Entities;
 using Estudaki.Modules.Questions.Domain.ValueObjects;
 using System.Net.Mime;
 
@@ -18,7 +19,7 @@ public class QuestionDto
     public string[] SubAreas { get; set; } = [];
     public List<ContentBlock> QuestionContents { get; set; } = [];
     public List<Choice>? Choices { get; set; }
-
+    
     public static QuestionDto Clone(QuestionDto original)
     {
         return new QuestionDto
