@@ -16,7 +16,7 @@
 @* Renderiza o conteúdo inline (TextInline, ImageInline, MathInline, ChemicalFormulaInline) *@
 @if (Inline is TextInline textInline)
 {
-    <span class="preserve-linebreaks" style="@GetTextStyle(textInline)">@textInline.Text</span>    
+    <span class="preserve-linebreaks" style="@GetTextStyle(textInline)">@((MarkupString)textInline.Text)</span>    
 }
 else if (Inline is ImageInline imageInline)
 {

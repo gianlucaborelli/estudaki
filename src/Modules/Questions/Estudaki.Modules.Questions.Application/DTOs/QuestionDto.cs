@@ -48,6 +48,7 @@ public class QuestionDto
                             {
                                 Inlines = p.Inlines,
                                 Title = p.Title,
+                                Source = p.Source,
                                 Order = p.Order
                             },
 
