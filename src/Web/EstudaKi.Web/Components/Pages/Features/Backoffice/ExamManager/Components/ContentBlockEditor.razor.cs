@@ -1,17 +1,28 @@
-﻿using Estudaki.Modules.Questions.Domain.Entities;
+﻿using Estudaki.Modules.Questions.Application.DTOs;
+using Estudaki.Modules.Questions.Domain.Entities;
 using Estudaki.Modules.Questions.Domain.ValueObjects;
 using Microsoft.AspNetCore.Components;
+using MudBlazor;
 
 namespace EstudaKi.Web.Components.Pages.Features.Backoffice.ExamManager.Components;
 
 public class ContentBlockEditorBase : ComponentBase
 {
-    [Inject]
+    [Inject] 
     protected ILogger<ContentBlockEditorBase> Logger { get; set; } = default!;
-    [Parameter]
-    public List<ContentBlock> ContentBlocks { get; set; } = [];
-    protected enum ContentBlockType { Paragraph, Image }
 
+    [Parameter] 
+    public List<ContentBlock> ContentBlocks { get; set; } = [];
+
+    [Inject]
+    protected IDialogService Dialog { get; set; } = default!;
+
+
+    [CascadingParameter(Name = "PublicNotice")]
+    protected PublicNoticeDto? PublicNotice { get; set; }
+
+    protected enum ContentBlockType { Paragraph, Image }
+    
     protected void AddContentBlock(ContentBlockType type)
     {
         var newOrder = ContentBlocks.Any()
@@ -82,8 +93,27 @@ public class ContentBlockEditorBase : ComponentBase
         StateHasChanged();
     }    
 
-    protected void OpenImageSelectorForBlock(int blockIndex)
+    protected async Task OpenImageSelectorForBlock(ContentBlock block)
     {
-        Logger.LogDebug("Abrindo seletor de imagens para ImageBlock no bloco {BlockIndex}", blockIndex);
+        if (PublicNotice == null) return;
+
+        var parameters = new DialogParameters<ImageSelectorModal>
+        {
+            { c => c.PublicNotice, PublicNotice }
+        };
+
+        var options = new DialogOptions() { CloseButton = true, MaxWidth = MaxWidth.Large, FullWidth = true };
+        var dialog = await Dialog.ShowAsync<ImageSelectorModal>("Selecionar Imagem", parameters, options);
+        var result = await dialog.Result;
+
+        if (result is not null && !result.Canceled && result.Data is string selectedImageKey)
+        {
+            if (block is ImageBlock imageBlock)
+            {
+                imageBlock.Key = selectedImageKey;                
+                Logger.LogInformation("Imagem {ImageKey} atribuída ao bloco {BlockOrder}", selectedImageKey, block.Order);
+                StateHasChanged();
+            }
+        }
     }
 }

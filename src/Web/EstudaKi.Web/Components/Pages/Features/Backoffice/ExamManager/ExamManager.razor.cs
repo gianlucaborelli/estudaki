@@ -128,7 +128,8 @@ namespace EstudaKi.Web.Components.Pages.Features.Backoffice.ExamManager
             }
             var parameters = new DialogParameters<QuestionEditorModal>{
                 { x => x.Question, SelectedQuestion },
-                { x => x.AvailableQuestionSupports, QuestionSupports  }
+                { x => x.AvailableQuestionSupports, QuestionSupports },
+                { x => x.PublicNotice, PublicNotice }
             };
 
             var options = new DialogOptions { CloseButton = true, MaxWidth = MaxWidth.Medium, FullWidth = true };

@@ -1,568 +1,156 @@
 @using Estudaki.Commons.Core.Storage
 @using Estudaki.Modules.Questions.Domain.Entities
 @using Estudaki.Modules.Questions.Domain.Extensions
-@using Microsoft.JSInterop
-@inject IStorageService StorageService
-@inject IJSRuntime JSRuntime
-@inject ILogger<ImageSelectorModal> Logger
-@implements IAsyncDisposable
 
-<div class="modal fade show d-block" style="background-color: rgba(0,0,0,0.5);" tabindex="-1">
-    <div class="modal-dialog modal-xl modal-dialog-scrollable">
-        <div class="modal-content">
-            <div class="modal-header bg-primary text-white">
-                <h5 class="modal-title">
-                    <i class="bi bi-images me-2"></i>Selecionar Imagem
-                </h5>
-                <button type="button" class="btn-close btn-close-white" @onclick="Close"></button>
-            </div>
-            <div class="modal-body">
-                @if (isLoading)
-                {
-                    <div class="text-center py-5">
-                        <div class="spinner-border text-primary" role="status">
-                            <span class="visually-hidden">Carregando...</span>
-                        </div>
-                        <p class="mt-3 text-muted">Carregando imagens do S3...</p>
-                    </div>
-                }
-                else if (images.Count == 0)
-                {
-                    <div class="alert alert-warning">
-                        <i class="bi bi-exclamation-triangle me-2"></i>
-                        Nenhuma imagem encontrada no S3 para esta prova.
-                        <br />
-                        <small>Utilize a opção "Carregar Todas" ou "Upload Individual" para fazer upload de imagens.</small>
-                    </div>
-                }
-                else
-                {
-                    @* Área de Paste para Upload Rápido *@
-                    <div class="mb-3">
-                        @* InputFile oculto para receber imagens coladas *@
-                        <InputFile id="imageSelectorPasteInput" 
-                                    @ref="pasteInputFileRef"
-                                    OnChange="OnPastedImageSelected" 
-                                    style="display: none;" 
-                                    accept="image/*" />
+@inherits ImageSelectorModalBase
 
-                        <div class="card border-success" 
-                                style="border-style: dashed; border-width: 2px; cursor: pointer;"
-                                id="imageSelectorPasteArea"
-                                tabindex="0"
-                                @onclick="FocusPasteArea">
-                            <div class="card-body text-center py-2">
-                                <i class="bi bi-clipboard-plus text-success" style="font-size: 1.5rem;"></i>
-                                <span class="ms-2">
-                                    <strong>Cole uma imagem aqui (Ctrl+V)</strong> para fazer upload e selecioná-la automaticamente
-                                </span>
-                                @if (isUploading)
-                                {
-                                    <div class="mt-2">
-                                        <span class="spinner-border spinner-border-sm text-success me-2"></span>
-                                        <span class="badge bg-warning">Enviando...</span>
-                                    </div>
-                                }
-                                else if (pasteAreaFocused)
-                                {
-                                    <div class="mt-1">
-                                        <span class="badge bg-success">
-                                            <i class="bi bi-check-circle me-1"></i>Pronto para colar!
-                                        </span>
-                                    </div>
-                                }
-                            </div>
-                        </div>
-                    </div>
-
-                    @if (!string.IsNullOrEmpty(uploadMessage))
-                    {
-                        <div class="alert alert-info alert-dismissible fade show">
-                            <i class="bi bi-info-circle me-2"></i>@uploadMessage
-                            <button type="button" class="btn-close" @onclick="() => uploadMessage = null"></button>
-                        </div>
-                    }
-
-                    @if (!string.IsNullOrEmpty(uploadError))
-                    {
-                        <div class="alert alert-danger alert-dismissible fade show">
-                            <i class="bi bi-exclamation-triangle me-2"></i>@uploadError
-                            <button type="button" class="btn-close" @onclick="() => uploadError = null"></button>
-                        </div>
-                    }
-
-                    <div class="mb-3">
-                        <input type="text" 
-                                class="form-control" 
-                                placeholder="Buscar por nome da imagem..." 
-                                @bind="searchTerm"
-                                @bind:event="oninput"
-                                @onkeyup="FilterImages" />
-                    </div>
-
-                    <div class="row g-3">
-                        @foreach (var image in filteredImages)
-                        {
-                            <div class="col-md-3">
-                                <div class="card h-100 @(selectedImageKey == image.Key ? "border-primary border-3" : "")" 
-                                        style="cursor: pointer;"
-                                        @onclick="() => SelectImage(image.Key)">
-                                    <div class="card-body p-2 text-center">
-                                        <div class="position-relative" style="height: 150px; overflow: hidden; display: flex; align-items: center; justify-content: center; background-color: #f8f9fa;">
-                                            @if (image.IsLoaded)
-                                            {
-                                                @if (image.HasError)
-                                                {
-                                                    <div class="text-center text-muted">
-                                                        <i class="bi bi-image" style="font-size: 3rem;"></i>
-                                                        <div><small>Erro ao carregar</small></div>
-                                                        <div><small class="text-truncate d-block" style="max-width: 150px;" title="@image.Url">@image.Url</small></div>
-                                                    </div>
-                                                }
-                                                else
-                                                {
-                                                    <img src="@image.Url" 
-                                                            alt="@image.Key" 
-                                                            class="img-fluid"
-                                                            style="max-height: 150px; max-width: 100%; object-fit: contain;"
-                                                            @onerror="() => OnImageError(image)" />
-                                                }
-                                            }
-                                            else
-                                            {
-                                                <div class="spinner-border spinner-border-sm text-secondary" role="status">
-                                                    <span class="visually-hidden">Carregando...</span>
-                                                </div>
-                                            }
-                                        </div>
-                                        <div class="mt-2">
-                                            <small class="text-muted d-block text-truncate" title="@image.Key">
-                                                @image.Key
-                                            </small>
-                                            @if (selectedImageKey == image.Key)
-                                            {
-                                                <span class="badge bg-primary mt-1">
-                                                    <i class="bi bi-check-circle me-1"></i>Selecionada
-                                                </span>
-                                            }
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        }
-                    </div>
-
-                    @if (filteredImages.Count == 0 && !string.IsNullOrWhiteSpace(searchTerm))
-                    {
-                        <div class="alert alert-info mt-3">
-                            <i class="bi bi-info-circle me-2"></i>
-                            Nenhuma imagem encontrada com o termo "@searchTerm".
-                        </div>
-                    }
-                }
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" @onclick="Close">
-                    <i class="bi bi-x-circle me-1"></i>Cancelar
-                </button>
-                <button type="button" 
-                        class="btn btn-primary" 
-                        @onclick="Confirm"
-                        disabled="@(string.IsNullOrEmpty(selectedImageKey))">
-                    <i class="bi bi-check-circle me-1"></i>Confirmar
-                </button>
-            </div>
-        </div>
-    </div>
-</div>
-
-
-@code {
-    
-    [Parameter] public PublicNotice? PublicNotice { get; set; }
-    [Parameter] public EventCallback<string> OnImageSelected { get; set; }
-    [Parameter] public EventCallback OnClose { get; set; }
-
-    private class ImageInfo
-    {
-        public string Key { get; set; } = string.Empty;
-        public string Url { get; set; } = string.Empty;
-        public bool IsLoaded { get; set; }
-        public bool HasError { get; set; }
-    }
-
-    private List<ImageInfo> images = new();
-    private List<ImageInfo> filteredImages = new();
-    private string searchTerm = string.Empty;
-    private string? selectedImageKey;
-    private bool isLoading = false;
-    private bool previousVisibility = false;
-    private bool pasteAreaFocused = false;
-    private bool isUploading = false;
-    private string? uploadMessage;
-    private string? uploadError;
-    private InputFile? pasteInputFileRef;
-
-    protected override async Task OnParametersSetAsync()
-    {
-        // Detectar quando o modal abre (transição de false para true)
-        if (PublicNotice != null)
+<MudDialog>
+    <DialogContent>
+        @if (isLoading)
         {
-            Logger.LogInformation("Modal de seleção de imagens aberto - recarregando lista");
-            // Reset e recarregar imagens toda vez que o modal abrir
-            Reset();
-            await LoadImagesAsync();
+            <MudStack AlignItems="AlignItems.Center" Spacing="3" Class="py-5">
+                <MudProgressCircular Color="Color.Primary" Indeterminate="true" />
+                <MudText Color="Color.Secondary">Carregando imagens do S3...</MudText>
+            </MudStack>
         }
-    }
-
-    private async Task LoadImagesAsync()
-    {
-        try
+        else if (images.Count == 0)
         {
-            isLoading = true;
-            StateHasChanged();
-
-            var imagesFolder = PublicNotice!.GetImagesFolder();
-            Logger.LogInformation("Carregando imagens da pasta: {Folder}", imagesFolder);
-
-            var s3Files = await StorageService.ListFilesAsync(imagesFolder);
-
-            images = s3Files
-                .Where(f => IsImageFile(f))
-                .Select(f =>
-                {
-                    // Extrair nome completo do arquivo do S3 (com path)
-                    var fullPath = f; // Ex: "files/exams/2024/FGV/abc123/images/guid.png"
-
-                    // Construir URL completa com extensão
-                    var baseUrl = StorageService.GetFileUrl();
-                    var url = $"{baseUrl}/{fullPath}";
-
-                    // Key COM extensão para o banco de dados
-                    var fileName = System.IO.Path.GetFileName(fullPath); // Ex: "guid.png"
-                    var key = fileName; // Agora mantém a extensão!
-
-                    Logger.LogDebug("Imagem carregada - Key: {Key}, URL: {Url}", key, url);
-
-                    return new ImageInfo
-                    {
-                        Key = key,
-                        Url = url,
-                        IsLoaded = false
-                    };
-                })
-                .OrderBy(i => i.Key)
-                .ToList();
-
-            filteredImages = images.ToList();
-
-            Logger.LogInformation("Carregadas {Count} imagens do S3", images.Count);
-
-            // Carregar imagens progressivamente
-            _ = LoadImagesProgressivelyAsync();
-        }
-        catch (Exception ex)
-        {
-            Logger.LogError(ex, "Erro ao carregar imagens do S3");
-        }
-        finally
-        {
-            isLoading = false;
-            StateHasChanged();
-        }
-    }
-
-    private async Task LoadImagesProgressivelyAsync()
-    {
-        // Marca as imagens como carregadas progressivamente para melhor UX
-        foreach (var image in images)
-        {
-            image.IsLoaded = true;
-            StateHasChanged();
-            await Task.Delay(50); // Pequeno delay para evitar sobrecarga
-        }
-    }
-
-    private bool IsImageFile(string fileName)
-    {
-        var extension = System.IO.Path.GetExtension(fileName).ToLowerInvariant();
-        return extension is ".png" or ".jpg" or ".jpeg" or ".gif" or ".webp" or ".bmp" or ".svg";
-    }
-
-    private void FilterImages()
-    {
-        if (string.IsNullOrWhiteSpace(searchTerm))
-        {
-            filteredImages = images.ToList();
+            <MudAlert Severity="Severity.Warning" Icon="@Icons.Material.Filled.Warning">
+                Nenhuma imagem encontrada no S3 para esta prova.                
+            </MudAlert>
         }
         else
         {
-            filteredImages = images
-                .Where(i => i.Key.Contains(searchTerm, StringComparison.OrdinalIgnoreCase))
-                .ToList();
-        }
-    }
+            <MudPaper Class="mb-3" Outlined="true" Style="border-style: dashed; border-width: 2px; border-color: var(--mud-palette-success);">
+                <InputFile id="imageSelectorPasteInput"
+                           @ref="pasteInputFileRef"
+                           OnChange="OnPastedImageSelected"
+                           style="display: none;"
+                           accept="image/*" />
 
-    private void SelectImage(string key)
-    {
-        selectedImageKey = key;
-        Logger.LogInformation("Imagem selecionada: {Key}", key);
-    }
+                <MudStack AlignItems="AlignItems.Center" 
+                          Spacing="2" 
+                          Class="pa-3"
+                          Style="cursor: pointer;"
+                          id="imageSelectorPasteArea"
+                          tabindex="0"
+                          @onclick="FocusPasteArea">
+                    <MudIcon Icon="@Icons.Material.Filled.ContentPaste" Color="Color.Success" Size="Size.Large" />
+                    <MudText Typo="Typo.body1" Align="Align.Center">
+                        <strong>Cole uma imagem aqui (Ctrl+V)</strong> para fazer upload e selecioná-la automaticamente
+                    </MudText>
 
-    private void OnImageError(ImageInfo image)
-    {
-        image.HasError = true;
-        Logger.LogWarning("Erro ao carregar imagem: {Key} - URL: {Url}", image.Key, image.Url);
-        StateHasChanged();
-    }
+                    @if (isUploading)
+                    {
+                        <MudStack Row="true" AlignItems="AlignItems.Center" Spacing="2">
+                            <MudProgressCircular Size="Size.Small" Color="Color.Success" Indeterminate="true" />
+                            <MudChip T="string" Color="Color.Warning" Size="Size.Small">Enviando...</MudChip>
+                        </MudStack>
+                    }
+                    else if (pasteAreaFocused)
+                    {
+                        <MudChip T="string" Color="Color.Success" Size="Size.Small" Icon="@Icons.Material.Filled.CheckCircle">
+                            Pronto para colar!
+                        </MudChip>
+                    }
+                </MudStack>
+            </MudPaper>
 
-    private async Task Confirm()
-    {
-        if (!string.IsNullOrEmpty(selectedImageKey))
-        {
-            Logger.LogInformation("Confirmando seleção da imagem: {Key}", selectedImageKey);
-            await OnImageSelected.InvokeAsync(selectedImageKey);
-            await Close();
-        }
-    }
-
-    private async Task Close()
-    {
-        selectedImageKey = null;
-        searchTerm = string.Empty;
-        pasteAreaFocused = false;
-        uploadMessage = null;
-        uploadError = null;
-        await OnClose.InvokeAsync();
-    }
-
-    private async Task FocusPasteArea()
-    {
-        pasteAreaFocused = true;
-        try
-        {
-            await JSRuntime.InvokeVoidAsync("eval", "document.getElementById('imageSelectorPasteArea')?.focus()");
-        }
-        catch
-        {
-            // Ignorar erro
-        }
-    }
-
-    protected override async Task OnAfterRenderAsync(bool firstRender)
-    {        
-        try
-        {
-            // Inicializar paste handler usando abordagem similar ao paste-handler.js
-            await JSRuntime.InvokeVoidAsync("eval", @"
-                if (!window.imageSelectorPasteHandler) {
-                    console.log('[ImageSelectorModal] Criando paste handler');
-
-                    window.imageSelectorPasteHandler = (e) => {
-                        const pasteArea = document.getElementById('imageSelectorPasteArea');
-                        const fileInput = document.getElementById('imageSelectorPasteInput');
-
-                        if (!pasteArea || !fileInput) {
-                            console.log('[ImageSelectorModal] Elementos não encontrados');
-                            return;
-                        }
-
-                        // Só processar se for na área de paste
-                        if (e.target !== pasteArea && !pasteArea.contains(e.target)) {
-                            console.log('[ImageSelectorModal] Paste não está na área - ignorando');
-                            return;
-                        }
-
-                        const items = e.clipboardData?.items;
-                        if (!items) {
-                            console.log('[ImageSelectorModal] Clipboard vazio');
-                            return;
-                        }
-
-                        // Verificar se tem imagem
-                        let hasImage = false;
-                        for (let i = 0; i < items.length; i++) {
-                            if (items[i].type.indexOf('image') !== -1) {
-                                hasImage = true;
-                                break;
-                            }
-                        }
-
-                        if (!hasImage) {
-                            console.log('[ImageSelectorModal] Sem imagem no clipboard');
-                            return;
-                        }
-
-                        console.log('[ImageSelectorModal] Imagem detectada - processando');
-                        e.preventDefault();
-
-                        // Criar DataTransfer e adicionar arquivos
-                        const dataTransfer = new DataTransfer();
-                        let fileCount = 0;
-
-                        for (let i = 0; i < items.length; i++) {
-                            if (items[i].type.indexOf('image') !== -1) {
-                                const blob = items[i].getAsFile();
-                                if (blob) {
-                                    const timestamp = Date.now();
-                                    const ext = blob.type.split('/')[1] || 'png';
-                                    const fileName = `pasted-image-${timestamp}.${ext}`;
-                                    const file = new File([blob], fileName, { type: blob.type });
-                                    dataTransfer.items.add(file);
-                                    fileCount++;
-                                    console.log('[ImageSelectorModal] Arquivo adicionado:', fileName, 'Tamanho:', blob.size);
-                                }
-                            }
-                        }
-
-                        if (fileCount > 0) {
-                            fileInput.files = dataTransfer.files;
-                            const event = new Event('change', { bubbles: true });
-                            fileInput.dispatchEvent(event);
-                            console.log('[ImageSelectorModal] Evento change disparado -', fileCount, 'arquivo(s)');
-                        }
-                    };
-
-                    document.addEventListener('paste', window.imageSelectorPasteHandler);
-                    console.log('[ImageSelectorModal] Handler registrado');
-                }
-            ");
-        }
-        catch (Exception ex)
-        {
-            Logger.LogError(ex, "Erro ao inicializar paste handler");
-        }
-        
-    }
-
-    private async Task OnPastedImageSelected(InputFileChangeEventArgs e)
-    {
-        Logger.LogInformation("OnPastedImageSelected - Arquivos recebidos: {Count}", e.FileCount);
-
-        if (PublicNotice == null)
-        {
-            Logger.LogError("PublicNotice é null - não é possível fazer upload");
-            uploadError = "Erro: PublicNotice não está carregado";
-            StateHasChanged();
-            return;
-        }
-
-        if (isUploading)
-        {
-            Logger.LogWarning("Upload já em andamento - ignorando");
-            return;
-        }
-
-        try
-        {
-            isUploading = true;
-            uploadError = null;
-            uploadMessage = "Enviando imagem...";
-            pasteAreaFocused = false;
-            StateHasChanged();
-
-            var file = e.File;
-            Logger.LogInformation("Processando arquivo: {FileName}, Tipo: {ContentType}, Tamanho: {Size}", 
-                file.Name, file.ContentType, file.Size);
-
-            // Gerar GUID e extensão
-            var guid = Guid.NewGuid().ToString();
-            var extension = file.ContentType switch
+            @if (!string.IsNullOrEmpty(uploadMessage))
             {
-                "image/png" => ".png",
-                "image/jpeg" or "image/jpg" => ".jpg",
-                "image/gif" => ".gif",
-                "image/webp" => ".webp",
-                "image/bmp" => ".bmp",
-                "image/svg+xml" => ".svg",
-                _ => ".png"
-            };
+                <MudAlert Severity="Severity.Info" 
+                          CloseIcon="@Icons.Material.Filled.Close"
+                          CloseIconClicked="() => uploadMessage = null"
+                          Class="mb-3">
+                    @uploadMessage
+                </MudAlert>
+            }
 
-            Logger.LogInformation("GUID gerado: {Guid}, Extensão: {Extension}", guid, extension);
-
-            var fileName = $"{guid}{extension}";
-            var imagesFolder = PublicNotice.GetImagesFolder();
-            var s3Key = $"{imagesFolder}/{fileName}";
-
-            Logger.LogInformation("Iniciando upload para S3 - S3Key: {S3Key}", s3Key);
-
-            // Upload para S3
-            using var stream = file.OpenReadStream(maxAllowedSize: 10 * 1024 * 1024); // 10MB max
-            await StorageService.UploadFileAsync(stream, s3Key, file.ContentType);
-
-            Logger.LogInformation("Imagem colada enviada para S3 com sucesso: {Key}", guid);
-
-            // Adicionar à lista de imagens
-            var baseUrl = StorageService.GetFileUrl();
-            var fullUrl = $"{baseUrl}/{s3Key}";
-
-            Logger.LogInformation("URL da imagem gerada: {Url}", fullUrl);
-
-            // Key COM extensão (fileName = "guid.png")
-            var newImage = new ImageInfo
+            @if (!string.IsNullOrEmpty(uploadError))
             {
-                Key = fileName, // Agora inclui a extensão!
-                Url = fullUrl,
-                IsLoaded = true,
-                HasError = false
-            };
+                <MudAlert Severity="Severity.Error" 
+                          CloseIcon="@Icons.Material.Filled.Close"
+                          CloseIconClicked="() => uploadError = null"
+                          Class="mb-3">
+                    @uploadError
+                </MudAlert>
+            }
 
-            images.Insert(0, newImage); // Adicionar no início
-            filteredImages.Insert(0, newImage);
+            <MudTextField @bind-Value="searchTerm"
+                          Placeholder="Buscar por nome da imagem..."
+                          Immediate="true"
+                          Adornment="Adornment.Start"
+                          AdornmentIcon="@Icons.Material.Filled.Search"
+                          OnKeyUp="FilterImages"
+                          Class="mb-3" />
 
-            Logger.LogInformation("Imagem adicionada à lista - Total de imagens: {Count}", images.Count);
+            <MudGrid Spacing="3">
+                @foreach (var image in filteredImages)
+                {
+                    <MudItem xs="12" sm="6" md="3">
+                        <MudCard Class="@(selectedImageKey == image.Key ? "mud-theme-primary" : "")"
+                                 Style="cursor: pointer; height: 100%;"
+                                 Outlined="@(selectedImageKey != image.Key)"
+                                 Elevation="@(selectedImageKey == image.Key ? 8 : 1)"
+                                 @onclick="() => SelectImage(image.Key)">
+                            <MudCardContent Class="pa-2">
+                                <MudStack AlignItems="AlignItems.Center" Justify="Justify.Center" Style="height: 150px; background-color: var(--mud-palette-background-grey);">
+                                    @if (image.IsLoaded)
+                                    {
+                                        @if (image.HasError)
+                                        {
+                                            <MudStack AlignItems="AlignItems.Center" Spacing="1">
+                                                <MudIcon Icon="@Icons.Material.Filled.BrokenImage" Size="Size.Large" Color="Color.Secondary" />
+                                                <MudText Typo="Typo.caption" Color="Color.Secondary">Erro ao carregar</MudText>
+                                                <MudTooltip Text="@image.Url">
+                                                    <MudText Typo="Typo.caption" Class="text-truncate" Style="max-width: 150px;">@image.Url</MudText>
+                                                </MudTooltip>
+                                            </MudStack>
+                                        }
+                                        else
+                                        {
+                                            <img src="@image.Url"
+                                                 alt="@image.Key"
+                                                 style="max-height: 150px; max-width: 100%; object-fit: contain;"
+                                                 @onerror="() => OnImageError(image)" />
+                                        }
+                                    }
+                                    else
+                                    {
+                                        <MudProgressCircular Size="Size.Small" Color="Color.Secondary" Indeterminate="true" />
+                                    }
+                                </MudStack>
 
-            // Selecionar automaticamente (Key COM extensão)
-            selectedImageKey = fileName;
+                                <MudStack Class="mt-2" Spacing="1">
+                                    <MudTooltip Text="@image.Key">
+                                        <MudText Typo="Typo.caption" Color="Color.Secondary" Class="text-truncate">
+                                            @image.Key
+                                        </MudText>
+                                    </MudTooltip>
 
-            Logger.LogInformation("Imagem selecionada automaticamente: {Key}", fileName);
-
-            uploadMessage = $"✓ Imagem enviada e selecionada: {fileName}";
-
-            StateHasChanged();
-
-            // Limpar mensagem após 3 segundos
-            await Task.Delay(3000);
-            uploadMessage = null;
-            StateHasChanged();
-        }
-        catch (Exception ex)
-        {
-            Logger.LogError(ex, "Erro ao fazer upload de imagem colada");
-            uploadError = $"Erro ao enviar imagem: {ex.Message}";
-        }
-        finally
-        {
-            isUploading = false;
-            StateHasChanged();
-        }
-    }
-
-    public void Reset()
-    {
-        images.Clear();
-        filteredImages.Clear();
-        selectedImageKey = null;
-        searchTerm = string.Empty;
-        pasteAreaFocused = false;
-        uploadMessage = null;
-        uploadError = null;
-    }
-
-    public async ValueTask DisposeAsync()
-    {
-        try
-        {
-            await JSRuntime.InvokeVoidAsync("eval", @"
-                if (window.imageSelectorPasteHandler) {
-                    document.removeEventListener('paste', window.imageSelectorPasteHandler);
-                    delete window.imageSelectorPasteHandler;
+                                    @if (selectedImageKey == image.Key)
+                                    {
+                                        <MudChip T="string" Color="Color.Primary" Size="Size.Small" Icon="@Icons.Material.Filled.CheckCircle">
+                                            Selecionada
+                                        </MudChip>
+                                    }
+                                </MudStack>
+                            </MudCardContent>
+                        </MudCard>
+                    </MudItem>
                 }
-            ");
+            </MudGrid>
+
+            @if (filteredImages.Count == 0 && !string.IsNullOrWhiteSpace(searchTerm))
+            {
+                <MudAlert Severity="Severity.Info" Class="mt-3">
+                    Nenhuma imagem encontrada com o termo "@searchTerm".
+                </MudAlert>
+            }
         }
-        catch
-        {
-            // Ignorar erros ao fazer dispose
-        }
-    }
-}
+    </DialogContent>
+    <DialogActions>
+        <MudButton Color="Color.Secondary" OnClick="Close">Cancelar</MudButton>
+        <MudButton Color="Color.Primary" OnClick="Confirm" Disabled="@string.IsNullOrEmpty(selectedImageKey)">Confirmar</MudButton>
+    </DialogActions>
+</MudDialog>

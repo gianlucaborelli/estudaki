@@ -6,7 +6,8 @@
 
 <MudDialog>
     <DialogContent>
-        <EditForm Model="@Question">          
+        <CascadingValue Value="PublicNotice" Name="PublicNotice">
+        <EditForm Model="@Question">
                 
             <MudGrid Spacing="3">
                 <MudItem xs="12" md="6">
@@ -124,6 +125,7 @@
                 </MudTabPanel>
             </MudTabs>            
         </EditForm>
+        </CascadingValue>
     </DialogContent>
     <DialogActions>
         <MudButton Variant="Variant.Text" Color="Color.Secondary" OnClick="() => Dialog.Cancel()">Cancelar</MudButton>

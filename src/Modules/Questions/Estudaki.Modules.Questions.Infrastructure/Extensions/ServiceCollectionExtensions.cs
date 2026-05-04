@@ -1,6 +1,7 @@
 using Estudaki.Commons.Core.CQRS.Extensions;
 using Estudaki.Modules.Questions.Application.Commands;
 using Estudaki.Modules.Questions.Application.Queries.GetFilterParameters;
+using Estudaki.Modules.Questions.Application.Queries.GetImageListByPublicNoticeId;
 using Estudaki.Modules.Questions.Application.Queries.GetPublicNoticeById;
 using Estudaki.Modules.Questions.Application.Queries.GetPublicNoticeList;
 using Estudaki.Modules.Questions.Application.Queries.GetQuestionById;
@@ -36,6 +37,7 @@ public static class ServiceCollectionExtensions
         services.AddCQRSHandlers(typeof(GetPublicNoticeByIdQueryHandler).Assembly);
         services.AddCQRSHandlers(typeof(GetQuestionsByPublicNoticeIdQueryHandler).Assembly);
         services.AddCQRSHandlers(typeof(GetQuestionSupportsByPublicNoticeIdQueryHandler).Assembly);
+        services.AddCQRSHandlers(typeof(GetImageListByPublicNoticeIdQueryHandler).Assembly);
 
         services.AddCQRSHandlers(typeof(UploadPublicNoticeFilesCommandHandler).Assembly);
         services.AddCQRSHandlers(typeof(UploadQuestionImagesCommandHandler).Assembly);

@@ -3,8 +3,10 @@
 
 @inherits QuestionSupportEditorModalBase
 
+
 <MudDialog>
     <DialogContent>
+        <CascadingValue Value="Notice" Name="PublicNotice">
         @if (QuestionSupport != null || Notice != null)
         {
             <MudStack Row="true" AlignItems="AlignItems.Center">
@@ -33,7 +35,7 @@
                 Erro ao carregar o texto de apoio.
             </div>
         }
-
+        </CascadingValue>
     </DialogContent>
     <DialogActions>
         <MudButton OnClick="Save">Salvar</MudButton>

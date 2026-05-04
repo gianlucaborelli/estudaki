@@ -23,8 +23,13 @@ public class QuestionEditorModalBase : ComponentBase
 
     [Parameter]
     public List<QuestionSupportDto> AvailableQuestionSupports { get; set; } = [];
+
     [Parameter]
     public QuestionDto? Question { get; set; }
+
+    [Parameter]
+    public PublicNoticeDto? PublicNotice { get; set; }
+
     public QuestionDto EditedQuestion { get; set; } = new QuestionDto();
 
     // Enums
@@ -107,47 +112,5 @@ public class QuestionEditorModalBase : ComponentBase
         if (EditedQuestion?.Choices == null || choice == null) return;        
         EditedQuestion.Choices.Remove(choice);
         StateHasChanged();
-    }
-   
-    // ==================== MÉTODOS DE GERENCIAMENTO DO MODAL DE SELEÇÃO DE IMAGENS ====================    
-
-    protected async Task OnImageSelectedFromModal(string imageKey)
-    {
-        //if (EditedQuestion == null || currentEditingBlockIndex < 0 || currentEditingBlockIndex >= EditedQuestion.QuestionContents.Count)
-        //{
-        //    Logger.LogWarning("Índice de bloco inválido ao selecionar imagem");
-        //    return;
-        //}
-
-        //var block = EditedQuestion.QuestionContents[currentEditingBlockIndex];
-
-        //if (isEditingImageBlock)
-        //{
-        //    // Editando um ImageBlock
-        //    if (block is ImageBlock imageBlock)
-        //    {
-        //        imageBlock.Key = imageKey;
-        //        Logger.LogInformation("Imagem {Key} selecionada para ImageBlock no bloco {BlockIndex}", imageKey, currentEditingBlockIndex);
-        //    }
-        //}
-        //else
-        //{
-        //    // Editando um ImageInline dentro de um ParagraphBlock
-        //    if (block is ParagraphBlock paragraph &&
-        //        currentEditingInlineIndex >= 0 &&
-        //        currentEditingInlineIndex < paragraph.Inlines.Count)
-        //    {
-        //        var inline = paragraph.Inlines[currentEditingInlineIndex];
-        //        if (inline is ImageInline imageInline)
-        //        {
-        //            imageInline.Key = imageKey;
-        //            Logger.LogInformation("Imagem {Key} selecionada para ImageInline no bloco {BlockIndex}, inline {InlineIndex}",
-        //                imageKey, currentEditingBlockIndex, currentEditingInlineIndex);
-        //        }
-        //    }
-        //}
-
-        //StateHasChanged();
-        await Task.CompletedTask;
-    }    
+    }       
 }
