@@ -1,16 +1,59 @@
-﻿@inherits InlineTextEditorBase
+@inherits InlineTextEditorBase
 
-<MudTextField T="string"
-              @bind-Value="Value.Text"
-              Label="Texto"
-              FullWidth="true"
-              Lines="3"
-              Variant="Variant.Outlined"/>
-<MudGrid>
-    <MudItem>
-        <MudCheckBox @bind-Value="Value.Bold" Label="Negrito" />
-    </MudItem>
-    <MudItem>
-        <MudCheckBox @bind-Value="Value.Italic" Label="Itálico" />
-    </MudItem>    
-</MudGrid>
+<div id="@editorId" style="position: relative;" @onmouseup="OnTextSelected" >
+    <MudTextField T="string"
+                  @bind-Value="Value.Text"
+                  Label="Texto (suporta HTML)"
+                  FullWidth="true"
+                  Lines="3"
+                  Variant="Variant.Outlined"
+                  Immediate="true"
+                  HelperText="Selecione o texto e escolha a formatação desejada" />
+
+    @if (showFormattingMenu)
+    {
+        <MudPaper Elevation="8" 
+                  Class="pa-2" 
+                  Style="@($"position: fixed; left: {menuX}px; top: {menuY - 50}px; z-index: 9999;")"
+                  @onclick:stopPropagation="true">
+            <MudStack Row="true" Spacing="1">
+                <MudTooltip Text="Negrito">
+                    <MudIconButton Icon="@Icons.Material.Filled.FormatBold" 
+                                   Size="Size.Small" 
+                                   Color="Color.Primary"
+                                   OnClick="@(() => ApplyFormatting("bold"))" />
+                </MudTooltip>
+
+                <MudTooltip Text="Itálico">
+                    <MudIconButton Icon="@Icons.Material.Filled.FormatItalic" 
+                                   Size="Size.Small" 
+                                   Color="Color.Primary"
+                                   OnClick="@(() => ApplyFormatting("italic"))" />
+                </MudTooltip>
+
+                <MudTooltip Text="Sublinhado">
+                    <MudIconButton Icon="@Icons.Material.Filled.FormatUnderlined" 
+                                   Size="Size.Small" 
+                                   Color="Color.Primary"
+                                   OnClick="@(() => ApplyFormatting("underline"))" />
+                </MudTooltip>
+
+                <MudDivider Vertical="true" FlexItem="true" />
+
+                <MudTooltip Text="Fechar">
+                    <MudIconButton Icon="@Icons.Material.Filled.Close" 
+                                   Size="Size.Small" 
+                                   OnClick="CloseMenu" />
+                </MudTooltip>
+            </MudStack>
+        </MudPaper>
+    }
+
+    @if (!string.IsNullOrEmpty(Value.Text))
+    {
+        <MudPaper Class="pa-3 mt-2" Outlined="true">
+            <MudText Typo="Typo.caption" Color="Color.Secondary" Class="mb-2">Pré-visualização:</MudText>
+            <div>@((MarkupString)Value.Text)</div>
+        </MudPaper>
+    }
+</div>
