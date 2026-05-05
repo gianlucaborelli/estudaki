@@ -8,6 +8,8 @@ using Microsoft.AspNetCore.Components.Web;
 using Microsoft.AspNetCore.WebUtilities;
 using MudBlazor;
 using EstudaKi.Web.Helpers;
+using Microsoft.Extensions.Logging;
+using System.Diagnostics;
 
 namespace EstudaKi.Web.Components.Pages.Features.Questions;
 
@@ -21,6 +23,9 @@ public partial class ResultBase : ComponentBase
 
     [Inject]
     protected ISnackbar Snackbar { get; set; } = default!;
+
+    [Inject]
+    protected ILogger<ResultBase> Logger { get; set; } = default!;
 
     [SupplyParameterFromQuery(Name = "page")]
     public int CurrentPage { get; set; } = 1;
@@ -51,6 +56,7 @@ public partial class ResultBase : ComponentBase
     public int TotalPages { get; set; } = 0;
     protected int BoundaryCount { get; set; } = 1;
     protected QuestionDto[] Questions { get; set; } = [];
+    protected bool IsLoading { get; set; } = false;
 
     protected string SearchQuery { get; set; } = string.Empty;
     protected IReadOnlyCollection<string> SelectedTypeQuestion { get; set; } = [];
@@ -97,6 +103,11 @@ public partial class ResultBase : ComponentBase
 
     private async Task RefreshDataAsync()
     {
+        IsLoading = true;
+        StateHasChanged();
+
+        var stopwatch = Stopwatch.StartNew();
+
         try
         {
             var searchParameters = new SearchParameters
@@ -110,17 +121,48 @@ public partial class ResultBase : ComponentBase
                 SubAreas = SubAreas
             };
 
+            Logger.LogInformation(
+                "Iniciando consulta de questões - Página: {CurrentPage}, Filtros: Palavra-chave='{WordKey}', Tipos={TypeCount}, Categorias={CategoryCount}, Áreas={AreaCount}, Subáreas={SubAreaCount}",
+                CurrentPage, 
+                WordKey ?? "(nenhuma)", 
+                TypeQuestions?.Length ?? 0, 
+                ExamCategories?.Length ?? 0, 
+                MainAreas?.Length ?? 0, 
+                SubAreas?.Length ?? 0);
+
             var searchResult = await _queryDispatcher
                 .DispatchAsync<SearchQuestionsPaginatedQuery, PageResult<QuestionDto>>(new SearchQuestionsPaginatedQuery(searchParameters));
 
+            stopwatch.Stop();
+
             Questions = [.. searchResult.Items];
             TotalPages = searchResult.TotalPages;
+
+            Logger.LogInformation(
+                "Consulta de questões concluída com sucesso - Duração: {ElapsedMilliseconds}ms, Questões retornadas: {QuestionCount}, Total de páginas: {TotalPages}",
+                stopwatch.ElapsedMilliseconds,
+                Questions.Length,
+                TotalPages);
         }
         catch (Exception ex)
         {
+            stopwatch.Stop();
+
+            Logger.LogError(
+                ex,
+                "Erro ao carregar questões - Duração: {ElapsedMilliseconds}ms, Página: {CurrentPage}, Erro: {ErrorMessage}",
+                stopwatch.ElapsedMilliseconds,
+                CurrentPage,
+                ex.Message);
+
             Snackbar.Add($"Erro ao carregar questões: {ex.Message}", Severity.Error);
             Questions = [];
             TotalPages = 0;
+        }
+        finally
+        {
+            IsLoading = false;
+            StateHasChanged();
         }
     }
 

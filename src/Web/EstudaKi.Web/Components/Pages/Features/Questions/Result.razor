@@ -126,11 +126,41 @@
                            Class="mt-4" />
         </MudItem>
 
-        @foreach (var questionDto in Questions)
+        @if (IsLoading)
         {
-            <MudItem xs="12">
-                <QuestionComponent Value="questionDto" />
-            </MudItem>
+            @for (int i = 0; i < 5; i++)
+            {
+                <MudItem xs="12">
+                    <MudPaper Elevation="2" Class="pa-4">
+                        <MudGrid>
+                            <MudItem xs="12">
+                                <MudSkeleton SkeletonType="SkeletonType.Text" Height="30px" Width="80%" />
+                            </MudItem>
+                            <MudItem xs="12">
+                                <MudSkeleton SkeletonType="SkeletonType.Text" Height="20px" Width="60%" />
+                            </MudItem>
+                            <MudItem xs="12" Class="mt-2">
+                                <MudSkeleton SkeletonType="SkeletonType.Rectangle" Height="100px" />
+                            </MudItem>
+                            <MudItem xs="12" Class="mt-2">
+                                <MudSkeleton SkeletonType="SkeletonType.Text" Height="40px" Width="90%" />
+                                <MudSkeleton SkeletonType="SkeletonType.Text" Height="40px" Width="90%" Class="mt-1" />
+                                <MudSkeleton SkeletonType="SkeletonType.Text" Height="40px" Width="90%" Class="mt-1" />
+                                <MudSkeleton SkeletonType="SkeletonType.Text" Height="40px" Width="90%" Class="mt-1" />
+                            </MudItem>
+                        </MudGrid>
+                    </MudPaper>
+                </MudItem>
+            }
+        }
+        else
+        {
+            @foreach (var questionDto in Questions)
+            {
+                <MudItem xs="12">
+                    <QuestionComponent Value="questionDto" />
+                </MudItem>
+            }
         }
 
         <MudItem xs="12"
