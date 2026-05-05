@@ -1,6 +1,8 @@
 ﻿@page "/result"
 @using EstudaKi.Web.Components.Pages.Shared
 @using EstudaKi.Web.Components.Pages.Features.Questions.Components
+@using EstudaKi.Web.Helpers
+@using MudExtensions
 @inherits ResultBase
 
 <PageTitle>Resultados da Busca - EstudaKi</PageTitle>
@@ -13,6 +15,104 @@
 
 <MudContainer MaxWidth="MaxWidth.Large" Class="mt-4">
     <MudGrid>
+        <MudItem xs="12">
+            <MudTextField @bind-Value="SearchQuery"
+                          Label="Buscar questões"
+                          Placeholder="Digite palavras-chave para buscar questões..."
+                          Variant="Variant.Outlined"
+                          Adornment="Adornment.End"
+                          AdornmentIcon="@Icons.Material.Filled.Search"
+                          AdornmentColor="Color.Primary"
+                          OnKeyDown="OnSearchKeyDown"
+                          Immediate="false"
+                          FullWidth="true"
+                          Class="mb-3" />
+
+            <MudGrid Spacing="3" Class="mb-4">
+                <MudItem xs="12" md="3">
+                    <MudSelect T="string"
+                               @bind-SelectedValues="SelectedTypeQuestion"
+                               MultiSelection="true"
+                               Label="Tipo de Questão"
+                               Variant="Variant.Outlined"
+                               Margin="Margin.Dense"
+                               Clearable="true"
+                               AnchorOrigin="Origin.BottomCenter"
+                               TransformOrigin="Origin.TopCenter"
+                               MultiSelectionTextFunc="@(selectedValues => string.Join(", ", selectedValues.Select(x => QuestionTypeHelper.GetDisplayName(x))))"
+                               ToStringFunc="@(value => QuestionTypeHelper.GetDisplayName(value))">
+                        @foreach (var type in AvailableTypeQuestionsDisplay)
+                        {
+                            <MudSelectItem T="string" Value="@type.Value">@type.DisplayName</MudSelectItem>
+                        }
+                    </MudSelect>
+                </MudItem>
+
+                <MudItem xs="12" md="3">
+                    <MudSelect T="string"
+                               @bind-SelectedValues="SelectedExamCategory"
+                               MultiSelection="true"
+                               Label="Tipo de Prova"
+                               Variant="Variant.Outlined"
+                               Margin="Margin.Dense"
+                               Clearable="true"
+                               AnchorOrigin="Origin.BottomCenter"
+                               TransformOrigin="Origin.TopCenter"
+                               MultiSelectionTextFunc="@(selectedValues => string.Join(", ", selectedValues.Select(x => ExamCategoryHelper.GetDisplayName(x))))"
+                               ToStringFunc="@(value => ExamCategoryHelper.GetDisplayName(value))">
+                        @foreach (var category in AvailableExamCategoriesDisplay)
+                        {
+                            <MudSelectItem T="string" Value="@category.Value">@category.DisplayName</MudSelectItem>
+                        }
+                    </MudSelect>
+                </MudItem>
+
+                <MudItem xs="12" md="3">
+                    <MudSelectExtended T="string"
+                                       ItemCollection="AvailableMainAreas"
+                                       @bind-SelectedValues="SelectedMainArea"
+                                       MultiSelection="true"
+                                       Label="Área de conhecimento"
+                                       Variant="Variant.Outlined"
+                                       Margin="Margin.Dense"
+                                       Clearable="true"
+                                       AnchorOrigin="Origin.BottomCenter"
+                                       TransformOrigin="Origin.TopCenter" />
+                </MudItem>
+
+                <MudItem xs="12" md="3">
+                    <MudSelectExtended T="string"
+                                       ItemCollection="AvailableSubAreas"
+                                       @bind-SelectedValues="SelectedSubArea"
+                                       MultiSelection="true"
+                                       OnClearButtonClick="LoadingFilterParameters"
+                                       OnClose="LoadingFilterParameters"
+                                       Label="Subárea"
+                                       Variant="Variant.Outlined"
+                                       Margin="Margin.Dense"
+                                       Clearable="true"
+                                       AnchorOrigin="Origin.BottomCenter"
+                                       TransformOrigin="Origin.TopCenter" />
+                </MudItem>
+
+                <!-- Botões de Ação -->            
+                <MudItem xs="12" Class="d-flex justify-center gap-2">
+                    <MudButton Variant="Variant.Outlined" 
+                               Color="Color.Default" 
+                               OnClick="ClearFilters"
+                               StartIcon="@Icons.Material.Filled.Clear">
+                        Limpar Filtros
+                    </MudButton>
+                    <MudButton Variant="Variant.Filled" 
+                               Color="Color.Primary" 
+                               OnClick="ApplyFilters"
+                               StartIcon="@Icons.Material.Filled.Search">
+                        Aplicar Filtros
+                    </MudButton>
+                </MudItem>
+            </MudGrid>
+        </MudItem>
+
         <MudItem xs="12"
                  Style="display: flex; justify-content:center">
             <MudPagination Color="Color.Primary"
@@ -24,7 +124,7 @@
                            ShowFirstButton="true"
                            ShowLastButton="true"
                            Class="mt-4" />
-        </MudItem>    
+        </MudItem>
 
         @foreach (var questionDto in Questions)
         {
