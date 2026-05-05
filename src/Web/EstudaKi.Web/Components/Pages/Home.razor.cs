@@ -1,9 +1,129 @@
 ﻿using Microsoft.AspNetCore.Components;
+using Microsoft.AspNetCore.Components.Web;
+using EstudaKi.Web.Helpers;
+using Microsoft.AspNetCore.WebUtilities;
+using Estudaki.Commons.Core.CQRS;
+using Estudaki.Modules.Questions.Application.Queries.GetFilterParameters;
+using Estudaki.Modules.Questions.Domain.Common;
 
 namespace EstudaKi.Web.Components.Pages
 {
     public partial class Home
     {
+        [Inject]
+        private NavigationManager Navigation { get; set; } = default!;
+
+        [Inject]
+        private IQueryDispatcher QueryDispatcher { get; set; } = default!;
+
+        private string SearchQuery { get; set; } = string.Empty;
+
+        private IReadOnlyCollection<string> SelectedTypeQuestion { get; set; } = [];
+        private IReadOnlyCollection<string> SelectedExamCategory { get; set; } = [];
+        private IEnumerable<string> SelectedMainArea { get; set; } = [];
+        private IEnumerable<string> SelectedSubArea { get; set; } = [];
+
+        private bool _showFilters { get; set; } = false;
+
+        private List<(string Value, string DisplayName)> AvailableTypeQuestionsDisplay { get; set; } = [];
+        private string[] AvailableTypeQuestions { get; set; } = [];
+        private List<(string Value, string DisplayName)> AvailableExamCategoriesDisplay { get; set; } = [];
+        private string[] AvailableExamCategories { get; set; } = [];
+        private string[] AvailableMainAreas { get; set; } = [];
+        private string[] AvailableSubAreas { get; set; } = [];
+
+        protected override async Task OnInitializedAsync()
+        {
+            await LoadAvailableFilters();
+        }
+        protected async Task LoadingFilterParameters()
+        {
+            await LoadAvailableFilters();
+        }
+
+        private async Task LoadAvailableFilters()
+        {
+            try
+            {
+                var filterParams = new FilterParameters
+                {
+                    TypeQuestions = SelectedTypeQuestion?.ToArray() ?? Array.Empty<string>(),
+                    ExamCategories = SelectedExamCategory?.ToArray() ?? Array.Empty<string>(),
+                    MainAreas = SelectedMainArea?.ToArray() ?? Array.Empty<string>(),
+                    SubAreas = SelectedSubArea?.ToArray() ?? Array.Empty<string>()
+                };
+
+                var result = await QueryDispatcher
+                    .DispatchAsync<GetFilterParametersQuery, FilterParameters>(
+                        new GetFilterParametersQuery(filterParams));
+
+                AvailableTypeQuestions = result.TypeQuestions.ToArray();
+                AvailableTypeQuestionsDisplay = QuestionTypeHelper.GetDisplayList((string[])AvailableTypeQuestions);
+                AvailableExamCategories = result.ExamCategories.ToArray();    
+                AvailableExamCategoriesDisplay = ExamCategoryHelper.GetDisplayList((string[])AvailableExamCategories);
+                AvailableMainAreas = result.MainAreas;
+                AvailableSubAreas = result.SubAreas;
+            }
+            catch
+            {
+                AvailableTypeQuestions = [];
+                AvailableExamCategories = [];
+                AvailableMainAreas = [];
+                AvailableSubAreas = [];
+            }
+        }        
+
+        private void OnSearchKeyDown(KeyboardEventArgs e)
+        {
+            if (e.Key == "Enter")
+            {
+                ExecuteSearch();
+            }
+        }
+
+        private void ExecuteSearch()
+        {
+            var queryParams = new Dictionary<string, string?>();
+
+            if (!string.IsNullOrWhiteSpace(SearchQuery))
+            {
+                queryParams["q"] = SearchQuery;
+            }
+
+            if (SelectedTypeQuestion != null && SelectedTypeQuestion.Any())
+            {
+                queryParams["types"] = string.Join(",", SelectedTypeQuestion);
+            }
+
+            if (SelectedExamCategory != null && SelectedExamCategory.Any())
+            {
+                queryParams["categories"] = string.Join(",", SelectedExamCategory);
+            }
+
+            if (SelectedMainArea != null && SelectedMainArea.Any())
+            {
+                queryParams["areas"] = string.Join(",", SelectedMainArea);
+            }
+
+            if (SelectedSubArea != null && SelectedSubArea.Any())
+            {
+                queryParams["subareas"] = string.Join(",", SelectedSubArea);
+            }
+
+            var url = QueryHelpers.AddQueryString("/result", queryParams);
+            Navigation.NavigateTo(url);
+        }
+
+        private async Task ClearFilters()
+        {
+            SearchQuery = string.Empty;
+            SelectedTypeQuestion = [];
+            SelectedExamCategory = [];
+            SelectedMainArea = [];
+            SelectedSubArea = [];
+            await LoadAvailableFilters();
+        }
+
         private string GetStructuredData()
         {
             return @"{

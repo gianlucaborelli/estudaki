@@ -2,6 +2,8 @@
 @using EstudaKi.Web.Components.Pages.Shared
 @using MudBlazor
 @using EstudaKi.Web.Components
+@using EstudaKi.Web.Helpers
+@using MudExtensions
 
 <PageTitle>EstudaKi - Questões Gratuitas para Vestibular, Concurso e OAB</PageTitle>
 
@@ -22,6 +24,112 @@
             Explore questões de vestibulares, concursos públicos e do exame da OAB, sem precisar de cadastro.
         </MudText>
     </div>
+
+    <!-- Seção de Busca -->
+   
+    <MudTextField @bind-Value="SearchQuery"
+                    Label="Buscar questões"
+                    Placeholder="Digite palavras-chave para buscar questões..."
+                    Variant="Variant.Outlined"
+                    Adornment="Adornment.End"
+                    AdornmentIcon="@Icons.Material.Filled.Search"
+                    AdornmentColor="Color.Primary"
+                    OnKeyDown="OnSearchKeyDown"
+                    Immediate="false"
+                    FullWidth="true"
+                    Class="mb-4" />
+
+    <div class="d-flex justify-center mt-1">
+        <MudButton Variant="Variant.Text"
+                   Class="pa-0"
+                   OnClick="() => _showFilters =!_showFilters">
+            @(_showFilters ? "Ocultar filtros" : "Mostrar filtros")
+        </MudButton>
+    </div>
+
+    <MudCollapse Expanded="_showFilters">
+        <MudGrid Spacing="3">
+            <MudItem xs="12" md="3">
+                <MudSelect T="string"
+                            @bind-SelectedValues="SelectedTypeQuestion"
+                            MultiSelection="true"
+                            Label="Tipo de Questão"
+                            Variant="Variant.Outlined"
+                            Margin="Margin.Dense"
+                            Clearable="true"
+                            AnchorOrigin="Origin.BottomCenter"
+                            TransformOrigin="Origin.TopCenter"
+                            ToStringFunc="@(value => QuestionTypeHelper.GetDisplayName(value))">
+                    @foreach (var type in AvailableTypeQuestionsDisplay)
+                    {
+                        <MudSelectItem T="string" Value="@type.Value">@type.DisplayName</MudSelectItem>
+                    }
+                </MudSelect>
+            </MudItem>
+
+            <MudItem xs="12" md="3">
+                <MudSelect T="string" Class="my-custom-textfield"
+                            @bind-SelectedValues="SelectedExamCategory"
+                            MultiSelection="true"
+                            Label="Tipo de Prova"
+                            Variant="Variant.Outlined"
+                            Margin="Margin.Dense"
+                            Clearable="true"
+                            AnchorOrigin="Origin.BottomCenter"
+                            TransformOrigin="Origin.TopCenter"
+                            ToStringFunc="@(value => ExamCategoryHelper.GetDisplayName(value))">
+                    @foreach (var category in AvailableExamCategoriesDisplay)
+                    {
+                        <MudSelectItem T="string" Value="@category.Value">@category.DisplayName</MudSelectItem>
+                    }
+                </MudSelect>
+            </MudItem>
+
+            <MudItem xs="12" md="3">
+                <MudSelectExtended T="string" Class="my-custom-textfield my-custom-select"
+                                    ItemCollection="AvailableMainAreas"
+                                    @bind-SelectedValues="SelectedMainArea"
+                                    MultiSelection="true"          
+                                    Label="Área de conhecimento"
+                                    Variant="Variant.Outlined"
+                                    Margin="Margin.Dense"
+                                    Clearable="true"
+                                    AnchorOrigin="Origin.BottomCenter"
+                                    TransformOrigin="Origin.TopCenter" />
+            </MudItem>
+
+            <MudItem xs="12" md="3">
+                <MudSelectExtended T="string" Class="my-custom-textfield"
+                                    ItemCollection="AvailableSubAreas"
+                                    @bind-SelectedValues="SelectedSubArea"
+                                    MultiSelection="true"
+                                    OnClearButtonClick="LoadingFilterParameters"
+                                    OnClose="LoadingFilterParameters"
+                                    Label="Subárea"
+                                    Variant="Variant.Outlined"
+                                    Margin="Margin.Dense"
+                                    Clearable="true"
+                                    AnchorOrigin="Origin.BottomCenter"
+                                    TransformOrigin="Origin.TopCenter" />
+            </MudItem>
+
+            <!-- Botões de Ação -->            
+            <MudItem xs="12" Class="d-flex justify-center gap-2">
+                <MudButton Variant="Variant.Outlined" 
+                            Color="Color.Default" 
+                            OnClick="ClearFilters"
+                            StartIcon="@Icons.Material.Filled.Clear">
+                    Limpar Filtros
+                </MudButton>
+                <MudButton Variant="Variant.Filled" 
+                            Color="Color.Primary" 
+                            OnClick="ExecuteSearch"
+                            StartIcon="@Icons.Material.Filled.Search">
+                    Buscar
+                </MudButton>
+            </MudItem>
+        </MudGrid>        
+    </MudCollapse>
 
     <MudDivider Class="my-8" />
 
