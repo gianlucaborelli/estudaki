@@ -18,6 +18,7 @@ public class DeleteQuestionCommandHandler : CommandHandler, ICommandHandler<Dele
     }
     public async Task<ValidationResult> HandleAsync(DeleteQuestionCommand command, CancellationToken cancellationToken = default)
     {
+        //To-Do: Deletar ExamQuestion associada a questão
         ValidationResult = await _validator.ValidateAsync(command);
         if(!ValidationResult.IsValid) return ValidationResult;
 

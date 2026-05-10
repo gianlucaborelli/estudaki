@@ -1,6 +1,6 @@
 namespace Estudaki.Modules.Questions.Domain.Common;
 
-public class PageResult<T>
+public class PagedResult<T>
 {
     public List<T> Items { get; set; } = [];
     public int PageNumber { get; set; }

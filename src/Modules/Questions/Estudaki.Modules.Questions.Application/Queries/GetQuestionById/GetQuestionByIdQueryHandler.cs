@@ -32,14 +32,18 @@ public class GetQuestionByIdQueryHandler : IQueryHandler<GetQuestionByIdQuery, Q
         if (question == null)
             return null;
 
-        var publicNotice = !string.IsNullOrEmpty(question.PublicNoticeId)
-            ? await _publicNoticeRepository.GetById(question.PublicNoticeId)
-            : null;
 
-        var questionSupports = question.QuestionSupports != null && question.QuestionSupports.Any()
-            ? await _questionSupportRepository.GetByIds(question.QuestionSupports)
-            : null;
+        //To-Do: Corrigir query para buscar o edital e os apoios de questão em um único acesso ao banco, evitando múltiplas consultas
+        //var publicNotice = !string.IsNullOrEmpty(question.PublicNoticeId)
+        //    ? await _publicNoticeRepository.GetById(question.PublicNoticeId)
+        //    : null;
 
-        return question.ToDto(publicNotice, questionSupports, _storageService);
+        //var questionSupports = question.QuestionSupports != null && question.QuestionSupports.Any()
+        //    ? await _questionSupportRepository.GetByIds(question.QuestionSupports)
+        //    : null;
+
+        //return question.ToDto(publicNotice, questionSupports, _storageService);
+
+        return new QuestionDto();
     }
 }

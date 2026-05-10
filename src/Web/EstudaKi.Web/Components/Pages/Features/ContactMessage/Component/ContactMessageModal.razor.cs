@@ -51,7 +51,7 @@ namespace EstudaKi.Web.Components.Pages.Features.ContactMessage.Component
             {
                 Success = false;
                 ProcessValidationErrors(result);
-                await Form.Validate();
+                await Form.ValidateAsync();
                 Snackbar.Add("Falha ao enviar a mensagem!", Severity.Error);
             }
         }

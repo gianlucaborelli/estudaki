@@ -54,9 +54,9 @@ namespace EstudaKi.Web.Components.Pages.Features.Backoffice.ExamManager
                 }
                 PublicNotice = publicNotice;
 
-                var questionsQuery = new GetQuestionsByPublicNoticeIdQuery(Id);
+                var questionsQuery = new GetQuestionsByExamIdQuery(Id);
                 QuestionList = await QueryDispatcher
-                                            .DispatchAsync<GetQuestionsByPublicNoticeIdQuery, List<QuestionDto>>(questionsQuery);                
+                                            .DispatchAsync<GetQuestionsByExamIdQuery, List<QuestionDto>>(questionsQuery);                
 
                 var questionSupportsQuery = new GetQuestionSupportsByPublicNoticeIdQuery(PublicNotice.Id);
                 QuestionSupports = await QueryDispatcher
@@ -178,7 +178,7 @@ namespace EstudaKi.Web.Components.Pages.Features.Backoffice.ExamManager
 
             if (result is not null && !result.Canceled)
             {
-                var deleteQuery = new DeleteQuestionCommand(SelectedQuestion.Id);
+                var deleteQuery = new DeleteQuestionCommand(SelectedQuestion.QuestionId);
                 var deleteResult = await CommandDispatcher.DispatchAsync<DeleteQuestionCommand, ValidationResult>(deleteQuery);
                 if (deleteResult.IsValid)
                 {

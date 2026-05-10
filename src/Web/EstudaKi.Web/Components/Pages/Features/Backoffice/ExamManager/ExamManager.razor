@@ -70,10 +70,10 @@ else
             <MudGrid>
                 <MudItem xs="12" sm="4">
                     <MudText Typo="Typo.subtitle2">Banca</MudText>
-                    <MudText>@(PublicNotice.ExamBoard ?? "Não definido")</MudText>
+                    <MudText>@(PublicNotice.ExaminerOrganization ?? "Não definido")</MudText>
                 </MudItem>
 
-                <MudItem xs="12" sm="4">
+                @* <MudItem xs="12" sm="4">
                     <MudText Typo="Typo.subtitle2">Fase</MudText>
                     <MudText>@(PublicNotice.ExamPhase ?? "Não definido")</MudText>
                 </MudItem>
@@ -81,7 +81,7 @@ else
                 <MudItem xs="12" sm="4">
                     <MudText Typo="Typo.subtitle2">Cargo</MudText>
                     <MudText>@(PublicNotice.Position ?? "Não definido")</MudText>
-                </MudItem>
+                </MudItem> *@
             </MudGrid>
 
             <MudDivider />
@@ -103,7 +103,7 @@ else
 
                 <MudSpacer />
 
-                @if (PublicNotice.HasAttachments)
+                @* @if (PublicNotice.HasAttachments)
                 {
                     <MudButton Variant="Variant.Outlined"
                                StartIcon="@Icons.Material.Filled.Description"
@@ -124,7 +124,7 @@ else
                     <MudText Color="Color.Secondary">
                         Arquivos não disponíveis
                     </MudText>
-                }
+                } *@
             </MudStack>
         </MudStack>
     }

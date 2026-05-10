@@ -49,11 +49,11 @@ namespace EstudaKi.Web.Components.Pages.Features.Questions.Components
         {
             Logger.LogInformation(
                 "Exam booklet download started - QuestionId: {QuestionId}, PublicNoticeId: {PublicNoticeId}, ExamBoard: {ExamBoard}, Year: {Year}, Url: {Url}",
-                Value?.Id,
-                Value?.PublicNotice?.Id,
-                Value?.PublicNotice?.ExamBoard,
-                Value?.PublicNotice?.Year,
-                Value?.PublicNotice?.ExamBookletUrl
+                Value?.QuestionId,
+                Value?.PublicNoticeId,
+                Value?.ExaminerOrganization,
+                Value?.Year,
+                Value?.ExamBookletUrl
             );
         }
 
@@ -61,27 +61,27 @@ namespace EstudaKi.Web.Components.Pages.Features.Questions.Components
         {
             Logger.LogInformation(
                 "Answer key download started - QuestionId: {QuestionId}, PublicNoticeId: {PublicNoticeId}, ExamBoard: {ExamBoard}, Year: {Year}, Url: {Url}",
-                Value?.Id,
-                Value?.PublicNotice?.Id,
-                Value?.PublicNotice?.ExamBoard,
-                Value?.PublicNotice?.Year,
-                Value?.PublicNotice?.AnswerKeyUrl
+                Value?.QuestionId,
+                Value?.PublicNoticeId,
+                Value?.ExaminerOrganization,
+                Value?.Year,
+                Value?.AnswerKeyUrl
             );
         }
 
         private string GetImageUrl(string key)
         {
-            if (Value?.PublicNotice == null)
+            //To-do: Refatorar para evitar criar um PublicNotice só para usar a extensão. 
+            if (string.IsNullOrEmpty(Value?.PublicNoticeId))
             {
-                return $"/api/images/{key}";
+                return string.Empty;
             }
 
-            // Criar um PublicNotice a partir do DTO para usar a extension
+            
             var notice = new PublicNotice
             {
-                Id = Value.PublicNotice.Id,
-                Year = Value.PublicNotice.Year,
-                ExamBoard = Value.PublicNotice.ExamBoard ?? string.Empty
+                Id = Value.PublicNoticeId,
+                Year = Value.Year,                
             };
 
             return notice.GetImageUrl(key, StorageService);

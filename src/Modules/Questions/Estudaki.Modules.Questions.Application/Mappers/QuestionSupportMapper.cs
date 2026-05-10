@@ -1,5 +1,5 @@
 using Estudaki.Modules.Questions.Application.DTOs;
-using Estudaki.Modules.Questions.Domain.ValueObjects;
+using Estudaki.Modules.Questions.Domain.Entities;
 
 namespace Estudaki.Modules.Questions.Application.Mappers;
 

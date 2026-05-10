@@ -1,71 +1,44 @@
-using Estudaki.Commons.Core.Storage;
 using Estudaki.Modules.Questions.Application.DTOs;
 using Estudaki.Modules.Questions.Domain.Entities;
-using Estudaki.Modules.Questions.Domain.ValueObjects;
 
 namespace Estudaki.Modules.Questions.Application.Mappers;
 
 public static class QuestionMapper
 {
-    public static Question ToEntity(this QuestionDto questionDto)
-    {
-        return new Question
-        {
-            Id = questionDto.Id,
-            PublicNoticeId = questionDto.PublicNoticeId,
-            CreatedAt = questionDto.CreatedAt,
-            IsPublished = questionDto.IsPublished,
-            IsNullified = questionDto.IsNullified,
-            QuestionNumber = questionDto.QuestionNumber,
-            Type = questionDto.QuestionType,
-            MainArea = questionDto.MainArea,
-            SubAreas = (string[])questionDto.SubAreas.Clone(),
-            QuestionSupports = questionDto.QuestionSupports
-                        .Select(s => s.Id).ToList(),
-            QuestionContents = questionDto.QuestionContents,
-            Choices = questionDto.Choices
-        };
-    }
-
     public static QuestionDto ToDto(
         this Question question, 
-        PublicNotice? publicNotice, 
-        List<QuestionSupport>? questionSupports,
-        IStorageService storageService)
+        PublicNotice publicNotice, 
+        Exam exam,
+        ExamQuestion examQuestion,
+        List<QuestionSupport>? questionSupports)
     {
         return new QuestionDto
         {
-            Id = question.Id,
-            PublicNoticeId = question.PublicNoticeId,
-            PublicNotice = publicNotice?.ToDto(storageService),
-            QuestionSupports = questionSupports?
-                    .Where(qs => question.QuestionSupports.Contains(qs.Id))
-                    .Select(qs => qs.ToDto())
-                    .ToList() ?? [],
-            CreatedAt = question.CreatedAt,
-            IsPublished = question.IsPublished,            
-            IsNullified = question.IsNullified,
-            QuestionNumber = question.QuestionNumber,
+            QuestionId = question.Id,
+            PublicNoticeId = publicNotice.Id,
+            ExamId = exam.Id,
+            PublicNoticeNumber = publicNotice.Number,
+            Year = publicNotice.Year,
+            ExaminerOrganization = publicNotice.ExaminerOrganization,
+            ContractingOrganization = publicNotice.ContractingOrganization,
+            ExamCategory = publicNotice.ExamCategory,
+            Phase = exam.Phase,
+            Position = exam.Position,
+            Area = exam.Area,
+            EducationLevel = exam.EducationLevel,
+            PublicNoticeFileUrl = publicNotice.FileUrl,
+            IsNullified = examQuestion.IsNullified,
+            QuestionNumber = examQuestion.QuestionNumber,
             QuestionType = question.Type,
             MainArea = question.MainArea,
             SubAreas = question.SubAreas,
             QuestionContents = question.QuestionContents,
-            Choices = question.Choices
+            QuestionSupports = questionSupports?
+                    .Where(qs => question.QuestionSupports.Contains(qs.Id))
+                    .Select(qs => qs.ToDto())
+                    .ToList() ?? [],
+            Choices = question.Choices,
+            CreatedAt = question.CreatedAt
         };
-    }
-
-    public static List<QuestionDto> ToDtoList(
-        this List<Question> questions, 
-        PublicNotice publicNotice, 
-        List<QuestionSupport>? questionSupports,
-        IStorageService storageService)
-    {
-        return questions.Select(q => 
-            q.ToDto(
-                publicNotice, 
-                questionSupports,
-                storageService
-            )
-        ).ToList();
-    }
+    }    
 }

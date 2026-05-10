@@ -56,7 +56,7 @@ namespace EstudaKi.Controllers
                 _logger.LogInformation($"Parâmetros de busca - IsPublished: {searchParameters.IsPublished}, PageSize: {searchParameters.PageSize}");
 
                 var result = await _queryDispatcher
-                                    .DispatchAsync<SearchQuestionsPaginatedQuery, PageResult<QuestionDto>>(new SearchQuestionsPaginatedQuery(searchParameters));
+                                    .DispatchAsync<SearchQuestionsPaginatedQuery, PagedResult<QuestionDto>>(new SearchQuestionsPaginatedQuery(searchParameters));
                 _logger.LogInformation($"Resultado da busca - TotalItems: {result.TotalItems}, Items.Count: {result.Items.Count}");
 
                 if (result.Items.Count == 0)
@@ -67,7 +67,7 @@ namespace EstudaKi.Controllers
                 int addedCount = 0;
                 foreach (var questionDto in result.Items)
                 {
-                    var questionUrl = $"https://estudaki.com.br/question/{questionDto.Id}";
+                    var questionUrl = $"https://estudaki.com.br/question/{questionDto.QuestionId}";
                     AddUrl(sitemap, questionUrl, questionDto.CreatedAt, "monthly", "0.7");
                     addedCount++;
                 }

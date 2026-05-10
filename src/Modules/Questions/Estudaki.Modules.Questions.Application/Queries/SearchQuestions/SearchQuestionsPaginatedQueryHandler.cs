@@ -7,7 +7,7 @@ using Estudaki.Modules.Questions.Domain.Repositories;
 
 namespace Estudaki.Modules.Questions.Application.Queries.SearchQuestions;
 
-public class SearchQuestionsPaginatedQueryHandler : IQueryHandler<SearchQuestionsPaginatedQuery, PageResult<QuestionDto>>
+public class SearchQuestionsPaginatedQueryHandler : IQueryHandler<SearchQuestionsPaginatedQuery, PagedResult<QuestionDto>>
 {
     private readonly IQuestionRepository _questionRepository;
     private readonly IPublicNoticeRepository _publicNoticeRepository;
@@ -26,57 +26,57 @@ public class SearchQuestionsPaginatedQueryHandler : IQueryHandler<SearchQuestion
         _storageService = storageService;
     }
 
-    public async Task<PageResult<QuestionDto>> HandleAsync(SearchQuestionsPaginatedQuery query, CancellationToken cancellationToken = default)
+    public async Task<PagedResult<QuestionDto>> HandleAsync(SearchQuestionsPaginatedQuery query, CancellationToken cancellationToken = default)
     {
         var questionsPage = await _questionRepository.FindQuestionsPaginatedAsync(query.SearchParameters);
 
-        var publicNoticeIds = questionsPage.Items
-            .Where(q => !string.IsNullOrEmpty(q.PublicNoticeId))
-            .Select(q => q.PublicNoticeId!)
-            .Distinct()
-            .ToList();
+        //var publicNoticeIds = questionsPage.Questions
+        //    .Where(q => !string.IsNullOrEmpty(q.PublicNoticeId))
+        //    .Select(q => q.PublicNoticeId!)
+        //    .Distinct()
+        //    .ToList();
 
-        var publicNotices = publicNoticeIds.Any()
-            ? await _publicNoticeRepository.GetByIds(publicNoticeIds)
-            : [];
+        //var publicNotices = publicNoticeIds.Any()
+        //    ? await _publicNoticeRepository.GetByIds(publicNoticeIds)
+        //    : [];
 
-        var publicNoticesDict = publicNotices.ToDictionary(pn => pn.Id!);
+        //var publicNoticesDict = publicNotices.ToDictionary(pn => pn.Id!);
 
-        // Buscar todos os QuestionSupports necessários
-        var allQuestionSupportIds = questionsPage.Items
-            .Where(q => q.QuestionSupports != null && q.QuestionSupports.Any())
-            .SelectMany(q => q.QuestionSupports)
-            .Distinct()
-            .ToList();
+        //// Buscar todos os QuestionSupports necessários
+        //var allQuestionSupportIds = questionsPage.Questions
+        //    .Where(q => q.QuestionSupports != null && q.QuestionSupports.Any())
+        //    .SelectMany(q => q.QuestionSupports)
+        //    .Distinct()
+        //    .ToList();
 
-        var questionSupports = allQuestionSupportIds.Any()
-            ? await _questionSupportRepository.GetByIds(allQuestionSupportIds)
-            : [];
+        //var questionSupports = allQuestionSupportIds.Any()
+        //    ? await _questionSupportRepository.GetByIds(allQuestionSupportIds)
+        //    : [];
 
-        var questionSupportsDict = questionSupports.ToDictionary(qs => qs.Id!);
+        //var questionSupportsDict = questionSupports.ToDictionary(qs => qs.Id!);
 
-        var dtos = questionsPage.Items.Select(question =>
+        //var dtos = questionsPage.Questions.Select(question =>
+        //{
+        //    var publicNotice = !string.IsNullOrEmpty(question.PublicNoticeId) && publicNoticesDict.ContainsKey(question.PublicNoticeId)
+        //        ? publicNoticesDict[question.PublicNoticeId]
+        //        : null;
+
+        //    var supports = question.QuestionSupports != null && question.QuestionSupports.Any()
+        //        ? question.QuestionSupports
+        //            .Where(id => questionSupportsDict.ContainsKey(id))
+        //            .Select(id => questionSupportsDict[id])
+        //            .ToList()
+        //        : null;
+
+        //    return question.ToDto(publicNotice, supports, _storageService);
+        //}).ToList();
+
+        return new PagedResult<QuestionDto>
         {
-            var publicNotice = !string.IsNullOrEmpty(question.PublicNoticeId) && publicNoticesDict.ContainsKey(question.PublicNoticeId)
-                ? publicNoticesDict[question.PublicNoticeId]
-                : null;
-
-            var supports = question.QuestionSupports != null && question.QuestionSupports.Any()
-                ? question.QuestionSupports
-                    .Where(id => questionSupportsDict.ContainsKey(id))
-                    .Select(id => questionSupportsDict[id])
-                    .ToList()
-                : null;
-
-            return question.ToDto(publicNotice, supports, _storageService);
-        }).ToList();
-
-        return new PageResult<QuestionDto>
-        {
-            Items = dtos,
-            PageNumber = questionsPage.PageNumber,
-            PageSize = questionsPage.PageSize,
-            TotalItems = questionsPage.TotalItems
+            Items = new List<QuestionDto>(),
+            PageNumber = 1,
+            PageSize = 1,
+            TotalItems = 1
         };
     }
 }

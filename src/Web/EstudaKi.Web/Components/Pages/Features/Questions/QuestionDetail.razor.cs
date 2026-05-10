@@ -79,8 +79,8 @@ public partial class QuestionDetailBase : ComponentBase
     {
         if (Question == null) return "Questão não encontrada - EstudaKi";
 
-        var examName = Question.PublicNotice?.ExamBoard ?? Question.QuestionType;
-        var year = Question.PublicNotice?.Year ?? DateTime.Now.Year;
+        var examName = Question.ExaminerOrganization ?? Question.QuestionType;
+        var year = Question.Year;
 
         return $"Questão {Question.QuestionNumber} - {examName} {year} - {Question.MainArea} | EstudaKi";
     }
@@ -97,13 +97,10 @@ public partial class QuestionDetailBase : ComponentBase
             description.Append($" sobre {string.Join(", ", Question.SubAreas.Take(2))}");
         }
 
-        var examName = Question.PublicNotice?.ExamBoard ?? Question.QuestionType;
+        var examName = Question.ExaminerOrganization ?? Question.QuestionType;
         description.Append($" do {examName}");
-
-        if (Question.PublicNotice?.Year != null)
-        {
-            description.Append($" {Question.PublicNotice.Year}");
-        }
+                
+        description.Append($" {Question.Year}");        
 
         description.Append(". Resolva gratuitamente e aprimore seus conhecimentos.");
 
@@ -124,12 +121,9 @@ public partial class QuestionDetailBase : ComponentBase
         };
 
         keywords.AddRange(Question.SubAreas.Take(3));
-
-        if (Question.PublicNotice != null)
-        {
-            keywords.Add(Question.PublicNotice.ExamBoard);
-            keywords.Add($"{Question.PublicNotice.ExamBoard} {Question.PublicNotice.Year}");
-        }
+                
+        keywords.Add(Question.ExaminerOrganization);
+        keywords.Add($"{Question.ExaminerOrganization} {Question.Year}");        
 
         return string.Join(", ", keywords);
     }
@@ -143,8 +137,8 @@ public partial class QuestionDetailBase : ComponentBase
     {
         if (Question == null) return "{}";
 
-        var examName = Question.PublicNotice?.ExamBoard ?? Question.QuestionType;
-        var year = Question.PublicNotice?.Year ?? DateTime.Now.Year;
+        var examName = Question.ExaminerOrganization ?? Question.QuestionType;
+        var year = Question.Year;
 
         var questionText = GetQuestionTextForStructuredData();
         var correctAnswer = GetCorrectAnswerText();

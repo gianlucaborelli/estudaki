@@ -65,7 +65,7 @@
         {
             Id = PublicNotice.Id,
             Year = PublicNotice.Year,
-            ExamBoard = PublicNotice.ExamBoard ?? string.Empty
+            //ExamBoard = PublicNotice.ExaminerOrganization ?? string.Empty
         };
 
         return notice.GetImageUrl(key, StorageService);

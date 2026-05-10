@@ -1,6 +1,10 @@
-﻿namespace Estudaki.Modules.Questions.Domain.ValueObjects;
+using Estudaki.Commons.Core.Data;
+using Estudaki.Commons.Core.Models;
 
-public class ExamQuestion
+namespace Estudaki.Modules.Questions.Domain.Entities;
+
+[CollectionName("exam_questions")]
+public class ExamQuestion : Entity
 {
     public string ExamId { get; set; } = default!;
     public string QuestionId { get; set; } = default!;

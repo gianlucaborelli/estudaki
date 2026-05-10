@@ -40,7 +40,7 @@ public class QuestionEditorModalBase : ComponentBase
         if (Question != null)
         {
             EditedQuestion = QuestionDto.Clone(Question);
-            Logger.LogDebug("Editor de questão inicializado com a questão: {QuestionId}", Question.Id);
+            Logger.LogDebug("Editor de questão inicializado com a questão: {QuestionId}", Question.QuestionId);
         }        
     }
 
@@ -51,7 +51,7 @@ public class QuestionEditorModalBase : ComponentBase
 
         if(result.IsValid)
         {
-            Logger.LogInformation("Questão {QuestionId} atualizada com sucesso", EditedQuestion.Id);
+            Logger.LogInformation("Questão {QuestionId} atualizada com sucesso", EditedQuestion.QuestionId);
             Snackbar.Add("Questão atualizada com sucesso!", Severity.Success);
             Dialog.Close(DialogResult.Ok(EditedQuestion));
         }
@@ -59,7 +59,7 @@ public class QuestionEditorModalBase : ComponentBase
         {
             foreach (var error in result.Errors)
             {
-                Logger.LogWarning("Erro de validação ao salvar questão {QuestionId}: {Error}", EditedQuestion.Id, error.ErrorMessage);
+                Logger.LogWarning("Erro de validação ao salvar questão {QuestionId}: {Error}", EditedQuestion.QuestionId, error.ErrorMessage);
                 Snackbar.Add(error.ErrorMessage, Severity.Error);
             }
         }

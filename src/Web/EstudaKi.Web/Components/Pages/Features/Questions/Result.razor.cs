@@ -131,7 +131,7 @@ public partial class ResultBase : ComponentBase
                 SubAreas?.Length ?? 0);
 
             var searchResult = await _queryDispatcher
-                .DispatchAsync<SearchQuestionsPaginatedQuery, PageResult<QuestionDto>>(new SearchQuestionsPaginatedQuery(searchParameters));
+                .DispatchAsync<SearchQuestionsPaginatedQuery, PagedResult<QuestionDto>>(new SearchQuestionsPaginatedQuery(searchParameters));
 
             stopwatch.Stop();
 

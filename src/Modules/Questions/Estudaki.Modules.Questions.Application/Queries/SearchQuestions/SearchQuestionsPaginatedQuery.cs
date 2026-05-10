@@ -4,4 +4,4 @@ using Estudaki.Modules.Questions.Domain.Common;
 
 namespace Estudaki.Modules.Questions.Application.Queries.SearchQuestions;
 
-public record SearchQuestionsPaginatedQuery(SearchParameters SearchParameters) : IQuery<PageResult<QuestionDto>>;
+public record SearchQuestionsPaginatedQuery(SearchParameters SearchParameters) : IQuery<PagedResult<QuestionDto>>;

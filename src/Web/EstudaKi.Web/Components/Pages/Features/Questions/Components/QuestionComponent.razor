@@ -4,13 +4,12 @@
     <MudCardHeader>
         <CardHeaderContent>
             <MudStack Row="true" Justify="Justify.SpaceBetween" AlignItems="AlignItems.Center">
-                @if (Value?.PublicNotice != null)
-                {
-                    <MudText Typo="Typo.h6">
-                        @Value.PublicNotice.ExamBoard - @Value.PublicNotice.Position @Value.PublicNotice.ExamPhase @Value.PublicNotice.Year
-                    </MudText>
-                }
-                <MudButton Href="@($"/question/{Value?.Id}")" 
+                
+                <MudText Typo="Typo.h6">
+                    @Value.ExaminerOrganization - @Value.Position @Value.Phase @Value.Year
+                </MudText>
+                
+                <MudButton Href="@($"/question/{Value?.QuestionId}")" 
                            Variant="Variant.Text" 
                            Color="Color.Primary"
                            Size="Size.Small"
@@ -26,7 +25,8 @@
         {
             foreach (var questionSupport in Value.QuestionSupports)
             {
-                <QuestionSupportRenderer QuestionSupport="@questionSupport" PublicNotice="@Value.PublicNotice" />
+                //To-DO: Alterar rotina para pegar PublicNotice
+                //<QuestionSupportRenderer QuestionSupport="@questionSupport" PublicNotice="@Value.PublicNotice" />
             }
         }
 
@@ -46,7 +46,7 @@
                             @* Renderiza os InlineContents (horizontal) *@
                             @foreach (var inline in paragraph.Inlines)
                             {
-                                <InlineContentRenderer Inline="@inline" PublicNotice="@Value.PublicNotice" />
+                                @* <InlineContentRenderer Inline="@inline" PublicNotice="@Value.PublicNotice" /> *@
                             }
                         </MudText>
                         @if (!string.IsNullOrEmpty(paragraph.Source))
@@ -98,7 +98,7 @@
                                 @* Renderiza o conteúdo da alternativa (horizontal) *@
                                 @foreach (var inline in choice.Content)
                                 {
-                                    <InlineContentRenderer Inline="@inline" PublicNotice="@Value.PublicNotice" />
+                                    @* <InlineContentRenderer Inline="@inline" PublicNotice="@Value.PublicNotice" /> *@
                                 }
                             </MudText>
                         </MudRadio>
@@ -125,7 +125,7 @@
 
             <MudSpacer />
 
-            @if (Value?.PublicNotice?.HasAttachments == true)
+            @* @if (Value?.PublicNotice?.HasAttachments == true)
             {
                 <MudStack Row="true" Spacing="2">
                     <MudButton Variant="Variant.Outlined"
@@ -144,7 +144,7 @@
                         Gabarito
                     </MudButton>
                 </MudStack>
-            }
+            } *@
 
         </MudStack>
     </MudCardActions>

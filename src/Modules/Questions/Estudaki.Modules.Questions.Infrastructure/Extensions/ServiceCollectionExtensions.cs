@@ -26,7 +26,6 @@ public static class ServiceCollectionExtensions
         services.AddScoped<IQuestionRepository, QuestionRepository>();
         services.AddScoped<IPublicNoticeRepository, PublicNoticeRepository>();
         services.AddScoped<IQuestionSupportRepository, QuestionSupportRepository>();
-        services.AddScoped<IExamProcessingMetadataRepository, ExamProcessingMetadataRepository>();
 
         services.AddValidatorsFromAssembly(typeof(UploadPublicNoticeFilesCommandValidator).Assembly);
 
@@ -35,11 +34,11 @@ public static class ServiceCollectionExtensions
         services.AddCQRSHandlers(typeof(SearchQuestionsPaginatedQueryHandler).Assembly);
         services.AddCQRSHandlers(typeof(GetPublicNoticeListQueryHandler).Assembly);
         services.AddCQRSHandlers(typeof(GetPublicNoticeByIdQueryHandler).Assembly);
-        services.AddCQRSHandlers(typeof(GetQuestionsByPublicNoticeIdQueryHandler).Assembly);
+        services.AddCQRSHandlers(typeof(GetQuestionsByExamIdQueryHandler).Assembly);
         services.AddCQRSHandlers(typeof(GetQuestionSupportsByPublicNoticeIdQueryHandler).Assembly);
         services.AddCQRSHandlers(typeof(GetImageListByPublicNoticeIdQueryHandler).Assembly);
 
-        services.AddCQRSHandlers(typeof(UploadPublicNoticeFilesCommandHandler).Assembly);
+        services.AddCQRSHandlers(typeof(UploadExamFilesCommandHandler).Assembly);
         services.AddCQRSHandlers(typeof(UploadQuestionImagesCommandHandler).Assembly);
         services.AddCQRSHandlers(typeof(UpdateQuestionCommandHandler).Assembly);
         services.AddCQRSHandlers(typeof(UpdatePublicNoticeCommandHandler).Assembly);

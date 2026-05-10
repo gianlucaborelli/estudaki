@@ -1,5 +1,6 @@
 using Estudaki.Commons.Core.Data;
 using Estudaki.Commons.Core.Models;
+using Estudaki.Modules.Questions.Domain.Entities;
 using Estudaki.Modules.Questions.Domain.ValueObjects;
 
 namespace Estudaki.Modules.Questions.Domain.Entities;
@@ -19,19 +20,31 @@ namespace Estudaki.Modules.Questions.Domain.Entities;
 public class PublicNotice : Entity
 {
     public string? Number { get; set; }
+
+    /// <summary>
+    /// Ano do concurso ou exame.
+    /// </summary>
     public int Year { get; set; }
-    public string? ExamPhase { get; set; }
-    public string? ExamBoard { get; set; }
-    public string? ExamRequester { get; set; }
+
+    /// <summary>
+    /// Banca examinadora responsável pelo concurso ou exame. Exemplo: FGV, Vunesp, Cespe, etc.
+    /// </summary>
+    public string? ExaminerOrganization { get; set; }
+
+    /// <summary>
+    /// Contratante do concurso ou exame. Exemplo: Prefeitura de São Paulo, OAB, etc.
+    /// </summary>
+    public string? ContractingOrganization { get; set; }
+
+    /// <summary>
+    /// Coleção de exames associados a este edital. Cada exame pode representar uma fase ou um cargo específico dentro do concurso.
+    /// </summary>
+    public List<Exam> Exams { get; set; } = [];
 
     /// <summary>
     /// Categoria do exame (armazenado como string no banco de dados)
     /// </summary>
-    public string ExamCategory { get; set; } = ExamCategories.PublicServiceExam;
-
-    public string? Position { get; set; }
-    public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
-    public bool HasAttachments { get; set; } = false;
+    public string ExamCategory { get; set; } = ExamCategories.PublicServiceExam;        
 
     /// <summary>
     /// Indica se o edital foi revisado e está pronto para publicação
@@ -42,8 +55,6 @@ public class PublicNotice : Entity
     /// Indica se a prova está publicada e visível para os usuários
     /// </summary>
     public bool IsPublished { get; set; } = false;
+    public string FileUrl { get; set; } = string.Empty;
+    public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
 }
-
-/// <summary>
-/// Categorias de exames (constantes string para usar no banco de dados)
-/// </summary>

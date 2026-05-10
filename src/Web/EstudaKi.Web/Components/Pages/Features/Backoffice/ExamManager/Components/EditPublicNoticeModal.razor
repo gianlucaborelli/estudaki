@@ -14,13 +14,13 @@
                     <MudTextField @bind-Value="EditedPublicNotice.Year" Label="Ano"/>
                 </MudItem>
                 <MudItem xs="12" md="6">
-                    <MudTextField @bind-Value="EditedPublicNotice.ExamPhase" Label="Fase"/>
+                    @* <MudTextField @bind-Value="EditedPublicNotice.ExamPhase" Label="Fase"/> *@
                 </MudItem>
                 <MudItem xs="12" md="6">
-                    <MudTextField @bind-Value="EditedPublicNotice.ExamBoard" Label="Banca Examinadora"/>
+                    <MudTextField @bind-Value="EditedPublicNotice.ExaminerOrganization" Label="Banca Examinadora"/>
                 </MudItem>
                 <MudItem xs="12" md="6">
-                    <MudTextField @bind-Value="EditedPublicNotice.Position" Label="Cargo/Função" />
+                    @* <MudTextField @bind-Value="EditedPublicNotice.Position" Label="Cargo/Função" /> *@
                 </MudItem>
                 <MudItem xs="12" md="6">
                     <MudSelect @bind-Value="EditedPublicNotice.ExamCategory" Label="Categoria do Exame" >
@@ -32,7 +32,7 @@
                 </MudItem>
                 <MudItem xs="12">
                     <MudGrid Class="py-5">
-                        <MudCheckBox @bind-Value="EditedPublicNotice.HasAttachments" Label="Possui Anexos" />
+                        @* <MudCheckBox @bind-Value="EditedPublicNotice.HasAttachments" Label="Possui Anexos" /> *@
                         <MudSpacer />
                         <MudCheckBox @bind-Value="EditedPublicNotice.IsPublished" Label="Publicado" />
                         <MudSpacer />

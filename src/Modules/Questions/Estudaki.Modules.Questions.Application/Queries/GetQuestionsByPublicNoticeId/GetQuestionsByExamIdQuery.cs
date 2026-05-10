@@ -3,4 +3,4 @@ using Estudaki.Modules.Questions.Application.DTOs;
 
 namespace Estudaki.Modules.Questions.Application.Queries.GetQuestionsByPublicNoticeId;
 
-public record GetQuestionsByPublicNoticeIdQuery(string PublicNoticeId) : IQuery<List<QuestionDto>>;
+public record GetQuestionsByExamIdQuery(string PublicNoticeId) : IQuery<List<QuestionDto>>;

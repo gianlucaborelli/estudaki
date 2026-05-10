@@ -13,18 +13,15 @@ public static class PublicNoticeMapper
         {
             Id = notice.Id,
             Number = notice.Number,
-            Year = notice.Year,
-            ExamPhase = notice.ExamPhase,
-            ExamBoard = notice.ExamBoard,
-            ExamRequester = notice.ExamRequester,
+            Year = notice.Year,            
+            ExaminerOrganization = notice.ExaminerOrganization,
+            ContractingOrganization = notice.ContractingOrganization,
             ExamCategory = notice.ExamCategory,
             IsReviewed = notice.IsReviewed,
             IsPublished = notice.IsPublished,
-            Position = notice.Position,
-            ExamBookletUrl = notice.GetQuestionFolder(storageService),
-            AnswerKeyUrl = notice.GetAnswerKeyFolder(storageService),
-            CreatedAt = notice.CreatedAt,
-            HasAttachments = notice.HasAttachments
+            FileUrl = notice.GetQuestionFolder(storageService),
+            Exams = notice.Exams,
+            CreatedAt = notice.CreatedAt
         };
     }
 
@@ -35,14 +32,13 @@ public static class PublicNoticeMapper
             Id = noticeDto.Id,
             Number = noticeDto.Number,
             Year = noticeDto.Year,
-            ExamPhase = noticeDto.ExamPhase,
-            ExamBoard = noticeDto.ExamBoard,
-            ExamRequester = noticeDto.ExamRequester,
+            ExaminerOrganization = noticeDto.ExaminerOrganization,
+            ContractingOrganization = noticeDto.ContractingOrganization,
             ExamCategory = noticeDto.ExamCategory!,
-            HasAttachments = noticeDto.HasAttachments,
             IsReviewed = noticeDto.IsReviewed,
             IsPublished = noticeDto.IsPublished,
-            Position = noticeDto.Position,
+            Exams = noticeDto.Exams,
+            FileUrl= noticeDto.FileUrl!,
             CreatedAt = noticeDto.CreatedAt
         };
     }

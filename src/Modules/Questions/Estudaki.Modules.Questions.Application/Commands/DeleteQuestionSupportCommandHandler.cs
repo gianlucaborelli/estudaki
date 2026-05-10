@@ -2,9 +2,6 @@
 using Estudaki.Modules.Questions.Domain.Repositories;
 using FluentValidation;
 using FluentValidation.Results;
-using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace Estudaki.Modules.Questions.Application.Commands;
 
@@ -21,6 +18,7 @@ public class DeleteQuestionSupportCommandHandler : CommandHandler, ICommandHandl
 
     public async Task<ValidationResult> HandleAsync(DeleteQuestionSupportCommand command, CancellationToken cancellationToken = default)
     {
+        //To-Do: Deletar referencia em Question
         ValidationResult = await _validator.ValidateAsync(command, cancellationToken);
         if (!ValidationResult.IsValid) return ValidationResult;
 

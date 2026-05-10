@@ -1,5 +1,6 @@
 ﻿using Estudaki.Commons.Core.CQRS;
 using Estudaki.Modules.Questions.Application.Mappers;
+using Estudaki.Modules.Questions.Domain.Entities;
 using Estudaki.Modules.Questions.Domain.Repositories;
 using FluentValidation;
 using FluentValidation.Results;
@@ -22,15 +23,16 @@ public class UpdateQuestionCommandHandler : CommandHandler, ICommandHandler<Upda
         ValidationResult = await _validator.ValidateAsync(command, cancellationToken);
         if (!ValidationResult.IsValid) return ValidationResult;
 
-        var question = await _questionRepository.GetById(command.Question.Id);
+        var question = await _questionRepository.GetById(command.Question.QuestionId);
         if (question == null)
         {
             ValidationResult.Errors.Add(new ValidationFailure("Question", "Question not found."));
             return ValidationResult;
         }
 
-        var updatedQuestion = command.Question.ToEntity();
-        await _questionRepository.Update(updatedQuestion);
+        //To-Do: Map the updated properties from the command to the existing question entity
+        var updatedQuestion = new Question();
+        //await _questionRepository.Update(updatedQuestion);
 
         return ValidationResult;
     }

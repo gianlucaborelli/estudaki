@@ -10,7 +10,8 @@ public static class PublicNoticeExtensions
     /// </summary>
     public static string GetExamFolder(this PublicNotice notice, IStorageService storageService)
     {
-        return $"{storageService.GetFileUrl()}/files/exams/{notice.Year}/{notice.ExamBoard}/{notice.Id}";
+        return string.Empty;
+        //return $"{storageService.GetFileUrl()}/files/exams/{notice.Year}/{notice.ExamBoard}/{notice.Id}";
     }
 
     /// <summary>
@@ -18,7 +19,8 @@ public static class PublicNoticeExtensions
     /// </summary>
     public static string GetQuestionFolder(this PublicNotice notice, IStorageService storageService)
     {
-        return $"{storageService.GetFileUrl()}/files/exams/{notice.Year}/{notice.ExamBoard}/{notice.Id}/{notice.Id}.pdf";
+        return string.Empty;
+        //return $"{storageService.GetFileUrl()}/files/exams/{notice.Year}/{notice.ExamBoard}/{notice.Id}/{notice.Id}.pdf";
     }
 
     /// <summary>
@@ -26,7 +28,8 @@ public static class PublicNoticeExtensions
     /// </summary>
     public static string GetAnswerKeyFolder(this PublicNotice notice, IStorageService storageService)
     {
-        return $"{storageService.GetFileUrl()}/files/exams/{notice.Year}/{notice.ExamBoard}/{notice.Id}/{notice.Id}-answer-key.pdf";
+        return string.Empty;
+        //return $"{storageService.GetFileUrl()}/files/exams/{notice.Year}/{notice.ExamBoard}/{notice.Id}/{notice.Id}-answer-key.pdf";
     }
 
     /// <summary>
@@ -34,7 +37,8 @@ public static class PublicNoticeExtensions
     /// </summary>
     public static string GetExamFileName(this PublicNotice notice)
     {
-        return $"files/exams/{notice.Year}/{notice.ExamBoard}/{notice.Id}/{notice.Id}.pdf";
+        return string.Empty;
+        //return $"files/exams/{notice.Year}/{notice.ExamBoard}/{notice.Id}/{notice.Id}.pdf";
     }
 
     /// <summary>
@@ -42,7 +46,8 @@ public static class PublicNoticeExtensions
     /// </summary>
     public static string GetAnswerKeyFileName(this PublicNotice notice)
     {
-        return $"files/exams/{notice.Year}/{notice.ExamBoard}/{notice.Id}/{notice.Id}-answer-key.pdf";
+        return string.Empty;
+        //return $"files/exams/{notice.Year}/{notice.ExamBoard}/{notice.Id}/{notice.Id}-answer-key.pdf";
     }
 
     /// <summary>
@@ -50,7 +55,8 @@ public static class PublicNoticeExtensions
     /// </summary>
     public static string GetImagesFolder(this PublicNotice notice)
     {
-        return $"files/exams/{notice.Year}/{notice.ExamBoard}/{notice.Id}/images";
+        return string.Empty;
+        //return $"files/exams/{notice.Year}/{notice.ExamBoard}/{notice.Id}/images";
     }
 
     /// <summary>
@@ -62,6 +68,7 @@ public static class PublicNoticeExtensions
     /// <returns>URL completa da imagem</returns>
     public static string GetImageUrl(this PublicNotice notice, string imageKey, IStorageService storageService)
     {
-        return $"{storageService.GetFileUrl()}/{notice.GetImagesFolder()}/{imageKey}";
+        return string.Empty;
+        //return $"{storageService.GetFileUrl()}/{notice.GetImagesFolder()}/{imageKey}";
     }
 }

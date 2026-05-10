@@ -7,4 +7,5 @@ public interface IPublicNoticeRepository : IRepository<PublicNotice>
 {
     Task<List<PublicNotice>> GetByIds(List<string> ids);
     Task<List<PublicNotice>> GetPublicNoticesList();
+    Task<PublicNotice> GetPublicNoticeByExamId(string examId);
 }
