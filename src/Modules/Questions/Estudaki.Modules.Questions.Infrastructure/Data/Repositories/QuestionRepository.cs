@@ -134,9 +134,17 @@ public class QuestionRepository : BaseRepository<Question>, IQuestionRepository
         return (items, totalItems);
     }
 
-    public async Task<List<Question>> GetByPublicNoticeId(string publicNoticeId)
+    public async Task<List<Question>> GetByExamId(string examId)
     {
-        var filter = Builders<Question>.Filter.Empty;
-        return await DbSet.Find(filter).ToListAsync();
+        var questionIds = await Context.GetCollection<ExamQuestion>()
+            .Find(x => x.ExamId == examId)
+            .Project(x => x.QuestionId)
+            .ToListAsync();
+
+        var questions = await DbSet
+            .Find(x => questionIds.Contains(x.Id))
+            .ToListAsync();
+
+        return questions;
     }
 }

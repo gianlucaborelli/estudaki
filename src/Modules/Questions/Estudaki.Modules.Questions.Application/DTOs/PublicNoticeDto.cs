@@ -14,6 +14,7 @@ public class PublicNoticeDto
     public bool IsPublished { get; set; }
     public string? FileUrl { get; set; }
     public List<Exam> Exams { get; set; } = [];
+    public int? QuestionCount { get; set; }
     public DateTime CreatedAt { get; set; }
 
 

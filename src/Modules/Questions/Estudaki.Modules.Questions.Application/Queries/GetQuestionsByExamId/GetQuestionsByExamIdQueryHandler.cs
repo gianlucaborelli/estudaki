@@ -1,10 +1,9 @@
 ﻿using Estudaki.Commons.Core.CQRS;
 using Estudaki.Commons.Core.Storage;
 using Estudaki.Modules.Questions.Application.DTOs;
-using Estudaki.Modules.Questions.Application.Mappers;
 using Estudaki.Modules.Questions.Domain.Repositories;
 
-namespace Estudaki.Modules.Questions.Application.Queries.GetQuestionsByPublicNoticeId;
+namespace Estudaki.Modules.Questions.Application.Queries.GetQuestionsByExamId;
 
 public class GetQuestionsByExamIdQueryHandler(
     IQuestionRepository questionRepository,
@@ -19,9 +18,10 @@ public class GetQuestionsByExamIdQueryHandler(
 
     public async Task<List<QuestionDto>> HandleAsync(GetQuestionsByExamIdQuery query, CancellationToken cancellationToken = default)
     {
-        var questions = await _questionRepository.GetByPublicNoticeId(query.PublicNoticeId);
-        var questionSupports = await _questionSupportRepository.GetByPublicNoticeId(query.PublicNoticeId);
-        var publicNotice = await _publicNoticeRepository.GetById(query.PublicNoticeId);
+        var questions = await _questionRepository.GetByExamId(query.ExamId);
+        var publicNotice = await _publicNoticeRepository.GetPublicNoticeByExamId(query.ExamId);
+        var questionSupports = await _questionSupportRepository.GetByPublicNoticeId(publicNotice.Id);
+        
 
         //return questions.ToDtoList(publicNotice, questionSupports, _storageService);
 

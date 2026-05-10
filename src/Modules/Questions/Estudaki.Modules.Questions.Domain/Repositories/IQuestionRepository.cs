@@ -8,5 +8,5 @@ public interface IQuestionRepository : IRepository<Question>
 {
     Task<FilterParameters> FindFilterParametersAsync(FilterParameters filterParameters);
     Task<(List<Question> Questions, long TotalCount)> FindQuestionsPaginatedAsync(SearchParameters searchParameter);
-    Task<List<Question>> GetByPublicNoticeId(string publicNoticeId);
+    Task<List<Question>> GetByExamId(string examId);
 }

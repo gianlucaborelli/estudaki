@@ -37,7 +37,8 @@
         <MudTh>Nr</MudTh>
         <MudTh>Categoria</MudTh>
         <MudTh>Banca</MudTh>
-        @* <MudTh>Position</MudTh> *@
+        <MudTh>Qt Exames</MudTh>
+        <MudTh>Qt Questões</MudTh>
         <MudTh>Publicado</MudTh>
         <MudTh>Revisado</MudTh>
         <MudTh>Criado em</MudTh>
@@ -45,9 +46,10 @@
     </HeaderContent>
     <RowTemplate>
         <MudTd DataLabel="Nr">@context.Number</MudTd>
-        <MudTd DataLabel="ExamCategory">@context.ExamCategory</MudTd>
-        <MudTd DataLabel="ExamBoard">@context.ExaminerOrganization</MudTd>
-        @* <MudTd DataLabel="Position">@context.Position</MudTd> *@
+        <MudTd DataLabel="Categoria">@context.ExamCategory</MudTd>
+        <MudTd DataLabel="Banca">@context.ExaminerOrganization</MudTd>
+        <MudTd DataLabel="Qt Exames">@context.Exams.Count</MudTd>
+        <MudTd DataLabel="Qt Questões">@context.QuestionCount</MudTd>
         <MudTd DataLabel="Publicado">
             <MudIcon Icon="@(context.IsPublished ? Icons.Material.Filled.CheckCircle : Icons.Material.Filled.Cancel)"
                      Color="@(context.IsPublished ? Color.Success : Color.Error)" />
