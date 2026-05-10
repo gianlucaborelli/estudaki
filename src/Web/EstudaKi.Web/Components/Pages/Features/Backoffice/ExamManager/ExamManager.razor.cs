@@ -2,8 +2,9 @@
 using Estudaki.Modules.Questions.Application.Commands;
 using Estudaki.Modules.Questions.Application.DTOs;
 using Estudaki.Modules.Questions.Application.Queries.GetPublicNoticeById;
-using Estudaki.Modules.Questions.Application.Queries.GetQuestionsByPublicNoticeId;
+using Estudaki.Modules.Questions.Application.Queries.GetQuestionsByExamId;
 using Estudaki.Modules.Questions.Application.Queries.GetQuestionSupportsByPublicNoticeId;
+using Estudaki.Modules.Questions.Domain.Entities;
 using EstudaKi.Web.Components.Pages.Features.Backoffice.ExamManager.Components;
 using EstudaKi.Web.Components.Shared;
 using FluentValidation.Results;
@@ -32,6 +33,7 @@ namespace EstudaKi.Web.Components.Pages.Features.Backoffice.ExamManager
         protected List<QuestionDto> QuestionList { get; set; } = [];
         protected List<QuestionSupportDto> QuestionSupports { get; set; } = [];
         protected QuestionDto? SelectedQuestion { get; set; } = null;
+        protected Exam? SelectedExam { get; set; } = null;
         protected QuestionSupportDto? SelectedQuestionSupport { get; set; }
 
         protected override async Task OnInitializedAsync()
@@ -53,8 +55,9 @@ namespace EstudaKi.Web.Components.Pages.Features.Backoffice.ExamManager
                     return;
                 }
                 PublicNotice = publicNotice;
+                SelectedExam = SelectedExam ?? PublicNotice.Exams.FirstOrDefault();
 
-                var questionsQuery = new GetQuestionsByExamIdQuery(Id);
+                var questionsQuery = new GetQuestionsByExamIdQuery(SelectedExam!.Id);
                 QuestionList = await QueryDispatcher
                                             .DispatchAsync<GetQuestionsByExamIdQuery, List<QuestionDto>>(questionsQuery);                
 
@@ -178,7 +181,7 @@ namespace EstudaKi.Web.Components.Pages.Features.Backoffice.ExamManager
 
             if (result is not null && !result.Canceled)
             {
-                var deleteQuery = new DeleteQuestionCommand(SelectedQuestion.QuestionId);
+                var deleteQuery = new DeleteQuestionCommand(SelectedQuestion.QuestionId, SelectedExam!.Id);
                 var deleteResult = await CommandDispatcher.DispatchAsync<DeleteQuestionCommand, ValidationResult>(deleteQuery);
                 if (deleteResult.IsValid)
                 {

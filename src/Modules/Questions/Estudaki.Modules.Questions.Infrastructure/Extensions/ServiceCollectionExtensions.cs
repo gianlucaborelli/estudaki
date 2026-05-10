@@ -5,7 +5,7 @@ using Estudaki.Modules.Questions.Application.Queries.GetImageListByPublicNoticeI
 using Estudaki.Modules.Questions.Application.Queries.GetPublicNoticeById;
 using Estudaki.Modules.Questions.Application.Queries.GetPublicNoticeList;
 using Estudaki.Modules.Questions.Application.Queries.GetQuestionById;
-using Estudaki.Modules.Questions.Application.Queries.GetQuestionsByPublicNoticeId;
+using Estudaki.Modules.Questions.Application.Queries.GetQuestionsByExamId;
 using Estudaki.Modules.Questions.Application.Queries.GetQuestionSupportsByPublicNoticeId;
 using Estudaki.Modules.Questions.Application.Queries.SearchQuestions;
 using Estudaki.Modules.Questions.Domain.Repositories;
@@ -26,6 +26,7 @@ public static class ServiceCollectionExtensions
         services.AddScoped<IQuestionRepository, QuestionRepository>();
         services.AddScoped<IPublicNoticeRepository, PublicNoticeRepository>();
         services.AddScoped<IQuestionSupportRepository, QuestionSupportRepository>();
+        services.AddScoped<IExamQuestionRepository, ExamQuestionRepository>();
 
         services.AddValidatorsFromAssembly(typeof(UploadPublicNoticeFilesCommandValidator).Assembly);
 
@@ -37,7 +38,7 @@ public static class ServiceCollectionExtensions
         services.AddCQRSHandlers(typeof(GetQuestionsByExamIdQueryHandler).Assembly);
         services.AddCQRSHandlers(typeof(GetQuestionSupportsByPublicNoticeIdQueryHandler).Assembly);
         services.AddCQRSHandlers(typeof(GetImageListByPublicNoticeIdQueryHandler).Assembly);
-
+        
         services.AddCQRSHandlers(typeof(UploadExamFilesCommandHandler).Assembly);
         services.AddCQRSHandlers(typeof(UploadQuestionImagesCommandHandler).Assembly);
         services.AddCQRSHandlers(typeof(UpdateQuestionCommandHandler).Assembly);

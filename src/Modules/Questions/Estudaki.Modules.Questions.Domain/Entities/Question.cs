@@ -8,8 +8,7 @@ namespace Estudaki.Modules.Questions.Domain.Entities;
 public class Question : Entity
 {
     public DateTime CreatedAt { get; set; } = DateTime.UtcNow;    
-    public bool IsPublished { get; set; } = false;    
-    public int Number { get; set; }
+    public bool IsPublished { get; set; } = false;  
     public string Type { get; set; } = QuestionType.MultipleChoice;
     public string MainArea { get; set; } = string.Empty;
     public string[] SubAreas { get; set; } = [];

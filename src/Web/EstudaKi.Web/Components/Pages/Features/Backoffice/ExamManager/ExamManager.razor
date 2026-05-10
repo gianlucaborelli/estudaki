@@ -44,6 +44,9 @@ else
         </MudToolBar>
     </MudPaper>
 
+
+
+    @* Public Notice Details *@
     <MudPaper Class="pa-6 my-2" Elevation="2">
     @if (PublicNotice == null)
     {
@@ -73,15 +76,66 @@ else
                     <MudText>@(PublicNotice.ExaminerOrganization ?? "Não definido")</MudText>
                 </MudItem>
 
-                @* <MudItem xs="12" sm="4">
+                <MudItem xs="12" sm="4">
+                    <MudText Typo="Typo.subtitle2">Categoria</MudText>
+                            <MudText>@(PublicNotice.ExamCategory ?? "Não definido")</MudText>
+                </MudItem>                
+            </MudGrid>
+
+            <MudDivider />
+
+            <MudStack Row="true" AlignItems="AlignItems.Center">
+                <MudSelect @bind-Value="SelectedExam"
+                            Variant="Variant.Filled"
+                            Label="Exames"
+                            onchange="() => LoadContent()"
+                            Style="width: auto; min-width: 200px;">
+                    @foreach (var exam in PublicNotice.Exams)
+                    {
+                        <MudSelectItem Value="exam">@exam.Phase - @exam.Area - @exam.Position - @exam.EducationLevel</MudSelectItem>
+                    }
+                </MudSelect>                
+            </MudStack>
+        </MudStack>
+    }
+    </MudPaper>
+
+    @* Exam Details *@
+
+    <MudPaper Class="pa-6 my-2" Elevation="2">
+    @if (SelectedExam != null)        
+    {
+        <MudStack>
+            <MudStack Row="true" AlignItems="AlignItems.Center">
+                <MudText Typo="Typo.h5" Class="fw-bold">
+                    @ExamCategories.GetDisplayName(PublicNotice.ExamCategory!)
+                </MudText>
+
+                <MudSpacer />
+
+                <MudChip T="string" Color="Color.Primary" Variant="Variant.Filled">
+                    Nº @PublicNotice.Number
+                </MudChip>
+                <MudChip T="string" Color="Color.Secondary" Variant="Variant.Outlined">
+                    @((PublicNotice.Year > 0) ? PublicNotice.Year.ToString() : "Ano não definido")
+                </MudChip>
+            </MudStack>
+
+            <MudGrid>
+                <MudItem xs="12" sm="4">
+                    <MudText Typo="Typo.subtitle2">Banca</MudText>
+                    <MudText>@(PublicNotice.ExaminerOrganization ?? "Não definido")</MudText>
+                </MudItem>
+
+                <MudItem xs="12" sm="4">
                     <MudText Typo="Typo.subtitle2">Fase</MudText>
-                    <MudText>@(PublicNotice.ExamPhase ?? "Não definido")</MudText>
+                    <MudText>@(SelectedExam.Phase ?? "Não definido")</MudText>
                 </MudItem>
 
                 <MudItem xs="12" sm="4">
                     <MudText Typo="Typo.subtitle2">Cargo</MudText>
-                    <MudText>@(PublicNotice.Position ?? "Não definido")</MudText>
-                </MudItem> *@
+                    <MudText>@(SelectedExam.Position ?? "Não definido")</MudText>
+                </MudItem>
             </MudGrid>
 
             <MudDivider />
@@ -103,32 +157,59 @@ else
 
                 <MudSpacer />
 
-                @* @if (PublicNotice.HasAttachments)
+                @if (!string.IsNullOrEmpty(SelectedExam?.ExamBookletUrl))
                 {
                     <MudButton Variant="Variant.Outlined"
-                               StartIcon="@Icons.Material.Filled.Description"
-                               Href="@PublicNotice.ExamBookletUrl"
-                               Target="_blank">
+                                StartIcon="@Icons.Material.Filled.Description"
+                                Href="@SelectedExam.ExamBookletUrl"
+                                Target="_blank">
                         Caderno
                     </MudButton>
-
+                }
+                @if (!string.IsNullOrEmpty(SelectedExam?.AnswerKeyUrl))
+                {
                     <MudButton Variant="Variant.Outlined"
-                               StartIcon="@Icons.Material.Filled.TaskAlt"
-                               Href="@PublicNotice.AnswerKeyUrl"
-                               Target="_blank">
+                                StartIcon="@Icons.Material.Filled.TaskAlt"
+                                Href="@SelectedExam.AnswerKeyUrl"
+                                Target="_blank">
                         Gabarito
                     </MudButton>
                 }
-                else
-                {
-                    <MudText Color="Color.Secondary">
-                        Arquivos não disponíveis
-                    </MudText>
-                } *@
             </MudStack>
         </MudStack>
     }
     </MudPaper>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
     <MudTabs Elevation="2" Rounded="true" ApplyEffectsToContainer="true">
         <MudTabPanel Text="Questões">

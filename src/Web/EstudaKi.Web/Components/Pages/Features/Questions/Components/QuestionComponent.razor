@@ -6,7 +6,7 @@
             <MudStack Row="true" Justify="Justify.SpaceBetween" AlignItems="AlignItems.Center">
                 
                 <MudText Typo="Typo.h6">
-                    @Value.ExaminerOrganization - @Value.Position @Value.Phase @Value.Year
+                    @Value!.ExaminerOrganization - @Value!.Position @Value!.Phase @Value!.Year
                 </MudText>
                 
                 <MudButton Href="@($"/question/{Value?.QuestionId}")" 
@@ -25,8 +25,7 @@
         {
             foreach (var questionSupport in Value.QuestionSupports)
             {
-                //To-DO: Alterar rotina para pegar PublicNotice
-                //<QuestionSupportRenderer QuestionSupport="@questionSupport" PublicNotice="@Value.PublicNotice" />
+                <QuestionSupportRenderer QuestionSupport="@questionSupport" />
             }
         }
 
@@ -46,7 +45,7 @@
                             @* Renderiza os InlineContents (horizontal) *@
                             @foreach (var inline in paragraph.Inlines)
                             {
-                                @* <InlineContentRenderer Inline="@inline" PublicNotice="@Value.PublicNotice" /> *@
+                                <InlineContentRenderer Inline="@inline" />
                             }
                         </MudText>
                         @if (!string.IsNullOrEmpty(paragraph.Source))
@@ -98,7 +97,7 @@
                                 @* Renderiza o conteúdo da alternativa (horizontal) *@
                                 @foreach (var inline in choice.Content)
                                 {
-                                    @* <InlineContentRenderer Inline="@inline" PublicNotice="@Value.PublicNotice" /> *@
+                                    <InlineContentRenderer Inline="@inline" />
                                 }
                             </MudText>
                         </MudRadio>
@@ -109,7 +108,6 @@
     </MudCardContent>
     <MudCardActions>
         <MudStack Row="true" AlignItems="AlignItems.Center" Style="width:100%;">
-
             <MudButton Variant="Variant.Outlined"
                        Color="Color.Primary"
                        OnClick="ToggleAnswers">
@@ -125,27 +123,28 @@
 
             <MudSpacer />
 
-            @* @if (Value?.PublicNotice?.HasAttachments == true)
+            <MudStack Row="true" Spacing="2">
+            @if (!string.IsNullOrEmpty(Value?.ExamBookletUrl))
+            {            
+                <MudButton Variant="Variant.Outlined"
+                            Color="Color.Primary"
+                            Href="@Value?.ExamBookletUrl"
+                            Target="_blank"
+                            OnClick="OnDownloadExamBooklet">
+                    Caderno de Questões
+                </MudButton>
+            }
+            @if (!string.IsNullOrEmpty(Value?.AnswerKeyUrl))
             {
-                <MudStack Row="true" Spacing="2">
-                    <MudButton Variant="Variant.Outlined"
-                               Color="Color.Primary"
-                               Href="@Value?.PublicNotice?.ExamBookletUrl"
-                               Target="_blank"
-                               OnClick="OnDownloadExamBooklet">
-                        Caderno de Questões
-                    </MudButton>
-
-                    <MudButton Variant="Variant.Outlined"
-                               Color="Color.Primary"
-                               Href="@Value?.PublicNotice?.AnswerKeyUrl"
-                               Target="_blank"
-                               OnClick="OnDownloadAnswerKey">
-                        Gabarito
-                    </MudButton>
-                </MudStack>
-            } *@
-
+                <MudButton Variant="Variant.Outlined"
+                            Color="Color.Primary"
+                            Href="@Value?.AnswerKeyUrl"
+                            Target="_blank"
+                            OnClick="OnDownloadAnswerKey">
+                    Gabarito
+                </MudButton>                
+            }
+            </MudStack>
         </MudStack>
     </MudCardActions>
 </MudCard>

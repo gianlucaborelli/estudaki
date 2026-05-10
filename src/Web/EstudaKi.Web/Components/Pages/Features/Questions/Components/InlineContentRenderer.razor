@@ -20,9 +20,9 @@
 }
 else if (Inline is ImageInline imageInline)
 {
-    @if (PublicNotice != null && !string.IsNullOrEmpty(imageInline.Key))
+    @if (!string.IsNullOrEmpty(imageInline.Key))
     {
-        <img src="@GetImageUrl(imageInline.Key)" 
+        <img src="@imageInline.Key" 
              alt="@imageInline.Alt" 
              class="img-fluid rounded mx-1" 
              style="max-height: 300px; display: inline-block; vertical-align: middle;" />
@@ -52,8 +52,7 @@ else
     [Parameter]
     public InlineContent? Inline { get; set; }
 
-    [Parameter]
-    public PublicNoticeDto? PublicNotice { get; set; }
+    
 
     private string mathElementId = string.Empty;
     private string chemicalElementId = string.Empty;
@@ -145,23 +144,5 @@ else
             styles.Add("font-style: italic");
 
         return string.Join("; ", styles);
-    }
-
-    private string GetImageUrl(string key)
-    {
-        if (PublicNotice == null)
-        {
-            return $"/api/images/{key}";
-        }
-
-        // Criar um PublicNotice a partir do DTO para usar a extension
-        var notice = new PublicNotice
-        {
-            Id = PublicNotice.Id,
-            Year = PublicNotice.Year,
-            //ExamBoard = PublicNotice.ExaminerOrganization ?? string.Empty
-        };
-
-        return notice.GetImageUrl(key, StorageService);
-    }
+    }    
 }

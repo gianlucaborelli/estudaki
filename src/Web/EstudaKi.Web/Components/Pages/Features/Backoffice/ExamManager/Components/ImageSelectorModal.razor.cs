@@ -64,14 +64,11 @@ public partial class ImageSelectorModalBase : ComponentBase
             images = imageListPath
                 .Where(f => IsImageFile(f))
                 .Select(f =>
-                {               
-                    var fullPath = f;
-                    var key = Path.GetFileName(fullPath);
-
+                {   
                     return new ImageInfo
                     {
-                        Key = key,
-                        Url = fullPath,
+                        Key = f,
+                        Url = f,
                         IsLoaded = false
                     };
                 })
@@ -146,12 +143,7 @@ public partial class ImageSelectorModalBase : ComponentBase
     }
 
     protected async Task Close()
-    {
-        selectedImageKey = null;
-        searchTerm = string.Empty;
-        pasteAreaFocused = false;
-        uploadMessage = null;
-        uploadError = null;
+    {        
         DialogInstance.Cancel();
     }
 

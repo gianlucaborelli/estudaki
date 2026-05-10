@@ -30,9 +30,14 @@ public class UpdateQuestionCommandHandler : CommandHandler, ICommandHandler<Upda
             return ValidationResult;
         }
 
-        //To-Do: Map the updated properties from the command to the existing question entity
-        var updatedQuestion = new Question();
-        //await _questionRepository.Update(updatedQuestion);
+        question.Type = command.Question.QuestionType;
+        question.MainArea = command.Question.MainArea;
+        question.SubAreas = command.Question.SubAreas;
+        question.QuestionSupports = command.Question.QuestionSupports.Select(s => s.Id).ToList();  
+        question.QuestionContents = command.Question.QuestionContents;
+        question.Choices = command.Question.Choices;
+
+        await _questionRepository.Update(question);
 
         return ValidationResult;
     }

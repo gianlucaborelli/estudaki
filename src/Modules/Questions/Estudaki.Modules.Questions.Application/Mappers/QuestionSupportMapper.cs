@@ -25,7 +25,6 @@ public static class QuestionSupportMapper
         };
     }
 
-
     public static List<QuestionSupportDto> ToDtoList(this List<QuestionSupport> questionSupports)
     {
         return questionSupports.Select(q => q.ToDto()).ToList();
