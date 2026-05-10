@@ -82,7 +82,13 @@ public class S3StorageService : IStorageService
             };
 
             var response = await _s3Client.ListObjectsV2Async(request);
-            files.AddRange(response.S3Objects.Select(o => o.Key));
+
+            // Verificar se S3Objects não é null antes de usar Select
+            if (response.S3Objects != null)
+            {
+                files.AddRange(response.S3Objects.Select(o => o.Key));
+            }
+
             continuationToken = response.NextContinuationToken;
 
         } while (continuationToken != null);
@@ -115,5 +121,54 @@ public class S3StorageService : IStorageService
 
         // Retorna apenas o GUID sem extensão (mantendo consistência com ImageBlock.Key)
         return guid;
+    }
+
+    public async Task<string> CopyFileAsync(string sourceKey, string destinationKey)
+    {
+        var copyRequest = new CopyObjectRequest
+        {
+            SourceBucket = _settings.BucketName,
+            SourceKey = sourceKey,
+            DestinationBucket = _settings.BucketName,
+            DestinationKey = destinationKey
+        };
+
+        await _s3Client.CopyObjectAsync(copyRequest);
+
+        return $"{GetFileUrl()}/{destinationKey}";
+    }
+
+    public async Task<string> MoveFileAsync(string sourceKey, string destinationKey)
+    {
+        // Copia o arquivo
+        var newUrl = await CopyFileAsync(sourceKey, destinationKey);
+
+        // Deleta o arquivo original
+        await DeleteFileAsync(sourceKey);
+
+        return newUrl;
+    }
+
+    public async Task<List<string>> CopyFolderAsync(string sourceFolderPath, string destinationFolderPath)
+    {
+        var copiedFiles = new List<string>();
+
+        // Lista todos os arquivos na pasta de origem
+        var sourceFiles = await ListFilesAsync(sourceFolderPath);
+
+        foreach (var sourceFile in sourceFiles)
+        {
+            // Extrai o nome do arquivo relativo à pasta de origem
+            var fileName = sourceFile.Replace(sourceFolderPath.TrimStart('/'), "").TrimStart('/');
+
+            // Constrói o caminho de destino
+            var destinationFile = $"{destinationFolderPath.TrimStart('/')}/{fileName}";
+
+            // Copia o arquivo
+            var newUrl = await CopyFileAsync(sourceFile, destinationFile);
+            copiedFiles.Add(newUrl);
+        }
+
+        return copiedFiles;
     }
 }

@@ -78,10 +78,20 @@ namespace EstudaKi.Web.Components.Pages.Features.Backoffice.ExamManager
 
         protected async Task OpenUploadFileDialogAsync()
         {
+            // Se não houver um exame selecionado, usar o primeiro da lista
+            var examId = SelectedExam?.Id ?? PublicNotice?.Exams?.FirstOrDefault()?.Id;
+
+            if (string.IsNullOrEmpty(examId))
+            {
+                Snackbar.Add("Nenhum exame disponível para upload de arquivos.", Severity.Warning);
+                return;
+            }
+
             var parameters = new DialogParameters<UploadExamFilesModal> {
-                { x => x.Notice, PublicNotice }
+                { x => x.Notice, PublicNotice },
+                { x => x.ExamId, examId }
             };
-            
+
             var options = new DialogOptions { CloseButton = true, MaxWidth = MaxWidth.Medium, FullWidth = true };
             var dialog = await Dialog.ShowAsync<UploadExamFilesModal>("Upload de Arquivos do Edital", parameters, options);           
             var result = await dialog.Result;

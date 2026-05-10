@@ -19,7 +19,7 @@ public static class PublicNoticeMapper
             ExamCategory = notice.ExamCategory,
             IsReviewed = notice.IsReviewed,
             IsPublished = notice.IsPublished,
-            FileUrl = notice.GetQuestionFolder(storageService),
+            FileUrl = notice.FileUrl,
             Exams = notice.Exams,
             CreatedAt = notice.CreatedAt
         };

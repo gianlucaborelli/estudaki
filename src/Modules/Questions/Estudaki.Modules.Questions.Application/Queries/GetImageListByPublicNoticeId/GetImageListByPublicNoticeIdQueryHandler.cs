@@ -20,8 +20,7 @@ public class GetImageListByPublicNoticeIdQueryHandler : IQueryHandler<GetImageLi
     {
         var publicNotice = await _publicNoticeRepository.GetById(query.PublicNoticeId);
         if (publicNotice == null) return [];
-
-        var path = publicNotice.GetImagesFolder();
+        var path = $"files/exams/{publicNotice.Year}/{publicNotice.ExaminerOrganization}/{publicNotice.Id}/images";        
 
         if (path == null) return [];
 

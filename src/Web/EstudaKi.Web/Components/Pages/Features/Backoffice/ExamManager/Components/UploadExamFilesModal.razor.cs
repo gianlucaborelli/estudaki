@@ -23,18 +23,21 @@ namespace EstudaKi.Web.Components.Pages.Features.Backoffice.ExamManager.Componen
         [Parameter]
         public PublicNoticeDto? Notice { get; set; }
 
+        [Parameter]
+        public string? ExamId { get; set; }
+
         protected IBrowserFile? examFile;
         protected IBrowserFile? answerKeyFile;
         protected bool IsUploading = false;        
 
         protected bool CanUpload()
         {
-            return Notice != null && examFile != null && answerKeyFile != null;
+            return Notice != null && !string.IsNullOrEmpty(ExamId) && examFile != null && answerKeyFile != null;
         }
 
         protected async Task UploadFiles()
         {
-            if (!CanUpload() || Notice == null || examFile == null || answerKeyFile == null)
+            if (!CanUpload() || Notice == null || string.IsNullOrEmpty(ExamId) || examFile == null || answerKeyFile == null)
                 return;
 
             IsUploading = true;
@@ -45,10 +48,10 @@ namespace EstudaKi.Web.Components.Pages.Features.Backoffice.ExamManager.Componen
                 var examFileToUpload = await UploadFileDto.CreateAsync(examFile);
 
                 var answerKeyFileToUpload = await UploadFileDto.CreateAsync(answerKeyFile);
-                
-                var uploadFileCommand = new UploadExamFilesCommand(Notice.Id, examFileToUpload, answerKeyFileToUpload);
 
-                var result = await CommandDispatcher.DispatchAsync<UploadExamFilesCommand, ValidationResult>(uploadFileCommand);
+                var uploadFileCommand = new UploadPublicNoticeFilesCommand(Notice.Id, ExamId, examFileToUpload, answerKeyFileToUpload);
+
+                var result = await CommandDispatcher.DispatchAsync<UploadPublicNoticeFilesCommand, ValidationResult>(uploadFileCommand);
 
                 if(result.IsValid)
                 {

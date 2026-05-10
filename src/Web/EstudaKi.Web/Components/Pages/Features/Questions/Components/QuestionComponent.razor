@@ -61,7 +61,7 @@
                         {
                             <MudText Typo="Typo.subtitle2" Align="Align.Center" Class="mb-2 fw-bold">@imageBlock.Title</MudText>
                         }
-                        <img src="@GetImageUrl(imageBlock.Key)" 
+                        <img src="@imageBlock.Key"
                              alt="@imageBlock.Title" 
                              style="max-width: 100%; height: auto; display: block; margin: 0 auto;" />
                         @if (!string.IsNullOrEmpty(imageBlock.Source))

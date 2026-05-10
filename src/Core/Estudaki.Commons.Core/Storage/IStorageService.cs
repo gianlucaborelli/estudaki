@@ -32,4 +32,19 @@ public interface IStorageService
     /// Upload de imagem local para S3 com novo nome (GUID)
     /// </summary>
     Task<string> UploadImageFromLocalAsync(string localFilePath, string s3FolderPath);
+
+    /// <summary>
+    /// Copia um arquivo de uma localização para outra dentro do S3
+    /// </summary>
+    Task<string> CopyFileAsync(string sourceKey, string destinationKey);
+
+    /// <summary>
+    /// Move um arquivo de uma localização para outra dentro do S3 (copia e deleta o original)
+    /// </summary>
+    Task<string> MoveFileAsync(string sourceKey, string destinationKey);
+
+    /// <summary>
+    /// Copia todos os arquivos de uma pasta para outra dentro do S3
+    /// </summary>
+    Task<List<string>> CopyFolderAsync(string sourceFolderPath, string destinationFolderPath);
 }

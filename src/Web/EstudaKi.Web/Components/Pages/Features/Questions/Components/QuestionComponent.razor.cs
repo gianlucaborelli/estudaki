@@ -1,6 +1,4 @@
 ﻿using Estudaki.Modules.Questions.Application.DTOs;
-using Estudaki.Modules.Questions.Domain.Entities;
-using Estudaki.Modules.Questions.Domain.Extensions;
 using Estudaki.Commons.Core.Storage;
 using Microsoft.AspNetCore.Components;
 
@@ -67,24 +65,6 @@ namespace EstudaKi.Web.Components.Pages.Features.Questions.Components
                 Value?.Year,
                 Value?.AnswerKeyUrl
             );
-        }
-
-        private string GetImageUrl(string key)
-        {
-            //To-do: Refatorar para evitar criar um PublicNotice só para usar a extensão. 
-            if (string.IsNullOrEmpty(Value?.PublicNoticeId))
-            {
-                return string.Empty;
-            }
-
-            
-            var notice = new PublicNotice
-            {
-                Id = Value.PublicNoticeId,
-                Year = Value.Year,                
-            };
-
-            return notice.GetImageUrl(key, StorageService);
-        }
+        }        
     }
 }

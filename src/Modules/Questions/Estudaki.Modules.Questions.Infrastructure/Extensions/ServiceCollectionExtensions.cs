@@ -39,7 +39,7 @@ public static class ServiceCollectionExtensions
         services.AddCQRSHandlers(typeof(GetQuestionSupportsByPublicNoticeIdQueryHandler).Assembly);
         services.AddCQRSHandlers(typeof(GetImageListByPublicNoticeIdQueryHandler).Assembly);
         
-        services.AddCQRSHandlers(typeof(UploadExamFilesCommandHandler).Assembly);
+        services.AddCQRSHandlers(typeof(UploadPublicNoticeFilesCommandHandler).Assembly);
         services.AddCQRSHandlers(typeof(UploadQuestionImagesCommandHandler).Assembly);
         services.AddCQRSHandlers(typeof(UpdateQuestionCommandHandler).Assembly);
         services.AddCQRSHandlers(typeof(UpdatePublicNoticeCommandHandler).Assembly);
