@@ -221,17 +221,9 @@ public partial class ResultBase : ComponentBase
     {
         try
         {
-            var filterParams = new FilterParameters
-            {
-                TypeQuestions = types,
-                ExamCategories = categories,
-                MainAreas = areas,
-                SubAreas = subareas
-            };
-
             var result = await _queryDispatcher
                 .DispatchAsync<GetFilterParametersQuery, FilterParameters>(
-                    new GetFilterParametersQuery(filterParams));
+                    new GetFilterParametersQuery(new FilterParameters()));
 
             AvailableTypeQuestions = result.TypeQuestions.ToArray();
             AvailableTypeQuestionsDisplay = QuestionTypeHelper.GetDisplayList(AvailableTypeQuestions);

@@ -45,17 +45,9 @@ namespace EstudaKi.Web.Components.Pages
         {
             try
             {
-                var filterParams = new FilterParameters
-                {
-                    TypeQuestions = SelectedTypeQuestion?.ToArray() ?? Array.Empty<string>(),
-                    ExamCategories = SelectedExamCategory?.ToArray() ?? Array.Empty<string>(),
-                    MainAreas = SelectedMainArea?.ToArray() ?? Array.Empty<string>(),
-                    SubAreas = SelectedSubArea?.ToArray() ?? Array.Empty<string>()
-                };
-
                 var result = await QueryDispatcher
                     .DispatchAsync<GetFilterParametersQuery, FilterParameters>(
-                        new GetFilterParametersQuery(filterParams));
+                        new GetFilterParametersQuery(new FilterParameters()));
 
                 AvailableTypeQuestions = result.TypeQuestions.ToArray();
                 AvailableTypeQuestionsDisplay = QuestionTypeHelper.GetDisplayList((string[])AvailableTypeQuestions);

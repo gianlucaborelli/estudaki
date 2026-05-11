@@ -11,17 +11,20 @@ public class GetQuestionByIdQueryHandler : IQueryHandler<GetQuestionByIdQuery, Q
     private readonly IQuestionRepository _questionRepository;
     private readonly IPublicNoticeRepository _publicNoticeRepository;
     private readonly IQuestionSupportRepository _questionSupportRepository;
+    private readonly IExamQuestionRepository _examQuestionRepository;
     private readonly IStorageService _storageService;
 
     public GetQuestionByIdQueryHandler(
         IQuestionRepository questionRepository,
         IPublicNoticeRepository publicNoticeRepository,
         IQuestionSupportRepository questionSupportRepository,
+        IExamQuestionRepository examQuestionRepository,
         IStorageService storageService)
     {
         _questionRepository = questionRepository;
         _publicNoticeRepository = publicNoticeRepository;
         _questionSupportRepository = questionSupportRepository;
+        _examQuestionRepository = examQuestionRepository;
         _storageService = storageService;
     }
 
@@ -32,18 +35,26 @@ public class GetQuestionByIdQueryHandler : IQueryHandler<GetQuestionByIdQuery, Q
         if (question == null)
             return null;
 
+        var examQuestions = await _examQuestionRepository.GetByQuestionId(query.Id);
 
-        //To-Do: Corrigir query para buscar o edital e os apoios de questão em um único acesso ao banco, evitando múltiplas consultas
-        //var publicNotice = !string.IsNullOrEmpty(question.PublicNoticeId)
-        //    ? await _publicNoticeRepository.GetById(question.PublicNoticeId)
-        //    : null;
+        if (!examQuestions.Any())
+            return null;
 
-        //var questionSupports = question.QuestionSupports != null && question.QuestionSupports.Any()
-        //    ? await _questionSupportRepository.GetByIds(question.QuestionSupports)
-        //    : null;
+        var examQuestion = examQuestions.First();
+        var publicNotice = await _publicNoticeRepository.GetPublicNoticeByExamId(examQuestion.ExamId);
 
-        //return question.ToDto(publicNotice, questionSupports, _storageService);
+        if (publicNotice == null)
+            return null;
 
-        return new QuestionDto();
+        var exam = publicNotice.Exams.FirstOrDefault(e => e.Id == examQuestion.ExamId);
+
+        if (exam == null)
+            return null;
+
+        var questionSupports = question.QuestionSupports != null && question.QuestionSupports.Any()
+            ? await _questionSupportRepository.GetByIds(question.QuestionSupports)
+            : null;
+
+        return question.ToDto(publicNotice, exam, examQuestion, questionSupports);
     }
 }

@@ -15,6 +15,6 @@ public class GetFilterParametersQueryHandler : IQueryHandler<GetFilterParameters
 
     public async Task<FilterParameters> HandleAsync(GetFilterParametersQuery query, CancellationToken cancellationToken = default)
     {
-        return await _questionRepository.FindFilterParametersAsync(query.FilterParameters);
+        return await _questionRepository.FindFilterParametersAsync();
     }
 }

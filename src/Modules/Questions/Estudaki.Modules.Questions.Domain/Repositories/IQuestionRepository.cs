@@ -6,7 +6,7 @@ namespace Estudaki.Modules.Questions.Domain.Repositories;
 
 public interface IQuestionRepository : IRepository<Question>
 {
-    Task<FilterParameters> FindFilterParametersAsync(FilterParameters filterParameters);
+    Task<FilterParameters> FindFilterParametersAsync();
     Task<(Dictionary<ExamQuestion, Question> QuestionsWithExam, long TotalCount)> FindQuestionsPaginatedAsync(SearchParameters searchParameter);
     Task<List<Question>> GetByExamId(string examId);
 }
