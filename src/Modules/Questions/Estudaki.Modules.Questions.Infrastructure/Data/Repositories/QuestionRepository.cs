@@ -21,7 +21,7 @@ public class QuestionRepository : BaseRepository<Question>, IQuestionRepository
         return await Task.FromResult(filterParameters);
     }
 
-    public async Task<(List<Question>, long)> FindQuestionsPaginatedAsync(SearchParameters searchParameter)
+    public async Task<(Dictionary<ExamQuestion, Question> QuestionsWithExam, long TotalCount)> FindQuestionsPaginatedAsync(SearchParameters searchParameter)
     {
         var filterBuilder = Builders<Question>.Filter;
         var filters = new List<FilterDefinition<Question>>();
@@ -96,26 +96,26 @@ public class QuestionRepository : BaseRepository<Question>, IQuestionRepository
                 // 6.3. Buscar ExamQuestions que referenciam esses ExamIds
                 var examQuestionsCollection = Context.GetCollection<ExamQuestion>();
                 var examQuestionsFilter = Builders<ExamQuestion>.Filter.In(eq => eq.ExamId, examIds);
-                var questionIds = await examQuestionsCollection
+                var filteredQuestionIds = await examQuestionsCollection
                     .Find(examQuestionsFilter)
                     .Project(eq => eq.QuestionId)
                     .ToListAsync();
 
-                if (questionIds.Any())
+                if (filteredQuestionIds.Any())
                 {
                     // 6.4. Filtrar questões pelos IDs encontrados
-                    filters.Add(filterBuilder.In(q => q.Id, questionIds));
+                    filters.Add(filterBuilder.In(q => q.Id, filteredQuestionIds));
                 }
                 else
                 {
                     // Se não há questões com essa categoria, retornar vazio
-                    return (new List<Question>(), 0);
+                    return (new Dictionary<ExamQuestion, Question>(), 0);
                 }
             }
             else
             {
                 // Se não há editais com essa categoria, retornar vazio
-                return (new List<Question>(), 0);
+                return (new Dictionary<ExamQuestion, Question>(), 0);
             }
         }
 
@@ -131,7 +131,25 @@ public class QuestionRepository : BaseRepository<Question>, IQuestionRepository
             .Limit(searchParameter.PageSize)
             .ToListAsync();
 
-        return (items, totalItems);
+        // 10. Buscar ExamQuestions relacionadas às questões encontradas
+        var foundQuestionIds = items.Select(q => q.Id).ToList();
+        var examQuestionsCollectionFinal = Context.GetCollection<ExamQuestion>();
+        var examQuestions = await examQuestionsCollectionFinal
+            .Find(Builders<ExamQuestion>.Filter.In(eq => eq.QuestionId, foundQuestionIds))
+            .ToListAsync();
+
+        // 11. Criar dictionary com ExamQuestion como chave e Question como valor
+        var result = new Dictionary<ExamQuestion, Question>();
+        foreach (var examQuestion in examQuestions)
+        {
+            var question = items.FirstOrDefault(q => q.Id == examQuestion.QuestionId);
+            if (question != null)
+            {
+                result[examQuestion] = question;
+            }
+        }
+
+        return (result, totalItems);
     }
 
     public async Task<List<Question>> GetByExamId(string examId)

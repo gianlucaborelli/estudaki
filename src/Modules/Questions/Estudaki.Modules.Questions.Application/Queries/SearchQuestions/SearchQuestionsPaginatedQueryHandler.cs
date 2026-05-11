@@ -28,55 +28,74 @@ public class SearchQuestionsPaginatedQueryHandler : IQueryHandler<SearchQuestion
 
     public async Task<PagedResult<QuestionDto>> HandleAsync(SearchQuestionsPaginatedQuery query, CancellationToken cancellationToken = default)
     {
-        var questionsPage = await _questionRepository.FindQuestionsPaginatedAsync(query.SearchParameters);
+        var (questionsWithExam, totalItems) = await _questionRepository.FindQuestionsPaginatedAsync(query.SearchParameters);
 
-        //var publicNoticeIds = questionsPage.Questions
-        //    .Where(q => !string.IsNullOrEmpty(q.PublicNoticeId))
-        //    .Select(q => q.PublicNoticeId!)
-        //    .Distinct()
-        //    .ToList();
+        if (!questionsWithExam.Any())
+        {
+            return new PagedResult<QuestionDto>
+            {
+                Items = [],
+                PageNumber = query.SearchParameters.CurrentPage,
+                PageSize = query.SearchParameters.PageSize,
+                TotalItems = 0
+            };
+        }
 
-        //var publicNotices = publicNoticeIds.Any()
-        //    ? await _publicNoticeRepository.GetByIds(publicNoticeIds)
-        //    : [];
+        var examIds = questionsWithExam.Keys
+            .Select(eq => eq.ExamId)
+            .Distinct()
+            .ToList();
 
-        //var publicNoticesDict = publicNotices.ToDictionary(pn => pn.Id!);
+        var publicNotices = new List<Domain.Entities.PublicNotice>();
+        foreach (var examId in examIds)
+        {
+            var publicNotice = await _publicNoticeRepository.GetPublicNoticeByExamId(examId);
+            if (publicNotice != null)
+            {
+                publicNotices.Add(publicNotice);
+            }
+        }
 
-        //// Buscar todos os QuestionSupports necessários
-        //var allQuestionSupportIds = questionsPage.Questions
-        //    .Where(q => q.QuestionSupports != null && q.QuestionSupports.Any())
-        //    .SelectMany(q => q.QuestionSupports)
-        //    .Distinct()
-        //    .ToList();
+        var examDict = publicNotices
+            .SelectMany(pn => pn.Exams.Select(exam => new { ExamId = exam.Id, Exam = exam, PublicNotice = pn }))
+            .ToDictionary(x => x.ExamId, x => (x.Exam, x.PublicNotice));
 
-        //var questionSupports = allQuestionSupportIds.Any()
-        //    ? await _questionSupportRepository.GetByIds(allQuestionSupportIds)
-        //    : [];
+        var allQuestionSupportIds = questionsWithExam.Values
+            .Where(q => q.QuestionSupports != null && q.QuestionSupports.Any())
+            .SelectMany(q => q.QuestionSupports)
+            .Distinct()
+            .ToList();
 
-        //var questionSupportsDict = questionSupports.ToDictionary(qs => qs.Id!);
+        var questionSupports = allQuestionSupportIds.Any()
+            ? await _questionSupportRepository.GetByIds(allQuestionSupportIds)
+            : [];
 
-        //var dtos = questionsPage.Questions.Select(question =>
-        //{
-        //    var publicNotice = !string.IsNullOrEmpty(question.PublicNoticeId) && publicNoticesDict.ContainsKey(question.PublicNoticeId)
-        //        ? publicNoticesDict[question.PublicNoticeId]
-        //        : null;
+        var dtos = questionsWithExam.Select(kvp =>
+        {
+            var examQuestion = kvp.Key;
+            var question = kvp.Value;
 
-        //    var supports = question.QuestionSupports != null && question.QuestionSupports.Any()
-        //        ? question.QuestionSupports
-        //            .Where(id => questionSupportsDict.ContainsKey(id))
-        //            .Select(id => questionSupportsDict[id])
-        //            .ToList()
-        //        : null;
+            if (!examDict.TryGetValue(examQuestion.ExamId, out var examData))
+            {
+                return null;
+            }
 
-        //    return question.ToDto(publicNotice, supports, _storageService);
-        //}).ToList();
+            return question.ToDto(
+                examData.PublicNotice,
+                examData.Exam,
+                examQuestion,
+                questionSupports
+            );
+        })
+        .Where(dto => dto != null)
+        .ToList();
 
         return new PagedResult<QuestionDto>
         {
-            Items = new List<QuestionDto>(),
-            PageNumber = 1,
-            PageSize = 1,
-            TotalItems = 1
+            Items = dtos!,
+            PageNumber = query.SearchParameters.CurrentPage,
+            PageSize = query.SearchParameters.PageSize,
+            TotalItems = totalItems
         };
     }
 }
