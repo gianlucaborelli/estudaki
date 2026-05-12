@@ -11,20 +11,17 @@ public class GetQuestionByIdQueryHandler : IQueryHandler<GetQuestionByIdQuery, Q
     private readonly IQuestionRepository _questionRepository;
     private readonly IPublicNoticeRepository _publicNoticeRepository;
     private readonly IQuestionSupportRepository _questionSupportRepository;
-    private readonly IExamQuestionRepository _examQuestionRepository;
     private readonly IStorageService _storageService;
 
     public GetQuestionByIdQueryHandler(
         IQuestionRepository questionRepository,
         IPublicNoticeRepository publicNoticeRepository,
         IQuestionSupportRepository questionSupportRepository,
-        IExamQuestionRepository examQuestionRepository,
         IStorageService storageService)
     {
         _questionRepository = questionRepository;
         _publicNoticeRepository = publicNoticeRepository;
         _questionSupportRepository = questionSupportRepository;
-        _examQuestionRepository = examQuestionRepository;
         _storageService = storageService;
     }
 
@@ -35,18 +32,17 @@ public class GetQuestionByIdQueryHandler : IQueryHandler<GetQuestionByIdQuery, Q
         if (question == null)
             return null;
 
-        var examQuestions = await _examQuestionRepository.GetByQuestionId(query.Id);
-
-        if (!examQuestions.Any())
+        // Pegar o primeiro exame associado à questão
+        var questionExam = question.Exams.FirstOrDefault();
+        if (questionExam == null)
             return null;
 
-        var examQuestion = examQuestions.First();
-        var publicNotice = await _publicNoticeRepository.GetPublicNoticeByExamId(examQuestion.ExamId);
+        var publicNotice = await _publicNoticeRepository.GetPublicNoticeByExamId(questionExam.ExamId);
 
         if (publicNotice == null)
             return null;
 
-        var exam = publicNotice.Exams.FirstOrDefault(e => e.Id == examQuestion.ExamId);
+        var exam = publicNotice.Exams.FirstOrDefault(e => e.Id == questionExam.ExamId);
 
         if (exam == null)
             return null;
@@ -55,6 +51,6 @@ public class GetQuestionByIdQueryHandler : IQueryHandler<GetQuestionByIdQuery, Q
             ? await _questionSupportRepository.GetByIds(question.QuestionSupports)
             : null;
 
-        return question.ToDto(publicNotice, exam, examQuestion, questionSupports);
+        return question.ToDto(publicNotice, exam, questionExam, questionSupports);
     }
 }

@@ -28,9 +28,9 @@ public class SearchQuestionsPaginatedQueryHandler : IQueryHandler<SearchQuestion
 
     public async Task<PagedResult<QuestionDto>> HandleAsync(SearchQuestionsPaginatedQuery query, CancellationToken cancellationToken = default)
     {
-        var (questionsWithExam, totalItems) = await _questionRepository.FindQuestionsPaginatedAsync(query.SearchParameters);
+        var (questions, totalItems) = await _questionRepository.FindQuestionsPaginatedAsync(query.SearchParameters);
 
-        if (!questionsWithExam.Any())
+        if (!questions.Any())
         {
             return new PagedResult<QuestionDto>
             {
@@ -41,8 +41,10 @@ public class SearchQuestionsPaginatedQueryHandler : IQueryHandler<SearchQuestion
             };
         }
 
-        var examIds = questionsWithExam.Keys
-            .Select(eq => eq.ExamId)
+        // Buscar todos os exames dos PublicNotices relacionados
+        var examIds = questions
+            .SelectMany(q => q.Exams)
+            .Select(qe => qe.ExamId)
             .Distinct()
             .ToList();
 
@@ -60,7 +62,7 @@ public class SearchQuestionsPaginatedQueryHandler : IQueryHandler<SearchQuestion
             .SelectMany(pn => pn.Exams.Select(exam => new { ExamId = exam.Id, Exam = exam, PublicNotice = pn }))
             .ToDictionary(x => x.ExamId, x => (x.Exam, x.PublicNotice));
 
-        var allQuestionSupportIds = questionsWithExam.Values
+        var allQuestionSupportIds = questions
             .Where(q => q.QuestionSupports != null && q.QuestionSupports.Any())
             .SelectMany(q => q.QuestionSupports)
             .Distinct()
@@ -70,22 +72,25 @@ public class SearchQuestionsPaginatedQueryHandler : IQueryHandler<SearchQuestion
             ? await _questionSupportRepository.GetByIds(allQuestionSupportIds)
             : [];
 
-        var dtos = questionsWithExam.Select(kvp =>
+        var dtos = questions.SelectMany(question =>
         {
-            var examQuestion = kvp.Key;
-            var question = kvp.Value;
-
-            if (!examDict.TryGetValue(examQuestion.ExamId, out var examData))
+            // Para cada questão, criar um DTO para cada exame associado
+            // (ou apenas o primeiro se preferir mostrar uma única vez)
+            var firstExam = question.Exams.FirstOrDefault();
+            if (firstExam == null || !examDict.TryGetValue(firstExam.ExamId, out var examData))
             {
-                return null;
+                return Enumerable.Empty<QuestionDto>();
             }
 
-            return question.ToDto(
-                examData.PublicNotice,
-                examData.Exam,
-                examQuestion,
-                questionSupports
-            );
+            return new[]
+            {
+                question.ToDto(
+                    examData.PublicNotice,
+                    examData.Exam,
+                    firstExam,
+                    questionSupports
+                )
+            };
         })
         .Where(dto => dto != null)
         .ToList();

@@ -20,14 +20,17 @@ public class QuestionRepository : BaseRepository<Question>, IQuestionRepository
         var filterBuilder = Builders<Question>.Filter;
         var baseFilter = filterBuilder.Eq(q => q.IsPublished, true);
 
+        // Buscar tipos de questões
         var typeQuestions = await DbSet
             .Distinct(x => x.Type, baseFilter)
             .ToListAsync();
 
+        // Buscar áreas principais
         var mainAreas = await DbSet
             .Distinct(x => x.MainArea, baseFilter)
             .ToListAsync();
 
+        // Buscar sub-áreas
         var allQuestions = await DbSet
             .Find(baseFilter)
             .Project(q => q.SubAreas)
@@ -39,32 +42,41 @@ public class QuestionRepository : BaseRepository<Question>, IQuestionRepository
             .OrderBy(sa => sa)
             .ToArray();
 
-        var publicNoticesCollection = Context.GetCollection<PublicNotice>();
-        var publicNoticeFilter = Builders<PublicNotice>.Filter.Eq(pn => pn.IsPublished, true);
-
-        var examCategories = await publicNoticesCollection
-            .Distinct(x => x.ExamCategory, publicNoticeFilter)
+        // Buscar categorias de exames diretamente das questões (dados desnormalizados)
+        var questionsWithExams = await DbSet
+            .Find(baseFilter)
+            .Project(q => q.Exams)
             .ToListAsync();
+
+        var examCategories = questionsWithExams
+            .SelectMany(exams => exams)
+            .Select(qe => qe.ExamCategory)
+            .Where(ec => !string.IsNullOrWhiteSpace(ec))
+            .Distinct()
+            .OrderBy(ec => ec)
+            .ToArray();
 
         return new FilterParameters
         {
             TypeQuestions = typeQuestions.Where(t => !string.IsNullOrWhiteSpace(t)).OrderBy(t => t).ToArray(),
-            ExamCategories = examCategories.Where(ec => !string.IsNullOrWhiteSpace(ec)).OrderBy(ec => ec).ToArray(),
+            ExamCategories = examCategories,
             MainAreas = mainAreas.Where(ma => !string.IsNullOrWhiteSpace(ma)).OrderBy(ma => ma).ToArray(),
             SubAreas = subAreas
         };
     }
 
-    public async Task<(Dictionary<ExamQuestion, Question> QuestionsWithExam, long TotalCount)> FindQuestionsPaginatedAsync(SearchParameters searchParameter)
+    public async Task<(List<Question> Questions, long TotalCount)> FindQuestionsPaginatedAsync(SearchParameters searchParameter)
     {
         var filterBuilder = Builders<Question>.Filter;
         var filters = new List<FilterDefinition<Question>>();
 
+        // Filtro de publicação
         if (searchParameter.IsPublished)
         {
             filters.Add(filterBuilder.Eq(q => q.IsPublished, true));
         }
 
+        // Filtro de texto (busca no conteúdo)
         if (!string.IsNullOrWhiteSpace(searchParameter.WordKey))
         {
             var textFilter = filterBuilder.ElemMatch(
@@ -84,100 +96,60 @@ public class QuestionRepository : BaseRepository<Question>, IQuestionRepository
             filters.Add(textFilter);
         }
 
+        // Filtro de tipo de questão
         if (searchParameter.TypeQuestions is { Length: > 0 })
         {
             filters.Add(filterBuilder.In(q => q.Type, searchParameter.TypeQuestions));
         }
 
+        // Filtro de área principal
         if (searchParameter.MainAreas is { Length: > 0 })
         {
             filters.Add(filterBuilder.In(q => q.MainArea, searchParameter.MainAreas));
         }
 
+        // Filtro de sub-áreas
         if (searchParameter.SubAreas is { Length: > 0 })
         {
             filters.Add(filterBuilder.AnyIn(q => q.SubAreas, searchParameter.SubAreas));
         }
 
+        // Filtro de categoria de exame (usando dados desnormalizados)
         if (searchParameter.ExamCategories is { Length: > 0 })
         {
-            var publicNoticeBuilder = Builders<PublicNotice>.Filter;
-            var categoryFilter = publicNoticeBuilder.And(
-                publicNoticeBuilder.In(pn => pn.ExamCategory, searchParameter.ExamCategories),
-                publicNoticeBuilder.Eq(pn => pn.IsPublished, true)
+            var examFilter = filterBuilder.ElemMatch(
+                q => q.Exams,
+                Builders<QuestionExam>.Filter.In(qe => qe.ExamCategory, searchParameter.ExamCategories)
             );
-
-            var publicNoticesCollection = Context.GetCollection<PublicNotice>();
-            var publicNotices = await publicNoticesCollection
-                .Find(categoryFilter)
-                .ToListAsync();
-
-            var examIds = publicNotices
-                .SelectMany(pn => pn.Exams)
-                .Select(e => e.Id)
-                .ToList();
-
-            if (examIds.Any())
-            {
-                var examQuestionsCollection = Context.GetCollection<ExamQuestion>();
-                var examQuestionsFilter = Builders<ExamQuestion>.Filter.In(eq => eq.ExamId, examIds);
-                var filteredQuestionIds = await examQuestionsCollection
-                    .Find(examQuestionsFilter)
-                    .Project(eq => eq.QuestionId)
-                    .ToListAsync();
-
-                if (filteredQuestionIds.Any())
-                {
-                    filters.Add(filterBuilder.In(q => q.Id, filteredQuestionIds));
-                }
-                else
-                {
-                    return (new Dictionary<ExamQuestion, Question>(), 0);
-                }
-            }
-            else
-            {
-                return (new Dictionary<ExamQuestion, Question>(), 0);
-            }
+            filters.Add(examFilter);
         }
 
         var finalFilter = filters.Any() ? filterBuilder.And(filters) : filterBuilder.Empty;
 
+        // Contar total de itens
         var totalItems = await DbSet.CountDocumentsAsync(finalFilter);
 
-        var items = await DbSet.Find(finalFilter)
+        // Buscar questões paginadas
+        var questions = await DbSet.Find(finalFilter)
             .Skip((searchParameter.CurrentPage - 1) * searchParameter.PageSize)
             .Limit(searchParameter.PageSize)
             .ToListAsync();
 
-        var foundQuestionIds = items.Select(q => q.Id).ToList();
-        var examQuestionsCollectionFinal = Context.GetCollection<ExamQuestion>();
-        var examQuestions = await examQuestionsCollectionFinal
-            .Find(Builders<ExamQuestion>.Filter.In(eq => eq.QuestionId, foundQuestionIds))
-            .ToListAsync();
-
-        var result = new Dictionary<ExamQuestion, Question>();
-        foreach (var examQuestion in examQuestions)
-        {
-            var question = items.FirstOrDefault(q => q.Id == examQuestion.QuestionId);
-            if (question != null)
-            {
-                result[examQuestion] = question;
-            }
-        }
-
-        return (result, totalItems);
+        return (questions, totalItems);
     }
 
     public async Task<List<Question>> GetByExamId(string examId)
     {
-        var questionIds = await Context.GetCollection<ExamQuestion>()
-            .Find(x => x.ExamId == examId)
-            .Project(x => x.QuestionId)
-            .ToListAsync();
+        var filterBuilder = Builders<Question>.Filter;
+
+        // Buscar questões que contenham este examId no array Exams
+        var filter = filterBuilder.ElemMatch(
+            q => q.Exams,
+            Builders<QuestionExam>.Filter.Eq(qe => qe.ExamId, examId)
+        );
 
         var questions = await DbSet
-            .Find(x => questionIds.Contains(x.Id))
+            .Find(filter)
             .ToListAsync();
 
         return questions;

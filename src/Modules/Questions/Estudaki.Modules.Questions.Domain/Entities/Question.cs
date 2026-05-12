@@ -15,6 +15,18 @@ public class Question : Entity
     public List<string> QuestionSupports { get; set; } = [];
     public List<ContentBlock> QuestionContents { get; set; } = [];
     public List<Choice>? Choices { get; set; }
+
+    /// <summary>
+    /// Indica se a questão foi anulada em todos os exames onde aparece.
+    /// Se anulada, esta propriedade afeta todos os exames relacionados.
+    /// </summary>
+    public bool IsNullified { get; set; } = false;
+
+    /// <summary>
+    /// Informações sobre os exames aos quais esta questão pertence.
+    /// Desnormalizado para melhor performance em queries.
+    /// </summary>
+    public List<QuestionExam> Exams { get; set; } = [];
 }
 
 

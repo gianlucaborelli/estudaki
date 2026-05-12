@@ -26,7 +26,6 @@ public static class ServiceCollectionExtensions
         services.AddScoped<IQuestionRepository, QuestionRepository>();
         services.AddScoped<IPublicNoticeRepository, PublicNoticeRepository>();
         services.AddScoped<IQuestionSupportRepository, QuestionSupportRepository>();
-        services.AddScoped<IExamQuestionRepository, ExamQuestionRepository>();
 
         services.AddValidatorsFromAssembly(typeof(UploadPublicNoticeFilesCommandValidator).Assembly);
 

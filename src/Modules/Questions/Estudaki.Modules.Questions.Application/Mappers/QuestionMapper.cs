@@ -1,5 +1,6 @@
 using Estudaki.Modules.Questions.Application.DTOs;
 using Estudaki.Modules.Questions.Domain.Entities;
+using Estudaki.Modules.Questions.Domain.ValueObjects;
 
 namespace Estudaki.Modules.Questions.Application.Mappers;
 
@@ -9,7 +10,7 @@ public static class QuestionMapper
         this Question question, 
         PublicNotice publicNotice, 
         Exam exam,
-        ExamQuestion examQuestion,
+        QuestionExam questionExam,
         List<QuestionSupport>? questionSupports)
     {
         return new QuestionDto
@@ -27,8 +28,8 @@ public static class QuestionMapper
             Area = exam.Area,
             EducationLevel = exam.EducationLevel,
             PublicNoticeFileUrl = publicNotice.FileUrl,
-            IsNullified = examQuestion.IsNullified,
-            QuestionNumber = examQuestion.QuestionNumber,
+            IsNullified = question.IsNullified,
+            QuestionNumber = questionExam.QuestionNumber,
             QuestionType = question.Type,
             MainArea = question.MainArea,
             SubAreas = question.SubAreas,

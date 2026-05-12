@@ -8,29 +8,20 @@ namespace Estudaki.Modules.Questions.Application.Commands;
 public class DeleteQuestionCommandHandler : CommandHandler, ICommandHandler<DeleteQuestionCommand, ValidationResult>
 {
     private readonly IQuestionRepository _questionRepository;
-    private readonly IExamQuestionRepository _examQuestionRepository;
     private readonly IValidator<DeleteQuestionCommand> _validator;
 
-    public DeleteQuestionCommandHandler(IQuestionRepository questionRepository, 
-        IExamQuestionRepository examQuestionRepository,
+    public DeleteQuestionCommandHandler(
+        IQuestionRepository questionRepository, 
         IValidator<DeleteQuestionCommand> validator)
     {
         _questionRepository = questionRepository;
-        _examQuestionRepository = examQuestionRepository;
         _validator = validator;
     }
+
     public async Task<ValidationResult> HandleAsync(DeleteQuestionCommand command, CancellationToken cancellationToken = default)
     {
         ValidationResult = await _validator.ValidateAsync(command);
         if(!ValidationResult.IsValid) return ValidationResult;
-
-        var examQuestion = await _examQuestionRepository.GetByExamAndQuestion(command.ExamId, command.QuestionId);
-
-        if (examQuestion == null)
-        {
-            ValidationResult.Errors.Add(new ValidationFailure("ExamId", "Questão não associada a prova."));
-            return ValidationResult;
-        }
 
         var question = await _questionRepository.GetById(command.QuestionId);
 
@@ -40,8 +31,26 @@ public class DeleteQuestionCommandHandler : CommandHandler, ICommandHandler<Dele
             return ValidationResult;
         }
 
-        await _examQuestionRepository.Remove(examQuestion.Id);
-        await _questionRepository.Remove(question.Id);
+        // Verificar se a questão está associada ao exame especificado
+        var hasExam = question.Exams.Any(qe => qe.ExamId == command.ExamId);
+        if (!hasExam)
+        {
+            ValidationResult.Errors.Add(new ValidationFailure("ExamId", "Questão não associada a esta prova."));
+            return ValidationResult;
+        }
+
+        // Se a questão está associada apenas a este exame, remove a questão inteira
+        if (question.Exams.Count == 1)
+        {
+            await _questionRepository.Remove(question.Id);
+        }
+        else
+        {
+            // Se está associada a múltiplos exames, remove apenas a associação com este exame
+            question.Exams.RemoveAll(qe => qe.ExamId == command.ExamId);
+            await _questionRepository.Update(question);
+        }
+
         return ValidationResult;
     }
 }
