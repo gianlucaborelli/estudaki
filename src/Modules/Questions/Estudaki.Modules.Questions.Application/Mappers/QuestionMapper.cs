@@ -6,30 +6,49 @@ namespace Estudaki.Modules.Questions.Application.Mappers;
 
 public static class QuestionMapper
 {
+    /// <summary>
+    /// Converte Question para DTO usando dados desnormalizados.
+    /// Não requer mais buscar PublicNotice ou Exam separadamente.
+    /// </summary>
     public static QuestionDto ToDto(
-        this Question question, 
-        PublicNotice publicNotice, 
-        Exam exam,
-        QuestionExam questionExam,
-        List<QuestionSupport>? questionSupports)
+        this Question question,
+        QuestionExam? questionExam = null,
+        List<QuestionSupport>? questionSupports = null)
     {
+        // Usa o primeiro exame se não foi especificado
+        var exam = questionExam ?? question.Exams.FirstOrDefault();
+
+        if (exam == null)
+        {
+            throw new InvalidOperationException($"Questão {question.Id} não possui exames associados.");
+        }
+
+        // Agregar todas as positions dos exames da questão
+        var allPositions = question.Exams
+            .Where(qe => !string.IsNullOrWhiteSpace(qe.Position))
+            .Select(qe => qe.Position!)
+            .Distinct()
+            .ToList();
+
         return new QuestionDto
         {
             QuestionId = question.Id,
-            PublicNoticeId = publicNotice.Id,
-            ExamId = exam.Id,
-            PublicNoticeNumber = publicNotice.Number,
-            Year = publicNotice.Year,
-            ExaminerOrganization = publicNotice.ExaminerOrganization,
-            ContractingOrganization = publicNotice.ContractingOrganization,
-            ExamCategory = publicNotice.ExamCategory,
-            Phase = exam.Phase,
-            Position = exam.Position,
-            Area = exam.Area,
-            EducationLevel = exam.EducationLevel,
-            PublicNoticeFileUrl = publicNotice.FileUrl,
+            PublicNoticeId = exam.PublicNoticeId,
+            ExamId = exam.ExamId,
+            PublicNoticeNumber = null, // TODO: Adicionar em QuestionExam se necessário
+            Year = exam.Year,
+            ExaminerOrganization = exam.ExaminerOrganization,
+            ContractingOrganization = exam.ContractingOrganization,
+            ExamCategory = exam.ExamCategory,
+            Phase = exam.Phase ?? string.Empty,
+            Positions = allPositions,
+            Area = exam.Area ?? string.Empty,
+            EducationLevel = exam.EducationLevel ?? string.Empty,
+            PublicNoticeFileUrl = string.Empty, // TODO: Adicionar em QuestionExam se necessário
+            ExamBookletUrl = exam.ExamBookletUrl ?? string.Empty,
+            AnswerKeyUrl = exam.AnswerKeyUrl ?? string.Empty,
             IsNullified = question.IsNullified,
-            QuestionNumber = questionExam.QuestionNumber,
+            QuestionNumber = exam.QuestionNumber,
             QuestionType = question.Type,
             MainArea = question.MainArea,
             SubAreas = question.SubAreas,
@@ -41,5 +60,5 @@ public static class QuestionMapper
             Choices = question.Choices,
             CreatedAt = question.CreatedAt
         };
-    }    
+    }
 }

@@ -4,11 +4,11 @@
     <MudCardHeader>
         <CardHeaderContent>
             <MudStack Row="true" Justify="Justify.SpaceBetween" AlignItems="AlignItems.Center">
-                
+
                 <MudText Typo="Typo.h6">
-                    @Value!.ExaminerOrganization - @Value!.Position @Value!.Phase @Value!.Year
+                    @Value!.ExaminerOrganization - @(string.Join(", ", Value!.Positions)) @Value!.Phase @Value!.Year
                 </MudText>
-                
+
                 <MudButton Href="@($"/question/{Value?.QuestionId}")" 
                            Variant="Variant.Text" 
                            Color="Color.Primary"

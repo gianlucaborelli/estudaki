@@ -49,8 +49,33 @@ public class QuestionExam
     public string? ContractingOrganization { get; set; }
 
     /// <summary>
-    /// Cargos/Posições para os quais esta questão é aplicável (desnormalizado para facilitar filtros)
-    /// Exemplo: ["Analista Judiciário", "Técnico Administrativo"]
+    /// Cargo/Posição para o qual esta questão é aplicável (desnormalizado para facilitar filtros)
+    /// Exemplo: "Analista Judiciário", "Técnico Administrativo"
     /// </summary>
-    public List<string> Positions { get; set; } = [];
+    public string? Position { get; set; }
+
+    /// <summary>
+    /// Fase do exame (ex: "1ª Fase", "2ª Fase", "Objetiva", "Discursiva")
+    /// </summary>
+    public string? Phase { get; set; }
+
+    /// <summary>
+    /// Área de conhecimento do exame (ex: "Direito", "Tecnologia da Informação")
+    /// </summary>
+    public string? Area { get; set; }
+
+    /// <summary>
+    /// Nível de escolaridade exigido (ex: "Superior", "Médio", "Fundamental")
+    /// </summary>
+    public string? EducationLevel { get; set; }
+
+    /// <summary>
+    /// URL do caderno de questões do exame
+    /// </summary>
+    public string? ExamBookletUrl { get; set; }
+
+    /// <summary>
+    /// URL do gabarito oficial do exame
+    /// </summary>
+    public string? AnswerKeyUrl { get; set; }
 }

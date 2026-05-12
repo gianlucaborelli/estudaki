@@ -1,8 +1,6 @@
 ﻿using Estudaki.Commons.Core.CQRS;
-using Estudaki.Commons.Core.Storage;
 using Estudaki.Modules.Questions.Application.DTOs;
 using Estudaki.Modules.Questions.Application.Mappers;
-using Estudaki.Modules.Questions.Domain.Entities;
 using Estudaki.Modules.Questions.Domain.Repositories;
 
 namespace Estudaki.Modules.Questions.Application.Queries.GetQuestionsByExamId;
@@ -32,13 +30,7 @@ public class GetQuestionsByExamIdQueryHandler(
             var questionExam = question.Exams.FirstOrDefault(qe => qe.ExamId == query.ExamId);
             if (questionExam != null)
             {
-                questionsDto.Add(
-                    question.ToDto(
-                        publicNotice, 
-                        publicNotice.Exams.FirstOrDefault(e => e.Id == query.ExamId)!, 
-                        questionExam,
-                        questionSupports
-                    ));
+                questionsDto.Add(question.ToDto(questionExam, questionSupports));
             }
         }
 

@@ -13,7 +13,7 @@ public class QuestionDto
     public string? ContractingOrganization { get; set; }    
     public string ExamCategory { get; set; } = ExamCategories.PublicServiceExam;
     public string Phase { get; set; } = string.Empty;
-    public string Position { get; set; } = string.Empty;
+    public List<string> Positions { get; set; } = [];
     public string Area { get; set; } = string.Empty;
     public string EducationLevel { get; set; } = string.Empty;
     public string PublicNoticeFileUrl { get; set; } = string.Empty;
