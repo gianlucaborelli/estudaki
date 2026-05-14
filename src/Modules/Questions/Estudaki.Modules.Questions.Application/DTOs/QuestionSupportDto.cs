@@ -39,7 +39,7 @@ public class QuestionSupportDto
 
     public string GetSupportPreview()
     {
-        if (Contents.Any()) return string.Empty;
+        if (!Contents.Any()) return string.Empty;
 
         var previewTexts = new List<string>();
         const int maxLength = 200; // Máximo de caracteres no preview

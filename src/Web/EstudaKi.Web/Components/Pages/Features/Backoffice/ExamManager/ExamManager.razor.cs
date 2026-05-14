@@ -17,6 +17,10 @@ namespace EstudaKi.Web.Components.Pages.Features.Backoffice.ExamManager
     {
         [Parameter]
         public string Id { get; set; } = string.Empty;
+
+        [SupplyParameterFromQuery(Name = "examId")]
+        public string? ExamId { get; set; }
+
         [Inject]
         public NavigationManager NavigationManager { get; set; } = default!;
         [Inject]
@@ -41,6 +45,14 @@ namespace EstudaKi.Web.Components.Pages.Features.Backoffice.ExamManager
             await LoadContent();
         }
 
+        protected override async Task OnParametersSetAsync()
+        {
+            if (!string.IsNullOrEmpty(ExamId) && SelectedExam?.Id != ExamId)
+            {
+                await LoadContent();
+            }
+        }
+
         private async Task LoadContent()
         {
             IsLoading = true;
@@ -55,11 +67,20 @@ namespace EstudaKi.Web.Components.Pages.Features.Backoffice.ExamManager
                     return;
                 }
                 PublicNotice = publicNotice;
-                SelectedExam = SelectedExam ?? PublicNotice.Exams.FirstOrDefault();
 
-                var questionsQuery = new GetQuestionsByExamIdQuery(SelectedExam!.Id);
-                QuestionList = await QueryDispatcher
-                                            .DispatchAsync<GetQuestionsByExamIdQuery, List<QuestionDto>>(questionsQuery);                
+                if (!string.IsNullOrEmpty(ExamId))
+                {
+                    SelectedExam = PublicNotice.Exams.FirstOrDefault(e => e.Id == ExamId);
+                }
+
+                SelectedExam ??= PublicNotice.Exams.FirstOrDefault();
+
+                if (SelectedExam != null)
+                {
+                    var questionsQuery = new GetQuestionsByExamIdQuery(SelectedExam.Id);
+                    QuestionList = await QueryDispatcher
+                                                .DispatchAsync<GetQuestionsByExamIdQuery, List<QuestionDto>>(questionsQuery);
+                }
 
                 var questionSupportsQuery = new GetQuestionSupportsByPublicNoticeIdQuery(PublicNotice.Id);
                 QuestionSupports = await QueryDispatcher
@@ -76,9 +97,38 @@ namespace EstudaKi.Web.Components.Pages.Features.Backoffice.ExamManager
             }
         }
 
+        protected async Task OnSelectedExamChanged(Exam? newExam)
+        {
+            if (newExam == null || newExam.Id == SelectedExam?.Id) return;
+
+            SelectedExam = newExam;
+            SelectedQuestion = null; // Limpar seleção de questão ao trocar de exame
+
+            // Atualizar a URL com o examId na query string
+            var uri = NavigationManager.GetUriWithQueryParameter("examId", newExam.Id);
+            NavigationManager.NavigateTo(uri, false);
+
+            // Recarregar as questões do novo exame
+            IsLoading = true;
+            try
+            {
+                var questionsQuery = new GetQuestionsByExamIdQuery(newExam.Id);
+                QuestionList = await QueryDispatcher
+                                            .DispatchAsync<GetQuestionsByExamIdQuery, List<QuestionDto>>(questionsQuery);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine("Error loading questions: " + ex.Message);
+                Snackbar.Add("Erro ao carregar questões do exame.", Severity.Error);
+            }
+            finally
+            {
+                IsLoading = false;
+            }
+        }
+
         protected async Task OpenUploadFileDialogAsync()
         {
-            // Se não houver um exame selecionado, usar o primeiro da lista
             var examId = SelectedExam?.Id ?? PublicNotice?.Exams?.FirstOrDefault()?.Id;
 
             if (string.IsNullOrEmpty(examId))

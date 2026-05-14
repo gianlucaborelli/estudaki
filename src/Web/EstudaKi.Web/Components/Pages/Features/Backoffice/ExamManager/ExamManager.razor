@@ -87,10 +87,10 @@ else
             <MudDivider />
 
             <MudStack Row="true" AlignItems="AlignItems.Center">
-                <MudSelect @bind-Value="SelectedExam"
+                <MudSelect Value="SelectedExam"
+                            ValueChanged="@((Exam? exam) => OnSelectedExamChanged(exam))"
                             Variant="Variant.Outlined"
                             Label="Exames"
-                            onchange="() => LoadContent()"
                             Style="width: auto; min-width: 200px;">
                     @foreach (var exam in PublicNotice.Exams)
                     {
