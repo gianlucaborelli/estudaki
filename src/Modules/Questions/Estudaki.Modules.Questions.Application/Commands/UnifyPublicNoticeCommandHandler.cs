@@ -65,25 +65,31 @@ public class UnifyPublicNoticeCommandHandler : CommandHandler, ICommandHandler<U
 
         foreach(var exam in publicNoticeToUnify.Exams)
         {
-            var oldExamBookletUrl = exam.ExamBookletUrl;
-            var oldExamAnswerKeyUrl = exam.AnswerKeyUrl;
+            var oldExamBookletUrl = ExtractPathKey(exam.ExamBookletUrl);
+            var oldExamAnswerKeyUrl = ExtractPathKey(exam.AnswerKeyUrl);
 
             var newExamBookletUrl = publicNoticeToUnify.BuildExamFilePath(exam.Id);
             var newExamAnswerKeyUrl = publicNoticeToUnify.BuildAnswerKeyPath(exam.Id);
 
-            var examBookletExists = await _storageService.FileExistsAsync(oldExamBookletUrl);
-            if (examBookletExists)
+            if (!string.IsNullOrEmpty(oldExamBookletUrl))
             {
-                //await _storageService.MoveFileAsync(oldExamBookletUrl, newExamBookletUrl);
-                exam.ExamBookletUrl = newExamBookletUrl;
+                var examBookletExists = await _storageService.FileExistsAsync(oldExamBookletUrl);
+                if (examBookletExists && (oldExamAnswerKeyUrl != newExamAnswerKeyUrl))
+                {
+                    newExamBookletUrl = await _storageService.MoveFileAsync(oldExamBookletUrl, newExamBookletUrl);
+                    exam.ExamBookletUrl = newExamBookletUrl;
+                }
             }
-
-            var examAnswerKeyExists = await _storageService.FileExistsAsync(oldExamAnswerKeyUrl);
-            if(examAnswerKeyExists)
+            
+            if(!string.IsNullOrEmpty(oldExamAnswerKeyUrl))
             {
-                //await _storageService.MoveFileAsync(oldExamAnswerKeyUrl, newExamAnswerKeyUrl);
-                exam.AnswerKeyUrl = newExamAnswerKeyUrl;
-            }
+                var examAnswerKeyExists = await _storageService.FileExistsAsync(oldExamAnswerKeyUrl);
+                if (examAnswerKeyExists && oldExamAnswerKeyUrl != newExamAnswerKeyUrl)
+                {
+                    newExamAnswerKeyUrl = await _storageService.MoveFileAsync(oldExamAnswerKeyUrl, newExamAnswerKeyUrl);
+                    exam.AnswerKeyUrl = newExamAnswerKeyUrl;
+                }
+            }            
         }
 
         foreach (var support in questionSupports)
@@ -107,11 +113,25 @@ public class UnifyPublicNoticeCommandHandler : CommandHandler, ICommandHandler<U
             await UpdateImages(question.QuestionContents);
         }
 
-        //await _publicNoticeRepository.Update(publicNoticeToUnify);
-        //foreach (var question in questions) await _questionRepository.Update(question);
-        //foreach (var support in questionSupports) await _questionSupportRepository.Update(support);
+        await _publicNoticeRepository.Update(publicNoticeToUnify);
+        foreach (var question in questions) await _questionRepository.Update(question);
+        foreach (var support in questionSupports) await _questionSupportRepository.Update(support);
+
+        var noticesToRemove = publicNotices
+            .Where(x => x.Id != publicNoticeToUnify.Id);
+
+        foreach (var publicNoticeToRemove in noticesToRemove)
+        {
+            await _publicNoticeRepository.Remove(publicNoticeToRemove.Id);
+        }
 
         return ValidationResult;
+    }
+
+    public static string ExtractPathKey(string url)
+    {
+        if (string.IsNullOrEmpty(url)) return "";
+        return new Uri(url).AbsolutePath.TrimStart('/');
     }
 
     public async Task UpdateImages(List<ContentBlock> contentBlocks)
@@ -120,20 +140,19 @@ public class UnifyPublicNoticeCommandHandler : CommandHandler, ICommandHandler<U
         {
             if (content is ImageBlock imageBlock)
             {
-                var oldImagePath = imageBlock.Key;
-                var newImagePath = publicNoticeToUnify.GetImagesFolder();
-
-                if (oldImagePath is not null)
+                var oldImagePath = ExtractPathKey(imageBlock.Key);
+                
+                if (!string.IsNullOrEmpty(oldImagePath))
                 {
+                    var fileName = Path.GetFileName(new Uri(imageBlock.Key).AbsolutePath);
+                    var newImagePath = publicNoticeToUnify.GetImagesFolder();
+                    newImagePath = newImagePath + fileName;
+
                     var fileExists = await _storageService.FileExistsAsync(oldImagePath);
 
-                    if (fileExists)
+                    if (fileExists && (newImagePath != oldImagePath))
                     {
-                        var fileName = Path.GetFileName(new Uri(oldImagePath).AbsolutePath);
-                        newImagePath = newImagePath + fileName;
-
-                        //await _storageService.MoveFileAsync(oldImagePath, newImagePath);
-
+                        newImagePath = await _storageService.MoveFileAsync(oldImagePath, newImagePath);
                         imageBlock.Key = newImagePath;
                     }
                 }
@@ -144,10 +163,10 @@ public class UnifyPublicNoticeCommandHandler : CommandHandler, ICommandHandler<U
                 {
                     if (inlineContent is ImageInline imageInInline)
                     {
-                        var oldImagePath = imageInInline.Key;
+                        var oldImagePath = ExtractPathKey(imageInInline.Key);
                         var newImagePath = publicNoticeToUnify.GetImagesFolder();
 
-                        if (oldImagePath is not null)
+                        if (!string.IsNullOrEmpty(oldImagePath))
                         {
                             var fileExists = await _storageService.FileExistsAsync(oldImagePath);
 
@@ -156,7 +175,7 @@ public class UnifyPublicNoticeCommandHandler : CommandHandler, ICommandHandler<U
                                 var fileName = Path.GetFileName(new Uri(oldImagePath).AbsolutePath);
                                 newImagePath = newImagePath + fileName;
 
-                                //await _storageService.MoveFileAsync(oldImagePath, newImagePath);
+                                newImagePath = await _storageService.MoveFileAsync(oldImagePath, newImagePath);
 
                                 imageInInline.Key = newImagePath;
                             }
