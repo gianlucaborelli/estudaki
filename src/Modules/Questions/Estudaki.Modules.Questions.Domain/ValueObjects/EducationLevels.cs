@@ -10,4 +10,16 @@ public static class EducationLevels
     {
         Elementary, HighSchool, Undergraduate, Technical
     };
+
+    public static string GetDisplayName(string category)
+    {
+        return category switch
+        {
+            Elementary => "Fundamental",
+            HighSchool => "Médio",
+            Undergraduate => "Superior",
+            Technical => "Técnico",
+            _ => category
+        };
+    }
 }

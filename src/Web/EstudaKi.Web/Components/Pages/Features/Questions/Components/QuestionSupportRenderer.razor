@@ -19,7 +19,7 @@
                 <MudText Align="Align.Justify">
                     @foreach (var inline in paragraph.Inlines)
                     {
-                        <InlineContentRenderer Inline="@inline" PublicNotice="@PublicNotice" />
+                        <InlineContentRenderer Inline="@inline" />
                     }
                 </MudText>
                 @if (!string.IsNullOrEmpty(paragraph.Source))

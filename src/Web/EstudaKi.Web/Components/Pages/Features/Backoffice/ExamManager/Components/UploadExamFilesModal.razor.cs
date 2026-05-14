@@ -49,9 +49,9 @@ namespace EstudaKi.Web.Components.Pages.Features.Backoffice.ExamManager.Componen
 
                 var answerKeyFileToUpload = await UploadFileDto.CreateAsync(answerKeyFile);
 
-                var uploadFileCommand = new UploadPublicNoticeFilesCommand(Notice.Id, ExamId, examFileToUpload, answerKeyFileToUpload);
+                var uploadFileCommand = new UploadExamFilesCommand(Notice.Id, ExamId, examFileToUpload, answerKeyFileToUpload);
 
-                var result = await CommandDispatcher.DispatchAsync<UploadPublicNoticeFilesCommand, ValidationResult>(uploadFileCommand);
+                var result = await CommandDispatcher.DispatchAsync<UploadExamFilesCommand, ValidationResult>(uploadFileCommand);
 
                 if(result.IsValid)
                 {

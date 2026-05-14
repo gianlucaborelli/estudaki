@@ -36,7 +36,18 @@ public class QuestionDto
             QuestionId = original.QuestionId,
             PublicNoticeId = original.PublicNoticeId,
             ExamId = original.ExamId,
-            CreatedAt = original.CreatedAt,
+            PublicNoticeNumber = original.PublicNoticeNumber,
+            Year = original.Year,
+            ExaminerOrganization = original.ExaminerOrganization,
+            ContractingOrganization = original.ContractingOrganization,
+            ExamCategory = original.ExamCategory,
+            Phase = original.Phase,
+            Positions = original.Positions.ToList(),
+            Area = original.Area,
+            EducationLevel = original.EducationLevel,
+            PublicNoticeFileUrl = original.PublicNoticeFileUrl,
+            ExamBookletUrl = original.ExamBookletUrl,
+            AnswerKeyUrl = original.AnswerKeyUrl,
             IsNullified = original.IsNullified,
             QuestionNumber = original.QuestionNumber,
             QuestionType = original.QuestionType,
@@ -79,7 +90,8 @@ public class QuestionDto
                                 Option = c.Option,
                                 Content = c.Content,
                                 IsCorrect = c.IsCorrect
-                            }).ToList()
+                            }).ToList(),
+            CreatedAt = original.CreatedAt
         };
     }
 }

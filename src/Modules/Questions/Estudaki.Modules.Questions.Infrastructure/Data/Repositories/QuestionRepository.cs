@@ -154,4 +154,20 @@ public class QuestionRepository : BaseRepository<Question>, IQuestionRepository
 
         return questions;
     }
+
+    public async Task<List<Question>> GetByPublicNoticeId(string publicNoticeId)
+    {
+        var filterBuilder = Builders<Question>.Filter;
+        
+        var filter = filterBuilder.ElemMatch(
+            q => q.Exams,
+            Builders<QuestionExam>.Filter.Eq(qe => qe.PublicNoticeId, publicNoticeId)
+        );
+
+        var questions = await DbSet
+            .Find(filter)
+            .ToListAsync();
+
+        return questions;
+    }
 }

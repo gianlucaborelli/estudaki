@@ -1,0 +1,37 @@
+﻿@using Estudaki.Modules.Questions.Domain.ValueObjects
+@inherits EditExamModalBase
+
+<MudDialog>
+    <DialogContent>
+        <MudForm @ref="Form" Model="@EditedExam">
+            <MudGrid Spacing="3">
+                <MudItem xs="12" md="6">
+                    <MudTextField @bind-Value="EditedExam.Position" Label="Cargo" />
+                </MudItem>
+                <MudItem xs="12" md="6">
+                    <MudTextField @bind-Value="EditedExam.Area" Label="Especialização" />
+                </MudItem>
+                <MudItem xs="12" md="6">
+                    <MudTextField @bind-Value="EditedExam.Phase" Label="Fase" />
+                </MudItem>                
+                <MudItem xs="12" md="6">
+                    <MudSelect @bind-Value="EditedExam.EducationLevel" Label="Nivel Educacional">
+                        @foreach (var category in EducationLevels.All)
+                        {
+                            <MudSelectItem Value="@category">@EducationLevels.GetDisplayName(category)</MudSelectItem>
+                        }
+                    </MudSelect>
+                </MudItem>
+                <MudItem xs="12">
+                    <MudTextField @bind-Value="EditedExam.ExamBookletUrl" Label="URL do Caderno de Prova" />
+                    <MudTextField @bind-Value="EditedExam.AnswerKeyItems" Label="Gabarito" />
+                </MudItem>
+            </MudGrid>
+        </MudForm>
+    </DialogContent>
+    <DialogActions>
+        <MudButton OnClick="Dialog.Cancel" Disabled="@IsUploading">Cancelar</MudButton>
+        <MudButton Color="Color.Primary" Disabled="@IsUploading" OnClick="SaveAsync">Salvar</MudButton>
+    </DialogActions>
+</MudDialog>
+

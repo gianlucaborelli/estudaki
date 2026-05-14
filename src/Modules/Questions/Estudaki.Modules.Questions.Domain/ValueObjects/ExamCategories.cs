@@ -32,7 +32,7 @@ public static class ExamCategories
         {
             UniversityEntranceExam => "Vestibular",
             PublicServiceExam => "Concurso Público",
-            BarExam => "Exame de Ordem (OAB)",
+            BarExam => "Exame de Ordem",
             NationalExam => "ENEM e Similares",
             SchoolExam => "Provas Escolares",
             _ => category

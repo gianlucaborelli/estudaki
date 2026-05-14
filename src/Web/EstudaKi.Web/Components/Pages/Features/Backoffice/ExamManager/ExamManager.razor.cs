@@ -118,6 +118,21 @@ namespace EstudaKi.Web.Components.Pages.Features.Backoffice.ExamManager
             return ;
         }
 
+        protected async Task OpenEditExamDialogAsync()
+        {
+            var parameters = new DialogParameters<EditExamModal> {
+                { x => x.OriginalExam, SelectedExam }
+            };
+
+            var options = new DialogOptions { CloseButton = true, MaxWidth = MaxWidth.Medium, FullWidth = true };
+            var dialog = await Dialog.ShowAsync<EditExamModal>("Editar Exame", parameters, options);
+            var result = await dialog.Result;
+
+            if (result is not null && !result.Canceled) await LoadContent();
+
+            return;
+        }
+
         protected async Task OpenUploadImagesDialogAsync()
         {           
             var parameters = new DialogParameters<UploadImagesModal> {

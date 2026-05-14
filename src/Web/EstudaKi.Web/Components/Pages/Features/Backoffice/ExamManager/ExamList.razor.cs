@@ -1,6 +1,10 @@
 ﻿using Estudaki.Commons.Core.CQRS;
+using Estudaki.Commons.Core.CQRS.Dispatchers;
+using Estudaki.Modules.Questions.Application.Commands;
 using Estudaki.Modules.Questions.Application.DTOs;
 using Estudaki.Modules.Questions.Application.Queries.GetPublicNoticeList;
+using EstudaKi.Web.Components.Shared;
+using FluentValidation.Results;
 using Microsoft.AspNetCore.Components;
 using MudBlazor;
 
@@ -16,6 +20,8 @@ public class ExamListBase : ComponentBase
     protected IDialogService DialogService { get; set; } = default!;
     [Inject]
     protected IQueryDispatcher QueryDispatcher { get; set; } = default!;
+    [Inject]
+    protected ICommandDispatcher CommandDispatcher { get; set; } = default!;
     protected List<PublicNoticeDto> PublicNoticeList { get; set; } = [];
     protected bool IsLoading { get; set; } = true;
     protected List<PublicNoticeDto> SelectedItems { get; set; } = [];
@@ -67,5 +73,38 @@ public class ExamListBase : ComponentBase
             Snackbar.Add($"Item {item.Id} deletado", Severity.Success);
         }
         StateHasChanged();
+    }
+
+    protected async Task UnifyPublicNoticeAsync()
+    {
+        if (SelectedItems.Count < 2) return;
+        var parameters = new DialogParameters<CustomDialog>
+            {
+                { x => x.ContentText, "Deseja realmente unificar essas provas? Este processo não pode ser desfeito." },
+                { x => x.ButtonText, "Unificar" },
+                { x => x.Color, Color.Error }
+            };
+        var options = new DialogOptions() { CloseButton = true, MaxWidth = MaxWidth.ExtraSmall };
+        var dialog = await DialogService.ShowAsync<CustomDialog>("Confirmar Unificação", parameters, options);
+        var result = await dialog.Result;
+
+        if (result is not null && !result.Canceled)
+        {
+            var publicNoticeIds = SelectedItems.Select(x => x.Id).ToList();
+
+
+            var unifyCommand = new UnifyPublicNoticeCommand(publicNoticeIds);
+            var deleteResult = await CommandDispatcher.DispatchAsync<UnifyPublicNoticeCommand, ValidationResult>(unifyCommand);
+            if (deleteResult.IsValid)
+            {
+                Snackbar.Add("Provas unificadas com sucesso!", Severity.Success);
+                await LoadPublicNotices();
+            }
+            else
+                Snackbar.Add("Falha ao unificar as provas. Verifique se há dependências.", Severity.Error);
+            await LoadPublicNotices();
+        }
+
+        return;
     }
 }

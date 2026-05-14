@@ -10,12 +10,15 @@ public class UpdatePublicNoticeCommandHandler : CommandHandler, ICommandHandler<
 {
     private readonly IValidator<UpdatePublicNoticeCommand> _validator;
     private readonly IPublicNoticeRepository _publicNoticeRepository;
+    private readonly IQuestionRepository _questionRepository;
 
     public UpdatePublicNoticeCommandHandler(IValidator<UpdatePublicNoticeCommand> validator,
-        IPublicNoticeRepository publicNoticeRepository)
+        IPublicNoticeRepository publicNoticeRepository,
+        IQuestionRepository questionRepository)
     {
         _validator = validator;
         _publicNoticeRepository = publicNoticeRepository;
+        _questionRepository = questionRepository;
     }
 
     public async Task<ValidationResult> HandleAsync(UpdatePublicNoticeCommand command, CancellationToken cancellationToken = default)
@@ -35,6 +38,23 @@ public class UpdatePublicNoticeCommandHandler : CommandHandler, ICommandHandler<
 
         var updatedPublicNotice = command.PublicNoticeDto.ToEntity();
         await _publicNoticeRepository.Update(updatedPublicNotice);
+
+        var questions = await _questionRepository.GetByPublicNoticeId(command.PublicNoticeDto.Id);
+
+        foreach (var question in questions)
+        {
+            var questionExam = question.Exams;
+
+            foreach (var exam in questionExam!)
+            {
+                exam.Year = updatedPublicNotice.Year;
+                exam.ExamCategory = updatedPublicNotice.ExamCategory;
+                exam.ExaminerOrganization = updatedPublicNotice.ExaminerOrganization;
+                exam.ContractingOrganization = updatedPublicNotice.ContractingOrganization;                
+            }
+
+            await _questionRepository.Update(question);
+        }
 
         return ValidationResult;
     }

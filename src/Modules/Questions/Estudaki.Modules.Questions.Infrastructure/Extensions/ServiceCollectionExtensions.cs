@@ -38,11 +38,13 @@ public static class ServiceCollectionExtensions
         services.AddCQRSHandlers(typeof(GetQuestionSupportsByPublicNoticeIdQueryHandler).Assembly);
         services.AddCQRSHandlers(typeof(GetImageListByPublicNoticeIdQueryHandler).Assembly);
         
-        services.AddCQRSHandlers(typeof(UploadPublicNoticeFilesCommandHandler).Assembly);
+        services.AddCQRSHandlers(typeof(UploadExamFilesCommandHandler).Assembly);
         services.AddCQRSHandlers(typeof(UploadQuestionImagesCommandHandler).Assembly);
+        services.AddCQRSHandlers(typeof(UnifyPublicNoticeCommandHandler).Assembly);
         services.AddCQRSHandlers(typeof(UpdateQuestionCommandHandler).Assembly);
         services.AddCQRSHandlers(typeof(UpdatePublicNoticeCommandHandler).Assembly);
         services.AddCQRSHandlers(typeof(UpdateQuestionSupportCommandHandler).Assembly);
+        services.AddCQRSHandlers(typeof(UpdateExamCommandHandler).Assembly);
         services.AddCQRSHandlers(typeof(CreatePublicNoticeCommandHandler).Assembly);
         services.AddCQRSHandlers(typeof(CreateQuestionSupportCommandHandler).Assembly);
         services.AddCQRSHandlers(typeof(DeleteQuestionCommandHandler).Assembly);

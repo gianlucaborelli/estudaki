@@ -7,35 +7,36 @@ using FluentValidation.Results;
 
 namespace Estudaki.Modules.Questions.Application.Commands
 {
-    public class UploadPublicNoticeFilesCommandHandler : CommandHandler, ICommandHandler<UploadPublicNoticeFilesCommand, ValidationResult>
+    public class UploadExamFilesCommandHandler : CommandHandler, ICommandHandler<UploadExamFilesCommand, ValidationResult>
     {
-        private readonly IValidator<UploadPublicNoticeFilesCommand> _validator;
+        private readonly IValidator<UploadExamFilesCommand> _validator;
         private readonly IPublicNoticeRepository _publicNoticeRepository;
+        private readonly IQuestionRepository _questionRepository;
         private readonly IStorageService _storageService;
 
-        public UploadPublicNoticeFilesCommandHandler(IValidator<UploadPublicNoticeFilesCommand> validator, 
+        public UploadExamFilesCommandHandler(IValidator<UploadExamFilesCommand> validator, 
             IPublicNoticeRepository publicNoticeRepository, 
+            IQuestionRepository questionRepository,
             IStorageService storageService) : base() 
         {
             _validator = validator;
             _publicNoticeRepository = publicNoticeRepository;
+            _questionRepository = questionRepository;
             _storageService = storageService;
         }
 
-        public async Task<ValidationResult> HandleAsync(UploadPublicNoticeFilesCommand command, CancellationToken cancellationToken = default)
+        public async Task<ValidationResult> HandleAsync(UploadExamFilesCommand command, CancellationToken cancellationToken = default)
         {
             var validationResult = await _validator.ValidateAsync(command, cancellationToken);
-            if (!validationResult.IsValid)
-            {
-                return validationResult;
-            }
+            if (!validationResult.IsValid) return validationResult;
 
             var publicNotice = await _publicNoticeRepository.GetById(command.publicNoticeId);
             var exam = publicNotice?.Exams.FirstOrDefault(e => e.Id == command.examId);
 
             if (publicNotice == null)
             {
-                validationResult.Errors.Add(new ValidationFailure(nameof(command.publicNoticeId), "Public notice not found."));
+                validationResult.Errors
+                    .Add(new ValidationFailure(nameof(command.publicNoticeId), "Public notice not found."));
                 return validationResult;
             }            
 
@@ -56,6 +57,18 @@ namespace Estudaki.Modules.Questions.Application.Commands
             }
 
             await _publicNoticeRepository.Update(publicNotice);
+
+            var questions = await _questionRepository.GetByExamId(command.examId);
+
+            foreach (var question in questions)
+            {
+                var questionExam = question.Exams.FirstOrDefault(e => e.ExamId == command.examId);
+                
+                questionExam!.ExamBookletUrl = examFile;
+                questionExam!.AnswerKeyUrl = answerKeyFile;
+
+                await _questionRepository.Update(question);
+            }
 
             return validationResult;
         }

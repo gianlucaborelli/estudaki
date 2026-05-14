@@ -9,13 +9,16 @@ namespace Estudaki.Modules.Questions.Application.Queries.SearchQuestions;
 public class SearchQuestionsPaginatedQueryHandler : IQueryHandler<SearchQuestionsPaginatedQuery, PagedResult<QuestionDto>>
 {
     private readonly IQuestionRepository _questionRepository;
+    private readonly IPublicNoticeRepository _publicNoticeRepository;
     private readonly IQuestionSupportRepository _questionSupportRepository;
 
     public SearchQuestionsPaginatedQueryHandler(
         IQuestionRepository questionRepository,
+        IPublicNoticeRepository publicNoticeRepository,
         IQuestionSupportRepository questionSupportRepository)
     {
         _questionRepository = questionRepository;
+        _publicNoticeRepository = publicNoticeRepository;
         _questionSupportRepository = questionSupportRepository;
     }
 
@@ -41,24 +44,33 @@ public class SearchQuestionsPaginatedQueryHandler : IQueryHandler<SearchQuestion
             .Distinct()
             .ToList();
 
+        var allPublicNotice = questions
+            .Where(q => q.Exams != null && q.Exams.Any())
+            .SelectMany(q => q.Exams)
+            .Select(e => e.PublicNoticeId)
+            .Distinct()
+            .ToList();
+
+        var publicNoticeSupports = allPublicNotice.Any()
+            ? await _publicNoticeRepository.GetByIds(allPublicNotice)
+            : [];
+
         var questionSupports = allQuestionSupportIds.Any()
             ? await _questionSupportRepository.GetByIds(allQuestionSupportIds)
             : [];
 
-        // Converter para DTO usando dados desnormalizados
         var dtos = questions.SelectMany(question =>
         {
-            // Para cada questão, criar um DTO para cada exame associado
-            // (ou apenas o primeiro se preferir mostrar uma única vez)
             var firstExam = question.Exams.FirstOrDefault();
+            
             if (firstExam == null)
-            {
                 return Enumerable.Empty<QuestionDto>();
-            }
+
+            var publicNoticeSupport = publicNoticeSupports.FirstOrDefault(p => p.Id == firstExam.PublicNoticeId);
 
             return new[]
             {
-                question.ToDto(firstExam, questionSupports)
+                question.ToDto(publicNoticeSupport, firstExam, questionSupports)
             };
         })
         .Where(dto => dto != null)

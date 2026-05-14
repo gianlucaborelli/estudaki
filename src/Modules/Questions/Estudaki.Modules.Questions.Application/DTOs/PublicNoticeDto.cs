@@ -26,7 +26,7 @@ public class PublicNoticeDto
             Number = original.Number,
             Year = original.Year,
             ExaminerOrganization = original.ExaminerOrganization,
-            ContractingOrganization = original.
+            ContractingOrganization = original.ContractingOrganization,
             ExamCategory = original.ExamCategory,
             IsReviewed = original.IsReviewed,
             IsPublished = original.IsPublished,

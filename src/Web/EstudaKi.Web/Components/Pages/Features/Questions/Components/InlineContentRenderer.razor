@@ -11,7 +11,7 @@
     .preserve-linebreaks {
         white-space: pre-line;
     }
- </style>
+</style>
 
 @* Renderiza o conteúdo inline (TextInline, ImageInline, MathInline, ChemicalFormulaInline) *@
 @if (Inline is TextInline textInline)
@@ -51,8 +51,6 @@ else
 @code {
     [Parameter]
     public InlineContent? Inline { get; set; }
-
-    
 
     private string mathElementId = string.Empty;
     private string chemicalElementId = string.Empty;

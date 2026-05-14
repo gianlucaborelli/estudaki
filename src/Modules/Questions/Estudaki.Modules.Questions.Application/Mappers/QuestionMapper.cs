@@ -35,7 +35,7 @@ public static class QuestionMapper
             QuestionId = question.Id,
             PublicNoticeId = exam.PublicNoticeId,
             ExamId = exam.ExamId,
-            PublicNoticeNumber = null, // TODO: Adicionar em QuestionExam se necessário
+            PublicNoticeNumber = null,
             Year = exam.Year,
             ExaminerOrganization = exam.ExaminerOrganization,
             ContractingOrganization = exam.ContractingOrganization,
@@ -44,7 +44,58 @@ public static class QuestionMapper
             Positions = allPositions,
             Area = exam.Area ?? string.Empty,
             EducationLevel = exam.EducationLevel ?? string.Empty,
-            PublicNoticeFileUrl = string.Empty, // TODO: Adicionar em QuestionExam se necessário
+            PublicNoticeFileUrl = string.Empty, 
+            ExamBookletUrl = exam.ExamBookletUrl ?? string.Empty,
+            AnswerKeyUrl = exam.AnswerKeyUrl ?? string.Empty,
+            IsNullified = question.IsNullified,
+            QuestionNumber = exam.QuestionNumber,
+            QuestionType = question.Type,
+            MainArea = question.MainArea,
+            SubAreas = question.SubAreas,
+            QuestionContents = question.QuestionContents,
+            QuestionSupports = questionSupports?
+                    .Where(qs => question.QuestionSupports.Contains(qs.Id))
+                    .Select(qs => qs.ToDto())
+                    .ToList() ?? [],
+            Choices = question.Choices,
+            CreatedAt = question.CreatedAt
+        };
+    }
+
+    public static QuestionDto ToDto(
+        this Question question,
+        PublicNotice? publicNotice = null,
+        QuestionExam? questionExam = null,
+        List<QuestionSupport>? questionSupports = null)
+    {
+        var exam = questionExam ?? question.Exams.FirstOrDefault();
+
+        if (exam == null)
+        {
+            throw new InvalidOperationException($"Questão {question.Id} não possui exames associados.");
+        }
+
+        var allPositions = question.Exams
+            .Where(qe => !string.IsNullOrWhiteSpace(qe.Position))
+            .Select(qe => qe.Position!)
+            .Distinct()
+            .ToList();
+
+        return new QuestionDto
+        {
+            QuestionId = question.Id,
+            PublicNoticeId = exam.PublicNoticeId,
+            ExamId = exam.ExamId,
+            PublicNoticeNumber = publicNotice?.Number ?? null,
+            Year = exam.Year,
+            ExaminerOrganization = exam.ExaminerOrganization,
+            ContractingOrganization = exam.ContractingOrganization,
+            ExamCategory = exam.ExamCategory,
+            Phase = exam.Phase ?? string.Empty,
+            Positions = allPositions,
+            Area = exam.Area ?? string.Empty,
+            EducationLevel = exam.EducationLevel ?? string.Empty,
+            PublicNoticeFileUrl = publicNotice?.FileUrl ?? string.Empty,
             ExamBookletUrl = exam.ExamBookletUrl ?? string.Empty,
             AnswerKeyUrl = exam.AnswerKeyUrl ?? string.Empty,
             IsNullified = question.IsNullified,

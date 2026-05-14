@@ -30,21 +30,7 @@
 else
 {
     <CascadingValue Value="PublicNotice" Name="PublicNotice">
-    <MudPaper Elevation="25">
-        <MudToolBar Dense="true">            
-            <MudTooltip Text="Editar Prova" Arrow="true" Placement="Placement.Top">
-                <MudIconButton Icon="@Icons.Material.Filled.Edit" OnClick="() => OpenEditPublicNoticeDialogAsync()"/>
-            </MudTooltip>
-            <MudTooltip Text="Adicionar Imagens" Arrow="true" Placement="Placement.Top">
-                <MudIconButton Icon="@Icons.Material.Filled.AddPhotoAlternate" OnClick="() => OpenUploadImagesDialogAsync()" />
-            </MudTooltip>
-            <MudTooltip Text="Anexar Arquivos" Arrow="true" Placement="Placement.Top">
-                <MudIconButton Icon="@Icons.Material.Filled.AttachFile" OnClick="() => OpenUploadFileDialogAsync()" />
-            </MudTooltip>
-        </MudToolBar>
-    </MudPaper>
-
-
+    
 
     @* Public Notice Details *@
     <MudPaper Class="pa-6 my-2" Elevation="2">
@@ -54,6 +40,17 @@ else
     }
     else
     {
+        <MudToolBar Dense="true" Class="px-0">
+            <MudTooltip Text="Editar Prova" Arrow="true" Placement="Placement.Top" >
+                <MudIconButton Size="Size.Small" Icon="@Icons.Material.Filled.Edit" OnClick="() => OpenEditPublicNoticeDialogAsync()" />
+            </MudTooltip>
+            <MudTooltip Text="Adicionar Imagens" Arrow="true" Placement="Placement.Top">
+                <MudIconButton Size="Size.Small" Icon="@Icons.Material.Filled.AddPhotoAlternate" OnClick="() => OpenUploadImagesDialogAsync()" />
+            </MudTooltip>
+            <MudTooltip Text="Anexar Edital" Arrow="true" Placement="Placement.Top">
+                <MudIconButton Size="Size.Small" Icon="@Icons.Material.Filled.AttachFile" OnClick="() => { }" />
+            </MudTooltip>
+        </MudToolBar>
         <MudStack>
             <MudStack Row="true" AlignItems="AlignItems.Center">
                 <MudText Typo="Typo.h5" Class="fw-bold">
@@ -77,8 +74,13 @@ else
                 </MudItem>
 
                 <MudItem xs="12" sm="4">
+                    <MudText Typo="Typo.subtitle2">Contratante</MudText>
+                    <MudText>@(PublicNotice.ContractingOrganization ?? "Não definido")</MudText>
+                </MudItem>
+
+                <MudItem xs="12" sm="4">
                     <MudText Typo="Typo.subtitle2">Categoria</MudText>
-                            <MudText>@(PublicNotice.ExamCategory ?? "Não definido")</MudText>
+                    <MudText>@(ExamCategories.GetDisplayName(PublicNotice.ExamCategory!) ?? "Não definido")</MudText>
                 </MudItem>                
             </MudGrid>
 
@@ -86,13 +88,13 @@ else
 
             <MudStack Row="true" AlignItems="AlignItems.Center">
                 <MudSelect @bind-Value="SelectedExam"
-                            Variant="Variant.Filled"
+                            Variant="Variant.Outlined"
                             Label="Exames"
                             onchange="() => LoadContent()"
                             Style="width: auto; min-width: 200px;">
                     @foreach (var exam in PublicNotice.Exams)
                     {
-                        <MudSelectItem Value="exam">@exam.Phase - @exam.Area - @exam.Position - @exam.EducationLevel</MudSelectItem>
+                                <MudSelectItem Value="exam">@exam.Phase - @EducationLevels.GetDisplayName(exam.EducationLevel) - @exam.Position - @exam.Area </MudSelectItem>
                     }
                 </MudSelect>                
             </MudStack>
@@ -101,10 +103,18 @@ else
     </MudPaper>
 
     @* Exam Details *@
-
     <MudPaper Class="pa-6 my-2" Elevation="2">
     @if (SelectedExam != null)        
-    {
+    {        
+        <MudToolBar Dense="true" Class="px-0">
+            <MudTooltip Text="Editar Exame" Arrow="true" Placement="Placement.Top">
+                <MudIconButton Size="Size.Small" Icon="@Icons.Material.Filled.Edit" OnClick="() => OpenEditExamDialogAsync()" />
+            </MudTooltip>
+            <MudTooltip Text="Anexar Arquivos" Arrow="true" Placement="Placement.Top">
+                <MudIconButton Size="Size.Small" Icon="@Icons.Material.Filled.AttachFile" OnClick="() => OpenUploadFileDialogAsync()" />
+            </MudTooltip>
+        </MudToolBar>
+        
         <MudStack>
             <MudStack Row="true" AlignItems="AlignItems.Center">
                 <MudText Typo="Typo.h5" Class="fw-bold">
@@ -114,11 +124,8 @@ else
                 <MudSpacer />
 
                 <MudChip T="string" Color="Color.Primary" Variant="Variant.Filled">
-                    Nº @PublicNotice.Number
-                </MudChip>
-                <MudChip T="string" Color="Color.Secondary" Variant="Variant.Outlined">
-                    @((PublicNotice.Year > 0) ? PublicNotice.Year.ToString() : "Ano não definido")
-                </MudChip>
+                    Ensino @EducationLevels.GetDisplayName(SelectedExam.EducationLevel)
+                </MudChip>               
             </MudStack>
 
             <MudGrid>

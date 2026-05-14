@@ -14,14 +14,11 @@
                     <MudTextField @bind-Value="EditedPublicNotice.Year" Label="Ano"/>
                 </MudItem>
                 <MudItem xs="12" md="6">
-                    @* <MudTextField @bind-Value="EditedPublicNotice.ExamPhase" Label="Fase"/> *@
+                    <MudTextField @bind-Value="EditedPublicNotice.ContractingOrganization" Label="Organização Contratante"/>
                 </MudItem>
                 <MudItem xs="12" md="6">
                     <MudTextField @bind-Value="EditedPublicNotice.ExaminerOrganization" Label="Banca Examinadora"/>
-                </MudItem>
-                <MudItem xs="12" md="6">
-                    @* <MudTextField @bind-Value="EditedPublicNotice.Position" Label="Cargo/Função" /> *@
-                </MudItem>
+                </MudItem>                
                 <MudItem xs="12" md="6">
                     <MudSelect @bind-Value="EditedPublicNotice.ExamCategory" Label="Categoria do Exame" >
                     @foreach (var category in ExamCategories.All)
@@ -31,9 +28,7 @@
                 </MudSelect>
                 </MudItem>
                 <MudItem xs="12">
-                    <MudGrid Class="py-5">
-                        @* <MudCheckBox @bind-Value="EditedPublicNotice.HasAttachments" Label="Possui Anexos" /> *@
-                        <MudSpacer />
+                    <MudGrid Class="py-5">                                                
                         <MudCheckBox @bind-Value="EditedPublicNotice.IsPublished" Label="Publicado" />
                         <MudSpacer />
                         <MudCheckBox @bind-Value="EditedPublicNotice.IsReviewed" Label="Revisado" />
@@ -44,6 +39,6 @@
     </DialogContent>
     <DialogActions>
         <MudButton OnClick="Dialog.Cancel" Disabled="@IsUploading">Cancelar</MudButton>
-        <MudButton Color="Color.Primary" Disabled="@IsUploading">Salvar</MudButton>
+        <MudButton Color="Color.Primary" Disabled="@IsUploading" OnClick="SavePublicNotice">Salvar</MudButton>
     </DialogActions>
 </MudDialog>

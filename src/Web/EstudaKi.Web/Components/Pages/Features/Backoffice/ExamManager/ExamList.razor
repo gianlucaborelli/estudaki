@@ -1,5 +1,6 @@
 ﻿@page "/Backoffice/ExamManager"
 @using Estudaki.Modules.Questions.Application.DTOs
+@using Estudaki.Modules.Questions.Domain.ValueObjects
 
 @inherits ExamListBase
 @attribute [Authorize(Roles = "Admin,Backoffice")]
@@ -8,9 +9,15 @@
 
 <MudToolBar>    
     <MudSpacer />
-    @if (SelectedItems.Count > 0)
+    @if (SelectedItems.Count > 0)    
     {
         <MudText Typo="Typo.subtitle1" Align="Align.Center">@SelectedItems.Count item(s) selecionado(s)</MudText>
+        @if (SelectedItems.Count > 1)
+        {
+            <MudTooltip Text="Unificar Provas" Arrow="true" Placement="Placement.Top">
+                <MudIconButton OnClick="UnifyPublicNoticeAsync" Icon="@Icons.Material.Filled.FileCopy" /> @* Unificar provas *@
+            </MudTooltip>
+        }
         <MudTooltip Text="Publicar" Arrow="true" Placement="Placement.Top">
             <MudIconButton Icon="@Icons.Material.Filled.Publish" /> @* Publica *@
         </MudTooltip>
@@ -34,9 +41,11 @@
     Loading="@IsLoading" 
     LoadingProgressColor="Color.Info">
     <HeaderContent>
+        <MudTh>Banca</MudTh>
+        <MudTh>Contratante</MudTh>
+        <MudTh>Ano</MudTh>
         <MudTh>Nr</MudTh>
         <MudTh>Categoria</MudTh>
-        <MudTh>Banca</MudTh>
         <MudTh>Qt Exames</MudTh>
         <MudTh>Qt Questões</MudTh>
         <MudTh>Publicado</MudTh>
@@ -45,9 +54,11 @@
         <MudTh>Ações</MudTh>
     </HeaderContent>
     <RowTemplate>
-        <MudTd DataLabel="Nr">@context.Number</MudTd>
-        <MudTd DataLabel="Categoria">@context.ExamCategory</MudTd>
         <MudTd DataLabel="Banca">@context.ExaminerOrganization</MudTd>
+        <MudTd DataLabel="Contratante">@context.ContractingOrganization</MudTd>
+        <MudTd DataLabel="Ano">@context.Year</MudTd>
+        <MudTd DataLabel="Nr">@context.Number</MudTd>
+        <MudTd DataLabel="Categoria">@ExamCategories.GetDisplayName(context.ExamCategory!)</MudTd>
         <MudTd DataLabel="Qt Exames">@context.Exams.Count</MudTd>
         <MudTd DataLabel="Qt Questões">@context.QuestionCount</MudTd>
         <MudTd DataLabel="Publicado">

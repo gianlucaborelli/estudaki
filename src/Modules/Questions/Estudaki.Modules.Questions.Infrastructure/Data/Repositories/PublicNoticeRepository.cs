@@ -31,4 +31,10 @@ public class PublicNoticeRepository : BaseRepository<PublicNotice>, IPublicNotic
         var filter = Builders<PublicNotice>.Filter.ElemMatch(p => p.Exams, e => e.Id == examId);
         return await DbSet.Find(filter).FirstOrDefaultAsync();
     }
+
+    public Task<PublicNotice> GetByExamId(string examId)
+    {
+        var filter = Builders<PublicNotice>.Filter.ElemMatch(p => p.Exams, e => e.Id == examId);
+        return DbSet.Find(filter).FirstOrDefaultAsync();
+    }
 }
