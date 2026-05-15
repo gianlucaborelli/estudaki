@@ -9,7 +9,7 @@ public class MongoContext : IMongoContext
 
     public MongoContext(IMongoClient client)
     {
-        var databaseName = "teste";
+        var databaseName = "ProvaOnlineV2";
         _database = client.GetDatabase(databaseName);
     }
 
