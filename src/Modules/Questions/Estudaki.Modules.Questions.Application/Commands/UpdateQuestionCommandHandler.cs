@@ -30,13 +30,22 @@ public class UpdateQuestionCommandHandler : CommandHandler, ICommandHandler<Upda
             return ValidationResult;
         }
 
+        var exam = question.Exams.FirstOrDefault(e => e.ExamId == command.Question.ExamId);
+        if (exam == null) 
+        {
+            ValidationResult.Errors.Add(new ValidationFailure("ExamId", "Exam not found for the question."));
+            return ValidationResult;
+        }
+
         question.Type = command.Question.QuestionType;
         question.MainArea = command.Question.MainArea;
         question.SubAreas = command.Question.SubAreas;
         question.QuestionSupports = command.Question.QuestionSupports.Select(s => s.Id).ToList();  
         question.QuestionContents = command.Question.QuestionContents;
-        question.Choices = command.Question.Choices;
+        question.Choices = command.Question.Choices;        
 
+        exam.QuestionNumber = command.Question.QuestionNumber;
+        
         await _questionRepository.Update(question);
 
         return ValidationResult;
