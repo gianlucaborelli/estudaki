@@ -104,6 +104,7 @@ public class UnifyPublicNoticeCommandHandler : CommandHandler, ICommandHandler<U
 
             foreach (var exam in questionExam!)
             {
+                exam.PublicNoticeId = publicNoticeToUnify.Id;
                 exam.Year = publicNoticeToUnify.Year;
                 exam.ExamCategory = publicNoticeToUnify.ExamCategory;
                 exam.ExaminerOrganization = publicNoticeToUnify.ExaminerOrganization;

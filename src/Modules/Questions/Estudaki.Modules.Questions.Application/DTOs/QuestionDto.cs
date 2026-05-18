@@ -94,4 +94,85 @@ public class QuestionDto
             CreatedAt = original.CreatedAt
         };
     }
+
+    /// <summary>
+    /// Retorna um preview/resumo da questão para exibição em listas ou cards.
+    /// Extrai os primeiros caracteres do conteúdo da questão.
+    /// </summary>
+    /// <param name="maxLength">Tamanho máximo do preview (padrão: 200 caracteres)</param>
+    /// <returns>Texto resumido do conteúdo da questão</returns>
+    public string GetQuestionPreview(int maxLength = 200)
+    {
+        if (!QuestionContents.Any()) return "Questão sem conteúdo disponível.";
+
+        var previewTexts = new List<string>();
+        var currentLength = 0;
+
+        foreach (var block in QuestionContents.OrderBy(c => c.Order))
+        {
+            if (currentLength >= maxLength) break;
+
+            if (block is ParagraphBlock paragraph)
+            {
+                // Adicionar título se existir
+                if (!string.IsNullOrWhiteSpace(paragraph.Title) && currentLength < maxLength)
+                {
+                    var titleLength = Math.Min(paragraph.Title.Length, maxLength - currentLength);
+                    previewTexts.Add(paragraph.Title.Substring(0, titleLength));
+                    currentLength += titleLength;
+
+                    if (currentLength < maxLength)
+                    {
+                        previewTexts.Add(" ");
+                        currentLength++;
+                    }
+                }
+
+                // Processar inlines
+                foreach (var inline in paragraph.Inlines)
+                {
+                    if (currentLength >= maxLength) break;
+
+                    if (inline is TextInline textInline && !string.IsNullOrWhiteSpace(textInline.Text))
+                    {
+                        var remainingLength = maxLength - currentLength;
+                        var textToAdd = textInline.Text.Length <= remainingLength
+                            ? textInline.Text
+                            : textInline.Text.Substring(0, remainingLength) + "...";
+
+                        previewTexts.Add(textToAdd);
+                        currentLength += textToAdd.Length;
+                    }
+                    else if (inline is ImageInline imageInline)
+                    {
+                        var imageText = $"[Imagem]";
+                        if (currentLength + imageText.Length <= maxLength)
+                        {
+                            previewTexts.Add(imageText);
+                            currentLength += imageText.Length;
+                        }
+                    }
+                }
+            }
+            else if (block is ImageBlock imageBlock)
+            {
+                var imageText = $"[Imagem]";
+                if (currentLength + imageText.Length <= maxLength)
+                {
+                    previewTexts.Add(imageText);
+                    currentLength += imageText.Length;
+                }
+            }
+        }
+
+        var preview = string.Join(" ", previewTexts).Trim();
+
+        // Remover múltiplos espaços
+        while (preview.Contains("  "))
+        {
+            preview = preview.Replace("  ", " ");
+        }
+
+        return string.IsNullOrWhiteSpace(preview) ? "Questão sem texto disponível." : preview;
+    }
 }

@@ -113,6 +113,9 @@ else
             <MudTooltip Text="Anexar Arquivos" Arrow="true" Placement="Placement.Top">
                 <MudIconButton Size="Size.Small" Icon="@Icons.Material.Filled.AttachFile" OnClick="() => OpenUploadFileDialogAsync()" />
             </MudTooltip>
+            <MudTooltip Text="Unificar Questões" Arrow="true" Placement="Placement.Top">
+                <MudIconButton Size="Size.Small" Icon="@Icons.Material.Filled.MergeType" OnClick="() => OpenQuestionUnifyDialogAsync()" />
+            </MudTooltip>
         </MudToolBar>
         
         <MudStack>
@@ -186,30 +189,6 @@ else
         </MudStack>
     }
     </MudPaper>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 

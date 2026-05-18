@@ -170,4 +170,16 @@ public class QuestionRepository : BaseRepository<Question>, IQuestionRepository
 
         return questions;
     }
+
+    public async Task<List<Question>> GetManyById(List<string> questionIds)
+    {
+        var filterBuilder = Builders<Question>.Filter;
+        var filter = filterBuilder.In(q => q.Id, questionIds);
+
+        var questions = await DbSet
+            .Find(filter)
+            .ToListAsync();
+
+        return questions;
+    }
 }

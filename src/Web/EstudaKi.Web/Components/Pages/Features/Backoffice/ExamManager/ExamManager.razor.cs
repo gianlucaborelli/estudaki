@@ -300,6 +300,22 @@ namespace EstudaKi.Web.Components.Pages.Features.Backoffice.ExamManager
             return;
         }
 
+        protected async Task OpenQuestionUnifyDialogAsync()
+        {
+            var parameters = new DialogParameters<QuestionUnifyModal>
+            {
+                { x => x.PublicNoticeId, PublicNotice.Id }
+            };
+            var options = new DialogOptions { CloseButton = true, MaxWidth = MaxWidth.Large, FullWidth = true };
+            var dialog = await Dialog.ShowAsync<QuestionUnifyModal>("Editar Suporte de Questão", parameters, options);
+            var result = await dialog.Result;
+            if (result is not null && !result.Canceled)
+            {
+                await LoadContent();
+            }
+            return;
+        }
+
         protected void QuestionsRowClickEvent(TableRowClickEventArgs<QuestionDto> tableRowClickEventArgs)
         {
             SelectedQuestion = tableRowClickEventArgs.Item;

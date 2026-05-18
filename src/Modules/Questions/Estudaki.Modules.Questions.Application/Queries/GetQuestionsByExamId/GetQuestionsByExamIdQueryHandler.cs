@@ -16,7 +16,6 @@ public class GetQuestionsByExamIdQueryHandler(
 
     public async Task<List<QuestionDto>> HandleAsync(GetQuestionsByExamIdQuery query, CancellationToken cancellationToken = default)
     {
-        // Buscar questões que contém este examId
         var questions = await _questionRepository.GetByExamId(query.ExamId);
 
         var publicNotice = await _publicNoticeRepository.GetPublicNoticeByExamId(query.ExamId);
@@ -26,7 +25,6 @@ public class GetQuestionsByExamIdQueryHandler(
 
         foreach (var question in questions) 
         {
-            // Encontrar o QuestionExam correspondente a este examId
             var questionExam = question.Exams.FirstOrDefault(qe => qe.ExamId == query.ExamId);
             if (questionExam != null)
             {
