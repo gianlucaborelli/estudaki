@@ -316,6 +316,28 @@ namespace EstudaKi.Web.Components.Pages.Features.Backoffice.ExamManager
             return;
         }
 
+        protected async Task OpenAddExistingQuestionIntoExamModal()
+        {
+            if (SelectedExam == null)
+            {
+                Snackbar.Add("Selecione um exame para unificar as questões.", Severity.Warning);
+                return;
+            }
+            var parameters = new DialogParameters<AddExistingQuestionIntoExamModal>
+            {
+                { x => x.ExamId, SelectedExam?.Id },
+                { x => x.PublicNoticeId, PublicNotice.Id }
+            };
+            var options = new DialogOptions { CloseButton = true, MaxWidth = MaxWidth.Large, FullWidth = true };
+            var dialog = await Dialog.ShowAsync<AddExistingQuestionIntoExamModal>("Adicionar Questão Existente ao Exame", parameters, options);
+            var result = await dialog.Result;
+            if (result is not null && !result.Canceled)
+            {
+                await LoadContent();
+            }
+            return;
+        }
+
         protected void QuestionsRowClickEvent(TableRowClickEventArgs<QuestionDto> tableRowClickEventArgs)
         {
             SelectedQuestion = tableRowClickEventArgs.Item;

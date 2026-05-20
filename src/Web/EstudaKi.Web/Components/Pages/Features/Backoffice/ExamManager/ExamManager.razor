@@ -112,7 +112,7 @@ else
             </MudTooltip>
             <MudTooltip Text="Anexar Arquivos" Arrow="true" Placement="Placement.Top">
                 <MudIconButton Size="Size.Small" Icon="@Icons.Material.Filled.AttachFile" OnClick="() => OpenUploadFileDialogAsync()" />
-            </MudTooltip>
+            </MudTooltip>            
             <MudTooltip Text="Unificar Questões" Arrow="true" Placement="Placement.Top">
                 <MudIconButton Size="Size.Small" Icon="@Icons.Material.Filled.MergeType" OnClick="() => OpenQuestionUnifyDialogAsync()" />
             </MudTooltip>
@@ -230,7 +230,19 @@ else
 
                 <!-- Ocupa 3/4 -->
                 <MudItem xs="12" md="9">
-                    <MudToolBar Dense="true">                        
+                    <MudToolBar Dense="true">         
+                        <MudTooltip Text="Adicionar Questão Existente ao Exame" Arrow="true" Placement="Placement.Top">
+                            <MudButtonGroup Variant="Variant.Outlined">
+                                <MudButton StartIcon="@Icons.Material.Filled.Add" Variant="Variant.Outlined"
+                                            OnClick="() => OpenAddExistingQuestionIntoExamModal()">
+                                    Adicionar
+                                </MudButton>
+                                <MudMenu Icon="@Icons.Material.Filled.ArrowDropDown" Dense="true" Style="align-self: auto;">
+                                    <MudMenuItem OnClick="() => OpenAddExistingQuestionIntoExamModal()">Adicionar questão existente</MudMenuItem>
+                                    <MudMenuItem OnClick="() => { }">Criar nova questão</MudMenuItem>
+                                </MudMenu>
+                            </MudButtonGroup>
+                        </MudTooltip>
                         <MudTooltip Text="Editar Questão" Arrow="true" Placement="Placement.Top">
                             <MudIconButton Icon="@Icons.Material.Filled.Edit" Disabled="@(SelectedQuestion == null)" OnClick="() => OpenQuestionEditorModalAsync()" />
                         </MudTooltip>
