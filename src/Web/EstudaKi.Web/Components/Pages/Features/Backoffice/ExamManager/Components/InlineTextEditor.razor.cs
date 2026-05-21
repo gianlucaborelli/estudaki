@@ -1,11 +1,11 @@
 ﻿using Estudaki.Modules.Questions.Domain.ValueObjects;
 using Microsoft.AspNetCore.Components;
-using Microsoft.AspNetCore.Components.Web;
 using Microsoft.JSInterop;
+
 
 namespace EstudaKi.Web.Components.Pages.Features.Backoffice.ExamManager.Components;
 
-public class InlineTextEditorBase : ComponentBase
+public class InlineTextEditorBase : ComponentBase, IDisposable
 {
     [Inject]
     protected ILogger<InlineTextEditorBase> Logger { get; set; } = default!;
@@ -16,123 +16,80 @@ public class InlineTextEditorBase : ComponentBase
     [Parameter]
     public TextInline Value { get; set; } = new TextInline();
 
+    private DotNetObjectReference<InlineTextEditorBase>? dotNetRef;
+
     protected string editorId = $"text-editor-{Guid.NewGuid()}";
-    protected bool showFormattingMenu = false;
-    protected double menuX = 0;
-    protected double menuY = 0;
+
     protected string selectedText = string.Empty;
     protected int selectionStart = 0;
     protected int selectionEnd = 0;
+    protected bool hasSelection = false;
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
         if (firstRender)
         {
-            await JSRuntime.InvokeVoidAsync("eval", @"
-                window.getTextSelection = function(editorId) {
-                    // Buscar o container com o ID
-                    const container = document.getElementById(editorId);
-                    if (!container) {
-                        return { text: '', start: 0, end: 0 };
-                    }
-
-                    let textarea = container.querySelector('textarea');
-                    if (!textarea) {
-                        textarea = container.querySelector('input[type=""text""]');
-                    }
-                    if (!textarea) {
-                        textarea = container.querySelector('input');
-                    }
-                    // Tentar buscar em profundidade (MudTextField pode ter wrappers)
-                    if (!textarea) {
-                        textarea = container.querySelector('.mud-input-slot textarea');
-                    }
-                    if (!textarea) {
-                        textarea = container.querySelector('.mud-input-slot input');
-                    }
-
-                    if (!textarea) {
-                        console.error('Textarea/Input não encontrado. Estrutura do container:', container);
-                        return { text: '', start: 0, end: 0 };
-                    }
-
-                    const start = textarea.selectionStart || 0;
-                    const end = textarea.selectionEnd || 0;
-                    const text = textarea.value.substring(start, end);
-
-                    console.log('Seleção capturada:', text, 'Start:', start, 'End:', end);
-
-                    return {
-                        text: text,
-                        start: start,
-                        end: end
-                    };
-                }
-            ");
+            dotNetRef = DotNetObjectReference.Create(this);
+            await JSRuntime.InvokeVoidAsync("textSelectionTracker.register", editorId, dotNetRef);
         }
     }
 
-    protected async Task OnTextSelected(MouseEventArgs e)
+    [JSInvokable]
+    public void OnSelectionChanged(TextSelection selection)
     {
-        try
-        {
-            var selection = await JSRuntime.InvokeAsync<TextSelection>("getTextSelection", editorId);
+        selectedText = selection.Text;
+        selectionStart = selection.Start;
+        selectionEnd = selection.End;
+        hasSelection = selection.HasSelection;
 
-            if (!string.IsNullOrEmpty(selection.Text))
-            {
-                // Captura a posição do mouse
-                menuX = e.ClientX;
-                menuY = e.ClientY;
-
-                selectedText = selection.Text;
-                selectionStart = selection.Start;
-                selectionEnd = selection.End;
-                showFormattingMenu = true;
-                StateHasChanged();
-
-                Logger.LogDebug("Menu aberto na posição ({X}, {Y}) para seleção: '{Text}'", menuX, menuY, selectedText);
-            }
-            else
-            {
-                // Sem seleção - fechar menu
-                showFormattingMenu = false;
-                StateHasChanged();
-                Logger.LogDebug("Nenhuma seleção detectada - menu fechado");
-            }
-        }
-        catch (Exception ex)
-        {
-            Logger.LogError(ex, "Erro ao obter seleção de texto");
-        }
+        StateHasChanged();
     }
 
     protected void ApplyFormatting(string tag)
     {
-        if (string.IsNullOrEmpty(selectedText) || selectionStart == selectionEnd)
+        var (openTag, closeTag) = GetFormattingTags(tag);
+
+        if (string.IsNullOrEmpty(openTag))
             return;
 
         var beforeSelection = Value.Text.Substring(0, selectionStart);
         var afterSelection = Value.Text.Substring(selectionEnd);
 
-        var formattedText = tag switch
+        if (hasSelection)
         {
-            "bold" => $"<strong>{selectedText}</strong>",
-            "italic" => $"<em>{selectedText}</em>",
-            "underline" => $"<u>{selectedText}</u>",
-            _ => selectedText
-        };
+            Value.Text = $"{beforeSelection}{openTag}{selectedText}{closeTag}{afterSelection}";
+            Logger.LogInformation($"Formatação '{tag}' aplicada à seleção: '{selectedText}'");
+        }
+        else
+        {
+            Value.Text = $"{beforeSelection}{openTag}{closeTag}{afterSelection}";
+            Logger.LogInformation($"Tags '{tag}' inseridas na posição do cursor: {selectionStart}");
+        }
 
-        Value.Text = beforeSelection + formattedText + afterSelection;
-        showFormattingMenu = false;
         StateHasChanged();
-
-        Logger.LogInformation("Formatação '{Tag}' aplicada ao texto selecionado", tag);
     }
 
-    protected void CloseMenu()
+    private (string openTag, string closeTag) GetFormattingTags(string tag)
     {
-        showFormattingMenu = false;
-        StateHasChanged();
+        return tag switch
+        {
+            "bold" => ("<strong>", "</strong>"),
+            "italic" => ("<em>", "</em>"),
+            "underline" => ("<u>", "</u>"),
+            "math" => ("<math>", "</math>"),
+            "chemical" => ("<chemical>", "</chemical>"),
+            "inline-image" => ("<inline-image>", "</inline-image>"),
+            _ => ("", "")
+        };
+    }
+
+    public void Dispose()
+    {
+        if (dotNetRef != null)
+        {
+            JSRuntime.InvokeVoidAsync("textSelectionTracker.unregister", editorId);
+            dotNetRef.Dispose();
+        }
     }
 
     public class TextSelection
@@ -140,5 +97,6 @@ public class InlineTextEditorBase : ComponentBase
         public string Text { get; set; } = string.Empty;
         public int Start { get; set; }
         public int End { get; set; }
+        public bool HasSelection { get; set; }
     }
 }

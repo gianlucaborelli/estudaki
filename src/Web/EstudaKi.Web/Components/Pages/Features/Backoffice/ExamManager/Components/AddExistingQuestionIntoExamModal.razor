@@ -20,7 +20,6 @@
     <DialogContent>
         <MudGrid>
             <MudItem xs="12" md="5">
-                <MudText Typo="Typo.h6">Questões Disponíveis</MudText>
                 <MudTable T="QuestionDto" Items="Questions"
                           @bind-SelectedItem="SelectedQuestion"       
                           RowClassFunc="@SelectedQuestionRowClassFunc"
