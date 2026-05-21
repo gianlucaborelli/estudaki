@@ -1,3 +1,4 @@
+@using EstudaKi.Web.Components.Pages.Features.Questions.Components
 @inherits InlineTextEditorBase
 
 <div id="@editorId" style="position: relative;">
@@ -56,7 +57,7 @@
     {
         <MudPaper Class="pa-3 mt-2" Outlined="true">
             <MudText Typo="Typo.caption" Color="Color.Secondary" Class="mb-2">Pré-visualização:</MudText>
-            <div>@((MarkupString)Value.Text)</div>
+            <InlineContentRenderer Inline="Value" />
         </MudPaper>
     }
 </div>

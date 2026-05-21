@@ -1,11 +1,7 @@
 @using Microsoft.JSInterop
 @using Estudaki.Modules.Questions.Domain.ValueObjects
-@using Estudaki.Modules.Questions.Application.DTOs
-@using Estudaki.Modules.Questions.Domain.Extensions
-@using Estudaki.Modules.Questions.Domain.Entities
-@using Estudaki.Commons.Core.Storage
+@using System.Text.RegularExpressions
 @inject IJSRuntime JSRuntime
-@inject IStorageService StorageService
 
 <style>
     .preserve-linebreaks {
@@ -13,34 +9,15 @@
     }
 </style>
 
-@* Renderiza o conteúdo inline (TextInline, ImageInline, MathInline, ChemicalFormulaInline) *@
+@* Renderiza o conteúdo inline processando tags especiais dentro do TextInline *@
 @if (Inline is TextInline textInline)
 {
-    <span class="preserve-linebreaks" style="@GetTextStyle(textInline)">@((MarkupString)textInline.Text)</span>    
-}
-else if (Inline is ImageInline imageInline)
-{
-    @if (!string.IsNullOrEmpty(imageInline.Key))
-    {
-        <img src="@imageInline.Key" 
-             alt="@imageInline.Alt" 
-             class="img-fluid rounded mx-1" 
-             style="max-height: 300px; display: inline-block; vertical-align: middle;" />
-    }
-    else
-    {
-        <span class="badge bg-secondary mx-1">
-            <i class="bi bi-image"></i> @imageInline.Key
-        </span>
-    }
-}
-else if (Inline is MathInline mathInline)
-{
-    <span class="math-inline-display" id="@mathElementId"></span>
-}
-else if (Inline is ChemicalFormulaInline chemicalInline)
-{
-    <span class="chemical-inline-display" id="@chemicalElementId"></span>
+    <span class="preserve-linebreaks">
+        @foreach (var part in ParseTextParts(textInline.Text))
+        {
+            @part
+        }
+    </span>    
 }
 else
 {
@@ -52,95 +29,97 @@ else
     [Parameter]
     public InlineContent? Inline { get; set; }
 
-    private string mathElementId = string.Empty;
-    private string chemicalElementId = string.Empty;
-    private bool isRendered = false;
+    private List<(string id, string content, string type)> specialTags = new();
 
-    protected override void OnInitialized()
+    private List<RenderFragment> ParseTextParts(string html)
     {
-        mathElementId = $"math-inline-{Guid.NewGuid()}";
-        chemicalElementId = $"chemical-inline-{Guid.NewGuid()}";
-    }
+        var parts = new List<RenderFragment>();
+        if (string.IsNullOrEmpty(html)) return parts;
 
-    protected override async Task OnAfterRenderAsync(bool firstRender)
-    {
-        if (firstRender)
+        specialTags.Clear();
+
+        var pattern = @"<(math|chemical)>([\s\S]*?)<\/\1>";
+        var matches = Regex.Matches(html, pattern, RegexOptions.IgnoreCase);
+
+        int lastIndex = 0;
+
+        foreach (Match match in matches)
         {
-            isRendered = true;
-
-            if (Inline is MathInline mathInline)
+            if (match.Index > lastIndex)
             {
-                // Aguardar um pouco para garantir que o DOM está pronto
-                await Task.Delay(100);
-                await RenderMath(mathInline.Latex);
+                var textBefore = html.Substring(lastIndex, match.Index - lastIndex);
+                parts.Add(CreateMarkupFragment(textBefore));
             }
-            else if (Inline is ChemicalFormulaInline chemicalInline)
+
+            var tagType = match.Groups[1].Value.ToLower();
+            var content = match.Groups[2].Value.Trim();
+            var id = $"{tagType}-inline-{Guid.NewGuid():N}";
+
+            specialTags.Add((id, content, tagType));
+
+            if (tagType == "math")
             {
-                // Por algum motivo, fórmulas químicas parecem precisar 
-                // de um pouco mais de tempo para renderizar corretamente
-                // Fica aparecendo um "X" junto com a fórmula, 
-                // Não consegui identificar o motivo, mas aumentar o delay resolveu
-                // Aguardar mais tempo para fórmulas químicas
-                await Task.Delay(150);
-                Console.WriteLine($"[InlineContentRenderer] Renderizando ChemicalInline: ID={chemicalElementId}, Formula={chemicalInline.Formula}");
-                await RenderChemical(chemicalInline.Formula);
+                parts.Add(CreateMathFragment(id, content));
             }
-        }
-    }
-
-    protected override async Task OnParametersSetAsync()
-    {
-        if (isRendered)
-        {
-            if (Inline is MathInline mathInline)
+            else if (tagType == "chemical")
             {
-                await RenderMath(mathInline.Latex);
+                parts.Add(CreateChemicalFragment(id, content));
             }
-            else if (Inline is ChemicalFormulaInline chemicalInline)
+
+            lastIndex = match.Index + match.Length;
+        }
+
+        if (lastIndex < html.Length)
+        {
+            var textAfter = html.Substring(lastIndex);
+            parts.Add(CreateMarkupFragment(textAfter));
+        }
+
+        return parts;
+    }
+
+    private RenderFragment CreateMarkupFragment(string html) => builder =>
+    {
+        builder.AddContent(0, (MarkupString)html);
+    };
+
+    private RenderFragment CreateMathFragment(string id, string latex) => builder =>
+    {
+        builder.OpenElement(0, "span");
+        builder.AddAttribute(1, "class", "math-inline-display");
+        builder.AddAttribute(2, "id", id);
+        builder.AddElementReferenceCapture(3, async elementRef =>
+        {
+            await Task.Delay(100);
+            try
             {
-                await RenderChemical(chemicalInline.Formula);
+                await JSRuntime.InvokeVoidAsync("MathQuillHelper.renderStatic", id, latex);
             }
-        }
-    }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"[InlineContentRenderer] Erro ao renderizar math {id}: {ex.Message}");
+            }
+        });
+        builder.CloseElement();
+    };
 
-    private async Task RenderMath(string latex)
+    private RenderFragment CreateChemicalFragment(string id, string formula) => builder =>
     {
-        if (string.IsNullOrEmpty(latex)) return;
-
-        try
+        builder.OpenElement(0, "span");
+        builder.AddAttribute(1, "class", "chemical-inline-display");
+        builder.AddAttribute(2, "id", id);
+        builder.AddElementReferenceCapture(3, async elementRef =>
         {
-            await JSRuntime.InvokeVoidAsync("MathQuillHelper.renderStatic", mathElementId, latex);
-        }
-        catch (Exception ex)
-        {
-            Console.WriteLine($"Erro ao renderizar fórmula matemática inline: {ex.Message}");
-        }
-    }
-
-    private async Task RenderChemical(string formula)
-    {
-        if (string.IsNullOrEmpty(formula)) return;
-
-        try
-        {
-            await JSRuntime.InvokeVoidAsync("ChemicalHelper.renderStatic", chemicalElementId, formula);
-        }
-        catch (Exception ex)
-        {
-            Console.WriteLine($"Erro ao renderizar fórmula química inline: {ex.Message}");
-        }
-    }
-
-    private string GetTextStyle(TextInline textInline)
-    {
-        var styles = new List<string>();
-
-        if (textInline.Bold)
-            styles.Add("font-weight: bold");
-
-        if (textInline.Italic)
-            styles.Add("font-style: italic");
-
-        return string.Join("; ", styles);
-    }    
+            await Task.Delay(150);
+            try
+            {
+                await JSRuntime.InvokeVoidAsync("ChemicalHelper.renderStatic", id, formula);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"[InlineContentRenderer] Erro ao renderizar chemical {id}: {ex.Message}");
+            }
+        });
+        builder.CloseElement();
+    };    
 }
