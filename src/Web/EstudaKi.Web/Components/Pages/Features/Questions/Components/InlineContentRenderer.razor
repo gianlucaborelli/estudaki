@@ -33,28 +33,45 @@ else
     private IJSRuntime JS { get; set; } = default!;
 
     private List<(string id, string content, string type)> specialTags = new();
+    private bool isProcessingTags = false;
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
-        if (specialTags.Any())
+        if (isProcessingTags) return;
+
+        // TODO: Por algum motivo, após a primeira renderização, 
+        // ao abrir um modal ou outro componente que renderize tambem o InlineContentRenderer, 
+        // esta estourando erro de que a lista sofreu alteração depois da renderização, 
+        // ao criar uma copia de specialTags esta resolvendo o problema, mas não consegui identificar o motivo do erro
+        var tagsToProcess = specialTags.ToList(); 
+
+        if (tagsToProcess.Any())
         {
-            foreach (var (id, content, type) in specialTags)
+            isProcessingTags = true;
+            try
             {
-                try
+                foreach (var (id, content, type) in tagsToProcess)
                 {
-                    if (type == "math")
+                    try
                     {
-                        await JS.InvokeVoidAsync("MathQuillHelper.renderStatic", id, content);
+                        if (type == "math")
+                        {
+                            await JS.InvokeVoidAsync("MathQuillHelper.renderStatic", id, content);
+                        }
+                        else if (type == "chemical")
+                        {
+                            await JS.InvokeVoidAsync("ChemicalHelper.renderStatic", id, content);
+                        }
                     }
-                    else if (type == "chemical")
+                    catch (Exception ex)
                     {
-                        await JS.InvokeVoidAsync("ChemicalHelper.renderStatic", id, content);
+                        Console.WriteLine($"Erro ao renderizar {type} com id {id}: {ex.Message}");
                     }
                 }
-                catch (Exception ex)
-                {
-                    Console.WriteLine($"Erro ao renderizar {type} com id {id}: {ex.Message}");
-                }
+            }
+            finally
+            {
+                isProcessingTags = false;
             }
         }
 
