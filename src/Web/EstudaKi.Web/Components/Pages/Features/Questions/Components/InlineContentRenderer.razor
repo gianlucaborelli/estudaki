@@ -33,61 +33,48 @@ else
     private IJSRuntime JS { get; set; } = default!;
 
     private List<(string id, string content, string type)> specialTags = new();
-    private bool isProcessingTags = false;
+    private HashSet<string> processedTagIds = new();
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
-        if (isProcessingTags) return;
-
-        // TODO: Por algum motivo, após a primeira renderização, 
-        // ao abrir um modal ou outro componente que renderize tambem o InlineContentRenderer, 
-        // esta estourando erro de que a lista sofreu alteração depois da renderização, 
-        // ao criar uma copia de specialTags esta resolvendo o problema, mas não consegui identificar o motivo do erro
-        var tagsToProcess = specialTags.ToList(); 
+        var tagsToProcess = specialTags
+            .Where(tag => !processedTagIds.Contains(tag.id))
+            .ToList();
 
         if (tagsToProcess.Any())
         {
-            isProcessingTags = true;
-            try
+            foreach (var (id, content, type) in tagsToProcess)
             {
-                foreach (var (id, content, type) in tagsToProcess)
+                try
                 {
-                    try
+                    if (type == "math")
                     {
-                        if (type == "math")
-                        {
-                            await JS.InvokeVoidAsync("MathQuillHelper.renderStatic", id, content);
-                        }
-                        else if (type == "chemical")
-                        {
-                            await JS.InvokeVoidAsync("ChemicalHelper.renderStatic", id, content);
-                        }
+                        await JS.InvokeVoidAsync("MathQuillHelper.renderStatic", id, content);
                     }
-                    catch (Exception ex)
+                    else if (type == "chemical")
                     {
-                        Console.WriteLine($"Erro ao renderizar {type} com id {id}: {ex.Message}");
+                        await JS.InvokeVoidAsync("ChemicalHelper.renderStatic", id, content);
                     }
+
+                    processedTagIds.Add(id);
                 }
-            }
-            finally
-            {
-                isProcessingTags = false;
+                catch (Exception ex)
+                {
+                    Console.WriteLine($"Erro ao renderizar {type} com id {id}: {ex.Message}");
+                }
             }
         }
 
         await base.OnAfterRenderAsync(firstRender);
     }
     
-    /// <summary>
-    /// Faz o parsing do texto HTML identificando tags especiais
-    /// Retorna uma lista de RenderFragment para renderizar
-    /// </summary>
     private List<RenderFragment> ParseTextParts(string html)
     {
         var parts = new List<RenderFragment>();
         if (string.IsNullOrEmpty(html)) return parts;
 
         specialTags.Clear();
+        processedTagIds.Clear();
 
         var pattern = @"<(math|chemical)>([\s\S]*?)<\/\1>";
         var matches = Regex.Matches(html, pattern, RegexOptions.IgnoreCase);

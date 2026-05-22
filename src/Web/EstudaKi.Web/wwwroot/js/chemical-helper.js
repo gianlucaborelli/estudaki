@@ -29,7 +29,7 @@ window.ChemicalHelper = {
             element.innerHTML = '';
 
             if (!formula || formula.trim() === '') {
-                element.innerHTML = '<span class="text-muted fst-italic">Digite a fórmula química...</span>';
+                element.innerHTML = '<span class="text-muted fst-italic"> </span>';
                 return;
             }
 

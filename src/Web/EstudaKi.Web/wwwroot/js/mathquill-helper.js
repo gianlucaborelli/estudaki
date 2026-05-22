@@ -12,7 +12,7 @@ window.MathQuillHelper = {
         element.innerHTML = '';
 
         if (!latex || latex.trim() === '') {
-            element.innerHTML = '<span class="text-muted">Digite uma fórmula LaTeX acima</span>';
+            element.innerHTML = '<span class="text-muted"> </span>';
             return;
         }
 

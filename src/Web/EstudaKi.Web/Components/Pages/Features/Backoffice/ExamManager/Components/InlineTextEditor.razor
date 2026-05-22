@@ -7,19 +7,19 @@
             <MudIconButton Icon="@Icons.Material.Filled.FormatBold"
                            Size="Size.Small"
                            Color="Color.Primary"
-                           OnClick="@(() => ApplyFormatting("bold"))" />
+                           OnClick="@(async () => await ApplyFormatting("bold"))" />
         </MudItem>
         <MudItem>
             <MudIconButton Icon="@Icons.Material.Filled.FormatItalic"
                            Size="Size.Small"
                            Color="Color.Primary"
-                           OnClick="@(() => ApplyFormatting("italic"))" />
+                           OnClick="@(async () => await ApplyFormatting("italic"))" />
         </MudItem>
         <MudItem>
             <MudIconButton Icon="@Icons.Material.Filled.FormatUnderlined"
                            Size="Size.Small"
                            Color="Color.Primary"
-                           OnClick="@(() => ApplyFormatting("underline"))" />
+                           OnClick="@(async () => await ApplyFormatting("underline"))" />
         </MudItem>
 
         <MudDivider Vertical="true" Class="mx-2" />
@@ -28,21 +28,21 @@
             <MudIconButton Icon="@Icons.Material.Filled.Functions"
                            Size="Size.Small"
                            Color="Color.Primary"
-                           OnClick="@(() => ApplyFormatting("math"))" />
+                           OnClick="@(async () => await ApplyFormatting("math"))" />
         </MudItem>
         <MudItem>
             <MudIconButton Icon="@Icons.Material.Filled.Science"
                            Size="Size.Small"
                            Color="Color.Primary"
-                           OnClick="@(() => ApplyFormatting("chemical"))" />
+                           OnClick="@(async () => await ApplyFormatting("chemical"))" />
         </MudItem>
         <MudItem>
             <MudIconButton Icon="@Icons.Material.Filled.Image"
                            Size="Size.Small"
                            Color="Color.Primary"
-                           OnClick="@(() => ApplyFormatting("inline-image"))" />
+                           OnClick="@(async () => await ApplyFormatting("inline-image"))" />
         </MudItem>
-    </MudStack>    
+    </MudStack>
     
     <MudTextField T="string"
                   Value="@Value.Text"

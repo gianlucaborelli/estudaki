@@ -60,5 +60,24 @@
         element.removeEventListener('keyup', element._selectionHandler);
         element.removeEventListener('mouseup', element._selectionHandler);
         element.removeEventListener('input', element._selectionHandler);
+    },
+
+    setCursorPosition: function (editorId, position) {
+        const container = document.getElementById(editorId);
+
+        if (!container)
+            return;
+
+        let element =
+            container.querySelector('textarea') ||
+            container.querySelector('input') ||
+            container.querySelector('.mud-input-slot textarea') ||
+            container.querySelector('.mud-input-slot input');
+
+        if (!element)
+            return;
+
+        element.focus();
+        element.setSelectionRange(position, position);
     }
 };

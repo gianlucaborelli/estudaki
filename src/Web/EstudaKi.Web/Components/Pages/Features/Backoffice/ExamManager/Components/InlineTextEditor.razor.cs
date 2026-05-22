@@ -2,7 +2,6 @@
 using Microsoft.AspNetCore.Components;
 using Microsoft.JSInterop;
 
-
 namespace EstudaKi.Web.Components.Pages.Features.Backoffice.ExamManager.Components;
 
 public class InlineTextEditorBase : ComponentBase, IDisposable
@@ -51,7 +50,7 @@ public class InlineTextEditorBase : ComponentBase, IDisposable
         StateHasChanged();
     }
 
-    protected void ApplyFormatting(string tag)
+    protected async Task ApplyFormatting(string tag)
     {
         var (openTag, closeTag) = GetFormattingTags(tag);
 
@@ -61,18 +60,27 @@ public class InlineTextEditorBase : ComponentBase, IDisposable
         var beforeSelection = Value.Text.Substring(0, selectionStart);
         var afterSelection = Value.Text.Substring(selectionEnd);
 
+        int newCursorPosition;
+
         if (hasSelection)
         {
             Value.Text = $"{beforeSelection}{openTag}{selectedText}{closeTag}{afterSelection}";
             Logger.LogInformation($"Formatação '{tag}' aplicada à seleção: '{selectedText}'");
+
+            newCursorPosition = beforeSelection.Length + openTag.Length + selectedText.Length + closeTag.Length;
         }
         else
         {
             Value.Text = $"{beforeSelection}{openTag}{closeTag}{afterSelection}";
             Logger.LogInformation($"Tags '{tag}' inseridas na posição do cursor: {selectionStart}");
+
+            newCursorPosition = beforeSelection.Length + openTag.Length;
         }
-        
+
         StateHasChanged();
+
+        await Task.Delay(50);
+        await JSRuntime.InvokeVoidAsync("textSelectionTracker.setCursorPosition", editorId, newCursorPosition);
     }
 
     private (string openTag, string closeTag) GetFormattingTags(string tag)
