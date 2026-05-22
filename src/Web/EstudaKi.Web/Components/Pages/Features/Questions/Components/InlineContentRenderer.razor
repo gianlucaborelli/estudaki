@@ -1,6 +1,7 @@
 @using Microsoft.JSInterop
 @using Estudaki.Modules.Questions.Domain.ValueObjects
 @using System.Text.RegularExpressions
+@inject IJSRuntime JSRuntime
 
 <style>
     .preserve-linebreaks {
@@ -11,7 +12,7 @@
 @* Renderiza o conteúdo inline processando tags especiais dentro do TextInline *@
 @if (Inline is TextInline textInline)
 {
-    <span class="preserve-linebreaks" style="@GetTextStyle(textInline)">
+    <span class="preserve-linebreaks">
         @foreach (var part in ParseTextParts(textInline.Text))
         {
             @part
@@ -28,18 +29,38 @@ else
     [Parameter]
     public InlineContent? Inline { get; set; }
 
+    [Inject]
+    private IJSRuntime JS { get; set; } = default!;
+
     private List<(string id, string content, string type)> specialTags = new();
-    private string? lastProcessedText;
 
-    protected override void OnParametersSet()
+    protected override async Task OnAfterRenderAsync(bool firstRender)
     {
-        // Detectar quando o texto muda
-        if (Inline is TextInline textInline && textInline.Text != lastProcessedText)
+        if (specialTags.Any())
         {
-            lastProcessedText = textInline.Text;
+            foreach (var (id, content, type) in specialTags)
+            {
+                try
+                {
+                    if (type == "math")
+                    {
+                        await JS.InvokeVoidAsync("MathQuillHelper.renderStatic", id, content);
+                    }
+                    else if (type == "chemical")
+                    {
+                        await JS.InvokeVoidAsync("ChemicalHelper.renderStatic", id, content);
+                    }
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine($"Erro ao renderizar {type} com id {id}: {ex.Message}");
+                }
+            }
         }
-    }
 
+        await base.OnAfterRenderAsync(firstRender);
+    }
+    
     /// <summary>
     /// Faz o parsing do texto HTML identificando tags especiais
     /// Retorna uma lista de RenderFragment para renderizar
@@ -51,7 +72,6 @@ else
 
         specialTags.Clear();
 
-        // Regex para encontrar tags <math>...</math> e <chemical>...</chemical>
         var pattern = @"<(math|chemical)>([\s\S]*?)<\/\1>";
         var matches = Regex.Matches(html, pattern, RegexOptions.IgnoreCase);
 
@@ -59,14 +79,12 @@ else
 
         foreach (Match match in matches)
         {
-            // Adiciona o texto antes da tag especial
             if (match.Index > lastIndex)
             {
                 var textBefore = html.Substring(lastIndex, match.Index - lastIndex);
                 parts.Add(CreateMarkupFragment(textBefore));
             }
 
-            // Adiciona a tag especial como componente renderizado
             var tagType = match.Groups[1].Value.ToLower();
             var content = match.Groups[2].Value.Trim();
             var id = $"{tagType}-inline-{Guid.NewGuid():N}";
@@ -85,7 +103,6 @@ else
             lastIndex = match.Index + match.Length;
         }
 
-        // Adiciona o texto restante após a última tag
         if (lastIndex < html.Length)
         {
             var textAfter = html.Substring(lastIndex);
@@ -119,17 +136,4 @@ else
         builder.AddAttribute(3, "data-formula", content);
         builder.CloseElement();
     };
-
-    private string GetTextStyle(TextInline textInline)
-    {
-        var styles = new List<string>();
-
-        if (textInline.Bold)
-            styles.Add("font-weight: bold");
-
-        if (textInline.Italic)
-            styles.Add("font-style: italic");
-
-        return string.Join("; ", styles);
-    }
 }
