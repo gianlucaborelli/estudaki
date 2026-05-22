@@ -34,7 +34,7 @@ public class ContentBlockEditorBase : ComponentBase
             ContentBlocks.Add(new ParagraphBlock
             {
                 Order = newOrder,
-                Inlines = new List<InlineContent>()
+                Inlines = new List<InlineContent> { new TextInline() },
             });
         }
         else if (type == ContentBlockType.Image)

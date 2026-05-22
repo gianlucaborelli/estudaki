@@ -52,36 +52,3 @@
         <MudDivider Class="my-2" />
     }
 </MudStack>
-
-@* Botões para adicionar inlines *@
-
-<MudButton Size="Size.Small"
-            Variant="Variant.Outlined"
-            StartIcon="@Icons.Material.Filled.Add"
-            OnClick="() => AddInlineContent(InlineType.Text)">
-    Adicionar Texto
-</MudButton>
-<MudButton Size="Size.Small"
-            Variant="Variant.Outlined"
-            StartIcon="@Icons.Material.Filled.Image"
-            Class="ms-2"
-            OnClick="() => AddInlineContent(InlineType.Image)">
-    Adicionar Imagem
-</MudButton>
-<MudButton Size="Size.Small"
-            Variant="Variant.Outlined"
-            StartIcon="@Icons.Material.Filled.Functions"
-            Class="ms-2"
-            Color="Color.Secondary"
-            OnClick="() => AddInlineContent(InlineType.Math)">
-    Adicionar Fórmula
-</MudButton>
-<MudButton Size="Size.Small"
-            Variant="Variant.Outlined"
-            StartIcon="@Icons.Material.Filled.Science"
-            Class="ms-2"
-            Color="Color.Tertiary"
-            OnClick="() => AddInlineContent(InlineType.Chemical)">
-    Adicionar Química
-</MudButton>
-
