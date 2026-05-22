@@ -19,11 +19,19 @@ public class InlineTextEditorBase : ComponentBase, IDisposable
     private DotNetObjectReference<InlineTextEditorBase>? dotNetRef;
 
     protected string editorId = $"text-editor-{Guid.NewGuid()}";
+    protected string previewKey = Guid.NewGuid().ToString();
 
     protected string selectedText = string.Empty;
     protected int selectionStart = 0;
     protected int selectionEnd = 0;
     protected bool hasSelection = false;
+
+    protected void OnTextChanged(string newText)
+    {
+        Value.Text = newText;
+        previewKey = Guid.NewGuid().ToString();
+        StateHasChanged();
+    }
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
@@ -66,6 +74,7 @@ public class InlineTextEditorBase : ComponentBase, IDisposable
             Logger.LogInformation($"Tags '{tag}' inseridas na posição do cursor: {selectionStart}");
         }
 
+        previewKey = Guid.NewGuid().ToString();
         StateHasChanged();
     }
 

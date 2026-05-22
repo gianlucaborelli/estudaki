@@ -1,7 +1,6 @@
 @using Microsoft.JSInterop
 @using Estudaki.Modules.Questions.Domain.ValueObjects
 @using System.Text.RegularExpressions
-@inject IJSRuntime JSRuntime
 
 <style>
     .preserve-linebreaks {
@@ -12,7 +11,7 @@
 @* Renderiza o conteúdo inline processando tags especiais dentro do TextInline *@
 @if (Inline is TextInline textInline)
 {
-    <span class="preserve-linebreaks">
+    <span class="preserve-linebreaks" style="@GetTextStyle(textInline)">
         @foreach (var part in ParseTextParts(textInline.Text))
         {
             @part
@@ -30,7 +29,21 @@ else
     public InlineContent? Inline { get; set; }
 
     private List<(string id, string content, string type)> specialTags = new();
+    private string? lastProcessedText;
 
+    protected override void OnParametersSet()
+    {
+        // Detectar quando o texto muda
+        if (Inline is TextInline textInline && textInline.Text != lastProcessedText)
+        {
+            lastProcessedText = textInline.Text;
+        }
+    }
+
+    /// <summary>
+    /// Faz o parsing do texto HTML identificando tags especiais
+    /// Retorna uma lista de RenderFragment para renderizar
+    /// </summary>
     private List<RenderFragment> ParseTextParts(string html)
     {
         var parts = new List<RenderFragment>();
@@ -38,6 +51,7 @@ else
 
         specialTags.Clear();
 
+        // Regex para encontrar tags <math>...</math> e <chemical>...</chemical>
         var pattern = @"<(math|chemical)>([\s\S]*?)<\/\1>";
         var matches = Regex.Matches(html, pattern, RegexOptions.IgnoreCase);
 
@@ -45,12 +59,14 @@ else
 
         foreach (Match match in matches)
         {
+            // Adiciona o texto antes da tag especial
             if (match.Index > lastIndex)
             {
                 var textBefore = html.Substring(lastIndex, match.Index - lastIndex);
                 parts.Add(CreateMarkupFragment(textBefore));
             }
 
+            // Adiciona a tag especial como componente renderizado
             var tagType = match.Groups[1].Value.ToLower();
             var content = match.Groups[2].Value.Trim();
             var id = $"{tagType}-inline-{Guid.NewGuid():N}";
@@ -59,16 +75,17 @@ else
 
             if (tagType == "math")
             {
-                parts.Add(CreateMathFragment(id, content));
+                parts.Add(CreateMathPlaceholder(id));
             }
             else if (tagType == "chemical")
             {
-                parts.Add(CreateChemicalFragment(id, content));
+                parts.Add(CreateChemicalPlaceholder(id));
             }
 
             lastIndex = match.Index + match.Length;
         }
 
+        // Adiciona o texto restante após a última tag
         if (lastIndex < html.Length)
         {
             var textAfter = html.Substring(lastIndex);
@@ -83,43 +100,36 @@ else
         builder.AddContent(0, (MarkupString)html);
     };
 
-    private RenderFragment CreateMathFragment(string id, string latex) => builder =>
+    private RenderFragment CreateMathPlaceholder(string id) => builder =>
     {
+        var content = specialTags.FirstOrDefault(t => t.id == id).content ?? "";
         builder.OpenElement(0, "span");
         builder.AddAttribute(1, "class", "math-inline-display");
         builder.AddAttribute(2, "id", id);
-        builder.AddElementReferenceCapture(3, async elementRef =>
-        {
-            await Task.Delay(100);
-            try
-            {
-                await JSRuntime.InvokeVoidAsync("MathQuillHelper.renderStatic", id, latex);
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine($"[InlineContentRenderer] Erro ao renderizar math {id}: {ex.Message}");
-            }
-        });
+        builder.AddAttribute(3, "data-latex", content);
         builder.CloseElement();
     };
 
-    private RenderFragment CreateChemicalFragment(string id, string formula) => builder =>
+    private RenderFragment CreateChemicalPlaceholder(string id) => builder =>
     {
+        var content = specialTags.FirstOrDefault(t => t.id == id).content ?? "";
         builder.OpenElement(0, "span");
         builder.AddAttribute(1, "class", "chemical-inline-display");
         builder.AddAttribute(2, "id", id);
-        builder.AddElementReferenceCapture(3, async elementRef =>
-        {
-            await Task.Delay(150);
-            try
-            {
-                await JSRuntime.InvokeVoidAsync("ChemicalHelper.renderStatic", id, formula);
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine($"[InlineContentRenderer] Erro ao renderizar chemical {id}: {ex.Message}");
-            }
-        });
+        builder.AddAttribute(3, "data-formula", content);
         builder.CloseElement();
-    };    
+    };
+
+    private string GetTextStyle(TextInline textInline)
+    {
+        var styles = new List<string>();
+
+        if (textInline.Bold)
+            styles.Add("font-weight: bold");
+
+        if (textInline.Italic)
+            styles.Add("font-style: italic");
+
+        return string.Join("; ", styles);
+    }
 }

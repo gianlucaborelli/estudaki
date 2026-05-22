@@ -45,7 +45,8 @@
     </MudStack>    
     
     <MudTextField T="string"
-                  @bind-Value="Value.Text"
+                  Value="@Value.Text"
+                  ValueChanged="@OnTextChanged"
                   Label="Texto (suporta HTML)"
                   FullWidth="true"
                   Lines="3"
@@ -57,7 +58,7 @@
     {
         <MudPaper Class="pa-3 mt-2" Outlined="true">
             <MudText Typo="Typo.caption" Color="Color.Secondary" Class="mb-2">Pré-visualização:</MudText>
-            <InlineContentRenderer Inline="Value" />
+            <InlineContentRenderer Inline="Value" @key="@previewKey" />
         </MudPaper>
     }
 </div>
