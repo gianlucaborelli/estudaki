@@ -76,7 +76,7 @@ else
         specialTags.Clear();
         processedTagIds.Clear();
 
-        var pattern = @"<(math|chemical)>([\s\S]*?)<\/\1>";
+        var pattern = @"<(math|chemical|inline-image)>([\s\S]*?)<\/\1>";
         var matches = Regex.Matches(html, pattern, RegexOptions.IgnoreCase);
 
         int lastIndex = 0;
@@ -102,6 +102,10 @@ else
             else if (tagType == "chemical")
             {
                 parts.Add(CreateChemicalPlaceholder(id));
+            }
+            else if (tagType == "inline-image")
+            {
+                parts.Add(CreateImagePlaceholder(id));
             }
 
             lastIndex = match.Index + match.Length;
@@ -138,6 +142,18 @@ else
         builder.AddAttribute(1, "class", "chemical-inline-display");
         builder.AddAttribute(2, "id", id);
         builder.AddAttribute(3, "data-formula", content);
+        builder.CloseElement();
+    };
+
+    private RenderFragment CreateImagePlaceholder(string id) => builder =>
+    {
+        var content = specialTags.FirstOrDefault(t => t.id == id).content ?? "";
+        builder.OpenElement(0, "img");
+        builder.AddAttribute(1, "class", "inline-image-display");
+        builder.AddAttribute(2, "id", id);
+        builder.AddAttribute(3, "src", content);
+        builder.AddAttribute(4, "alt", "Imagem inline");
+        builder.AddAttribute(5, "style", "max-width: 100%; max-height: 200px; vertical-align: middle;");
         builder.CloseElement();
     };
 }

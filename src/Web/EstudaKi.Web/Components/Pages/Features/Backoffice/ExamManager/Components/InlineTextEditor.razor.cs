@@ -1,6 +1,8 @@
-﻿using Estudaki.Modules.Questions.Domain.ValueObjects;
+﻿using Estudaki.Modules.Questions.Application.DTOs;
+using Estudaki.Modules.Questions.Domain.ValueObjects;
 using Microsoft.AspNetCore.Components;
 using Microsoft.JSInterop;
+using MudBlazor;
 
 namespace EstudaKi.Web.Components.Pages.Features.Backoffice.ExamManager.Components;
 
@@ -12,8 +14,14 @@ public class InlineTextEditorBase : ComponentBase, IDisposable
     [Inject]
     protected IJSRuntime JSRuntime { get; set; } = default!;
 
+    [Inject]
+    protected IDialogService Dialog { get; set; } = default!;
+
     [Parameter]
     public TextInline Value { get; set; } = new TextInline();
+
+    [CascadingParameter(Name = "PublicNotice")]
+    protected PublicNoticeDto? PublicNotice { get; set; }
 
     private DotNetObjectReference<InlineTextEditorBase>? dotNetRef;
 
@@ -76,6 +84,47 @@ public class InlineTextEditorBase : ComponentBase, IDisposable
 
             newCursorPosition = beforeSelection.Length + openTag.Length;
         }
+
+        StateHasChanged();
+
+        await Task.Delay(50);
+        await JSRuntime.InvokeVoidAsync("textSelectionTracker.setCursorPosition", editorId, newCursorPosition);
+    }
+
+    protected async Task OpenImageSelector()
+    {
+        if (PublicNotice == null)
+        {
+            Logger.LogWarning("PublicNotice não definido, não é possível abrir o seletor de imagens.");
+            return;
+        }
+
+        var parameters = new DialogParameters<ImageSelectorModal>
+        {
+            { c => c.PublicNotice, PublicNotice }
+        };
+
+        var options = new DialogOptions() { CloseButton = true, MaxWidth = MaxWidth.Large, FullWidth = true };
+        var dialog = await Dialog.ShowAsync<ImageSelectorModal>("Selecionar Imagem", parameters, options);
+        var result = await dialog.Result;
+
+        if (result is not null && !result.Canceled && result.Data is string selectedImageKey)
+        {
+            await InsertImageTag(selectedImageKey);
+        }
+    }
+
+    private async Task InsertImageTag(string imageKey)
+    {
+        var (openTag, closeTag) = GetFormattingTags("inline-image");
+
+        var beforeSelection = Value.Text.Substring(0, selectionStart);
+        var afterSelection = Value.Text.Substring(selectionEnd);
+
+        Value.Text = $"{beforeSelection}{openTag}{imageKey}{closeTag}{afterSelection}";
+        Logger.LogInformation($"Imagem '{imageKey}' inserida na posição do cursor: {selectionStart}");
+
+        var newCursorPosition = beforeSelection.Length + openTag.Length + imageKey.Length + closeTag.Length;
 
         StateHasChanged();
 
