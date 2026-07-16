@@ -46,23 +46,46 @@ public class QuestionEditorModalBase : ComponentBase
 
     protected async Task Save()
     {
-        var command = new UpdateQuestionCommand(EditedQuestion);
-        var result = await CommandDispatcher.DispatchAsync<UpdateQuestionCommand, ValidationResult>(command);
-
-        if(result.IsValid)
+        if (!string.IsNullOrEmpty(EditedQuestion.QuestionId))
         {
-            Logger.LogInformation("Questão {QuestionId} atualizada com sucesso", EditedQuestion.QuestionId);
-            Snackbar.Add("Questão atualizada com sucesso!", Severity.Success);
-            Dialog.Close(DialogResult.Ok(EditedQuestion));
+            var command = new UpdateQuestionCommand(EditedQuestion);
+            var result = await CommandDispatcher.DispatchAsync<UpdateQuestionCommand, ValidationResult>(command);
+
+            if (result.IsValid)
+            {
+                Logger.LogInformation("Questão {QuestionId} atualizada com sucesso", EditedQuestion.QuestionId);
+                Snackbar.Add("Questão atualizada com sucesso!", Severity.Success);
+                Dialog.Close(DialogResult.Ok(EditedQuestion));
+            }
+            else
+            {
+                foreach (var error in result.Errors)
+                {
+                    Logger.LogWarning("Erro de validação ao salvar questão {QuestionId}: {Error}", EditedQuestion.QuestionId, error.ErrorMessage);
+                    Snackbar.Add(error.ErrorMessage, Severity.Error);
+                }
+            }
         }
         else
         {
-            foreach (var error in result.Errors)
+            var command = new AddNewQuestionIntoExamCommand(EditedQuestion);
+            var result = await CommandDispatcher.DispatchAsync<AddNewQuestionIntoExamCommand, ValidationResult>(command);
+            if (result.IsValid)
             {
-                Logger.LogWarning("Erro de validação ao salvar questão {QuestionId}: {Error}", EditedQuestion.QuestionId, error.ErrorMessage);
-                Snackbar.Add(error.ErrorMessage, Severity.Error);
+                Logger.LogInformation("Nova questão criada com sucesso: {QuestionId}", EditedQuestion.QuestionId);
+                Snackbar.Add("Nova questão criada com sucesso!", Severity.Success);
+                Dialog.Close(DialogResult.Ok(EditedQuestion));
+            }
+            else
+            {
+                foreach (var error in result.Errors)
+                {
+                    Logger.LogWarning("Erro de validação ao criar nova questão: {Error}", error.ErrorMessage);
+                    Snackbar.Add(error.ErrorMessage, Severity.Error);
+                }
             }
         }
+        
     }   
     
     protected void ToggleQuestionSupportLink(QuestionSupportDto support, bool isChecked)
@@ -101,10 +124,16 @@ public class QuestionEditorModalBase : ComponentBase
         {
             Option = nextOption,
             IsCorrect = false,
-            Content = new List<InlineContent>()
+            Content = new List<InlineContent> { new TextInline() }
         });
 
         StateHasChanged();
+    }
+
+    protected void AddChoiceText(Choice choice)
+    {
+        var textInline = new TextInline();
+        choice.Content.Add(textInline);
     }
 
     protected void RemoveChoice(Choice choice)

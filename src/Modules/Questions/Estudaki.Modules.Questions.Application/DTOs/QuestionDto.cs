@@ -1,3 +1,4 @@
+using Estudaki.Modules.Questions.Domain.Entities;
 using Estudaki.Modules.Questions.Domain.ValueObjects;
 
 namespace Estudaki.Modules.Questions.Application.DTOs;
@@ -28,6 +29,28 @@ public class QuestionDto
     public List<QuestionSupportDto> QuestionSupports { get; set; } = [];
     public List<Choice>? Choices { get; set; }
     public DateTime CreatedAt { get; set; }
+
+    public static QuestionDto Create(PublicNoticeDto publicNotice, Exam exam)
+    {
+        var question = new QuestionDto 
+        {
+            ExamId = exam.Id,
+            PublicNoticeId = publicNotice.Id,
+            PublicNoticeNumber = publicNotice.Number,
+            Year = publicNotice.Year,
+            ExaminerOrganization = publicNotice.ExaminerOrganization,
+            ContractingOrganization = publicNotice.ContractingOrganization,
+            ExamCategory = publicNotice.ExamCategory ?? ExamCategories.PublicServiceExam,
+            Phase = exam.Phase,
+            Positions = new List<string> { exam.Position },
+            Area = exam.Area,
+            EducationLevel = exam.EducationLevel,
+            PublicNoticeFileUrl = publicNotice.FileUrl ?? string.Empty,
+            ExamBookletUrl = exam.ExamBookletUrl ?? string.Empty,
+            AnswerKeyUrl = exam.AnswerKeyUrl ?? string.Empty
+        };
+        return question;
+    }
 
     public static QuestionDto Clone(QuestionDto original)
     {

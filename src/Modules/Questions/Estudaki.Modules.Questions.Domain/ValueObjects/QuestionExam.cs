@@ -1,3 +1,5 @@
+using Estudaki.Modules.Questions.Domain.Entities;
+
 namespace Estudaki.Modules.Questions.Domain.ValueObjects;
 
 /// <summary>
@@ -78,4 +80,25 @@ public class QuestionExam
     /// URL do gabarito oficial do exame
     /// </summary>
     public string? AnswerKeyUrl { get; set; }
+
+    public static QuestionExam Create(Exam exam, PublicNotice publicNotice)
+    {
+        return new QuestionExam
+        {
+            ExamId = exam.Id,
+            PublicNoticeId = publicNotice.Id,
+            SourceExamId = exam.Id,
+            QuestionNumber = 0, // Inicialmente 0, será definido quando a questão for adicionada ao exame
+            Year = publicNotice.Year,
+            ExamCategory = publicNotice.ExamCategory,
+            ExaminerOrganization = publicNotice.ExaminerOrganization,
+            ContractingOrganization = publicNotice.ContractingOrganization,
+            EducationLevel = exam.EducationLevel,
+            Position = exam.Position,
+            Phase = exam.Phase,
+            Area = exam.Area,            
+            ExamBookletUrl = exam.ExamBookletUrl,
+            AnswerKeyUrl = exam.AnswerKeyUrl
+        };
+    }
 }

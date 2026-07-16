@@ -1,6 +1,4 @@
 ﻿using Estudaki.Commons.Core.CQRS;
-using Estudaki.Modules.Questions.Application.Mappers;
-using Estudaki.Modules.Questions.Domain.Entities;
 using Estudaki.Modules.Questions.Domain.Repositories;
 using FluentValidation;
 using FluentValidation.Results;

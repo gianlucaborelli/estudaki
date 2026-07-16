@@ -31,7 +31,7 @@
                     <MudGrid Class="py-5">
                         <MudCheckBox @bind-Value="EditedQuestion.IsNullified" Label="Anulada Pela Banca" />
                         <MudSpacer />
-                        @* <MudCheckBox @bind-Value="EditedQuestion.IsPublished" Label="Publicado" />                             *@
+                        @* <MudCheckBox @bind-Value="EditedQuestion.IsPublished" Label="Publicado" >*@
                     </MudGrid>
                 </MudItem>
             </MudGrid>
@@ -62,7 +62,17 @@
                                             <MudCheckBox @bind-Value="choice.IsCorrect" Label="Resposta Correta" />
                                         </MudItem>
                                         <MudItem>
-                                            <MudButton Size="Size.Small"
+                                                @if (!choice.Content.Any())
+                                                {
+                                                    <MudButton Size="Size.Small"
+                                                               Variant="Variant.Filled"
+                                                               Color="Color.Primary"
+                                                               StartIcon="@Icons.Material.Filled.EditAttributes"
+                                                               OnClick="() => AddChoiceText(choice)">
+                                                        Adicionar Texto
+                                                    </MudButton>
+                                                }
+                                                <MudButton Size="Size.Small"
                                                        Variant="Variant.Filled"
                                                        Color="Color.Error"
                                                        StartIcon="@Icons.Material.Filled.Delete"

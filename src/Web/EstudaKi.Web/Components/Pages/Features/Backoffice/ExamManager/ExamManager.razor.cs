@@ -198,14 +198,17 @@ namespace EstudaKi.Web.Components.Pages.Features.Backoffice.ExamManager
             return ;
         }
 
-        protected async Task OpenQuestionEditorModalAsync()
+        protected async Task AddNewQuestionEditorModalAsync()
         {
-            if (SelectedQuestion is null)
+            if (SelectedExam is null) 
             {
                 return;
             }
+
+            var newQuestion = QuestionDto.Create(PublicNotice, SelectedExam);
+
             var parameters = new DialogParameters<QuestionEditorModal>{
-                { x => x.Question, SelectedQuestion },
+                { x => x.Question, newQuestion },
                 { x => x.AvailableQuestionSupports, QuestionSupports },
                 { x => x.PublicNotice, PublicNotice }
             };
@@ -330,6 +333,28 @@ namespace EstudaKi.Web.Components.Pages.Features.Backoffice.ExamManager
             };
             var options = new DialogOptions { CloseButton = true, MaxWidth = MaxWidth.Large, FullWidth = true };
             var dialog = await Dialog.ShowAsync<AddExistingQuestionIntoExamModal>("Adicionar Questão Existente ao Exame", parameters, options);
+            var result = await dialog.Result;
+            if (result is not null && !result.Canceled)
+            {
+                await LoadContent();
+            }
+            return;
+        }
+
+        protected async Task OpenQuestionEditorModalAsync()
+        {
+            if (SelectedQuestion is null)
+            {
+                return;
+            }
+            var parameters = new DialogParameters<QuestionEditorModal>{
+                { x => x.Question, SelectedQuestion },
+                { x => x.AvailableQuestionSupports, QuestionSupports },
+                { x => x.PublicNotice, PublicNotice }
+            };
+
+            var options = new DialogOptions { CloseButton = true, MaxWidth = MaxWidth.Medium, FullWidth = true };
+            var dialog = await Dialog.ShowAsync<QuestionEditorModal>("Editar Questão", parameters, options);
             var result = await dialog.Result;
             if (result is not null && !result.Canceled)
             {
