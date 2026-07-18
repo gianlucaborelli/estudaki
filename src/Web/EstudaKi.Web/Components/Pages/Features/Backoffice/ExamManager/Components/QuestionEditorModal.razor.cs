@@ -1,6 +1,8 @@
 ﻿using Estudaki.Commons.Core.CQRS;
 using Estudaki.Modules.Questions.Application.Commands;
 using Estudaki.Modules.Questions.Application.DTOs;
+using Estudaki.Modules.Questions.Application.Queries.GetAreasPaginated;
+using Estudaki.Modules.Questions.Domain.Common;
 using Estudaki.Modules.Questions.Domain.Entities;
 using Estudaki.Modules.Questions.Domain.ValueObjects;
 using FluentValidation.Results;
@@ -11,6 +13,8 @@ namespace EstudaKi.Web.Components.Pages.Features.Backoffice.ExamManager.Componen
 
 public class QuestionEditorModalBase : ComponentBase
 {
+    private const int AreaSearchPageSize = 5;
+
     [CascadingParameter]
     public IMudDialogInstance Dialog { get; set; } = default!;
 
@@ -20,6 +24,10 @@ public class QuestionEditorModalBase : ComponentBase
     protected ILogger<QuestionEditorModalBase> Logger { get; set; } = default!;
     [Inject]
     protected ICommandDispatcher CommandDispatcher { get; set; } = default!;
+    [Inject]
+    protected IQueryDispatcher QueryDispatcher { get; set; } = default!;
+    [Inject]
+    protected IDialogService DialogService { get; set; } = default!;
 
     [Parameter]
     public List<QuestionSupportDto> AvailableQuestionSupports { get; set; } = [];
@@ -32,6 +40,11 @@ public class QuestionEditorModalBase : ComponentBase
 
     public QuestionDto EditedQuestion { get; set; } = new QuestionDto();
 
+    protected AreaDto? SelectedMainArea { get; set; }
+    protected IReadOnlyCollection<AreaDto> SelectedSubAreas { get; set; } = [];
+    protected AreaDto? SelectedSubAreaValue { get; set; }
+    protected MudAutocomplete<AreaDto> SubAreaAutocomplete { get; set; } = null!;
+
     // Enums
     protected enum InlineType { Text, Image, Math, Chemical }
 
@@ -41,7 +54,93 @@ public class QuestionEditorModalBase : ComponentBase
         {
             EditedQuestion = QuestionDto.Clone(Question);
             Logger.LogDebug("Editor de questão inicializado com a questão: {QuestionId}", Question.QuestionId);
-        }        
+
+            SelectedMainArea = !string.IsNullOrWhiteSpace(EditedQuestion.MainArea)
+                ? new AreaDto { Name = EditedQuestion.MainArea, Type = AreaType.Area }
+                : null;
+
+            SelectedSubAreas = EditedQuestion.SubAreas
+                .Select(name => new AreaDto { Name = name, Type = AreaType.SubArea })
+                .ToList();
+        }
+    }
+
+    // ==================== MÉTODOS DE GERENCIAMENTO DE ÁREA/SUBÁREA ====================
+
+    protected async Task<IEnumerable<AreaDto>> SearchMainAreas(string searchText, CancellationToken cancellationToken)
+    {
+        var query = new GetAreasPaginatedQuery(AreaType.Area, searchText, 1, AreaSearchPageSize);
+        var result = await QueryDispatcher.DispatchAsync<GetAreasPaginatedQuery, PagedResult<AreaDto>>(query, cancellationToken);
+        return result.Items;
+    }
+
+    protected void OnMainAreaChanged(AreaDto? area)
+    {
+        SelectedMainArea = area;
+        EditedQuestion.MainArea = area?.Name ?? string.Empty;
+    }
+
+    protected async Task<IEnumerable<AreaDto>> SearchSubAreas(string searchText, CancellationToken cancellationToken)
+    {
+        var query = new GetAreasPaginatedQuery(AreaType.SubArea, searchText, 1, AreaSearchPageSize);
+        var result = await QueryDispatcher.DispatchAsync<GetAreasPaginatedQuery, PagedResult<AreaDto>>(query, cancellationToken);
+        return result.Items.Where(a => SelectedSubAreas.All(selected => selected.Name != a.Name));
+    }
+
+    protected async Task OnSubAreaSelected(AreaDto? area)
+    {
+        if (area is null)
+        {
+            return;
+        }
+
+        if (SelectedSubAreas.All(a => a.Name != area.Name))
+        {
+            OnSubAreasChanged(SelectedSubAreas.Append(area));
+        }
+
+        SelectedSubAreaValue = null;
+        await SubAreaAutocomplete.ClearAsync();
+    }
+
+    protected void OnSubAreasChanged(IEnumerable<AreaDto> areas)
+    {
+        SelectedSubAreas = areas?.ToList() ?? [];
+        EditedQuestion.SubAreas = SelectedSubAreas.Select(a => a.Name).ToArray();
+    }
+
+    protected void RemoveSubArea(AreaDto area)
+    {
+        OnSubAreasChanged(SelectedSubAreas.Where(a => a.Name != area.Name));
+    }
+
+    protected async Task OpenNewAreaModal(AreaType type)
+    {
+        var parameters = new DialogParameters<NewAreaModal>
+        {
+            { x => x.Type, type }
+        };
+        var options = new DialogOptions { CloseOnEscapeKey = true, MaxWidth = MaxWidth.Small, FullWidth = true };
+        var title = type == AreaType.Area ? "Nova Área Principal" : "Nova Subárea";
+
+        var dialog = await DialogService.ShowAsync<NewAreaModal>(title, parameters, options);
+        var result = await dialog.Result;
+
+        if (result is null || result.Canceled || result.Data is not AreaDto newArea)
+        {
+            return;
+        }
+
+        if (type == AreaType.Area)
+        {
+            OnMainAreaChanged(newArea);
+        }
+        else
+        {
+            OnSubAreasChanged(SelectedSubAreas.Append(newArea));
+        }
+
+        StateHasChanged();
     }
 
     protected async Task Save()

@@ -14,10 +14,53 @@
                     <MudTextField @bind-Value="EditedQuestion.QuestionNumber" Label="Número" />
                 </MudItem>
                 <MudItem xs="12" md="6">
-                    <MudTextField @bind-Value="EditedQuestion.MainArea" Label="Área Principal" />
+                    <MudStack Row="true" Spacing="2" AlignItems="AlignItems.Center">
+                        <MudAutocomplete T="AreaDto"
+                                         Label="Área Principal"
+                                         Value="SelectedMainArea"
+                                         ValueChanged="OnMainAreaChanged"
+                                         SearchFunc="SearchMainAreas"
+                                         ToStringFunc="@(a => a?.Name)"
+                                         ResetValueOnEmptyText="true"
+                                         Clearable="true"
+                                         MinCharacters="0"
+                                         Class="flex-grow-1" />
+                        <MudIconButton Icon="@Icons.Material.Filled.Add"
+                                       Color="Color.Primary"
+                                       Variant="Variant.Filled"
+                                       Size="Size.Small"
+                                       OnClick="@(() => OpenNewAreaModal(AreaType.Area))" />
+                    </MudStack>
                 </MudItem>
                 <MudItem xs="12" md="6">
-                    <MudTextField @bind-Value="EditedQuestion.SubAreas" Label="Subareas" />
+                    <MudStack Row="true" Spacing="2" AlignItems="AlignItems.Center">
+                        <MudAutocomplete T="AreaDto"
+                                         @ref="SubAreaAutocomplete"
+                                         Label="Subareas"
+                                         Value="SelectedSubAreaValue"
+                                         ValueChanged="OnSubAreaSelected"
+                                         SearchFunc="SearchSubAreas"
+                                         ToStringFunc="@(a => a?.Name)"
+                                         ResetValueOnEmptyText="true"
+                                         Clearable="true"
+                                         MinCharacters="0"
+                                         Class="flex-grow-1" />
+                        <MudIconButton Icon="@Icons.Material.Filled.Add"
+                                       Color="Color.Primary"
+                                       Variant="Variant.Filled"
+                                       Size="Size.Small"
+                                       OnClick="@(() => OpenNewAreaModal(AreaType.SubArea))" />
+                    </MudStack>
+                    <MudChipSet T="string" Class="mt-1">
+                        @foreach (var subArea in SelectedSubAreas)
+                        {
+                            <MudChip T="string"
+                                     Value="@subArea.Name"
+                                     OnClose="@(() => RemoveSubArea(subArea))">
+                                @subArea.Name
+                            </MudChip>
+                        }
+                    </MudChipSet>
                 </MudItem>                    
                 <MudItem xs="12" md="6">
                     <MudSelect @bind-Value="EditedQuestion.QuestionType" Label="Tipo de questão">

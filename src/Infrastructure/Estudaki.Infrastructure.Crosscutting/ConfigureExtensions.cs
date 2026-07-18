@@ -56,7 +56,7 @@ public static class ConfigureExtensions
         services.AddScoped<IStorageService, S3StorageService>();
 
         // Modules
-        services.AddQuestionsModule();
+        services.AddQuestionsModule(configuration);
         services.AddComunicationsInfrastructure();
         services.AddIdentityModule(configuration);  
     }

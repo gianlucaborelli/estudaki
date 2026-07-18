@@ -1,0 +1,21 @@
+@using Estudaki.Modules.Questions.Domain.ValueObjects
+@inherits NewAreaModalBase
+
+<MudDialog>
+    <DialogContent>
+        <MudTextField @bind-Value="Name"
+                      Label="Nome"
+                      Immediate="true"
+                      For="@(() => Name)"
+                      OnKeyUp="OnNameKeyUp" />
+    </DialogContent>
+    <DialogActions>
+        <MudButton OnClick="Cancel">Cancelar</MudButton>
+        <MudButton Color="Color.Primary"
+                   Variant="Variant.Filled"
+                   Disabled="@IsSaving"
+                   OnClick="Save">
+            Salvar
+        </MudButton>
+    </DialogActions>
+</MudDialog>

@@ -1,5 +1,6 @@
 using Estudaki.Commons.Core.CQRS.Extensions;
 using Estudaki.Modules.Questions.Application.Commands;
+using Estudaki.Modules.Questions.Application.Queries.GetAreasPaginated;
 using Estudaki.Modules.Questions.Application.Queries.GetFilterParameters;
 using Estudaki.Modules.Questions.Application.Queries.GetImageListByPublicNoticeId;
 using Estudaki.Modules.Questions.Application.Queries.GetPublicNoticeById;
@@ -10,9 +11,12 @@ using Estudaki.Modules.Questions.Application.Queries.GetQuestionsByPublicNoticeI
 using Estudaki.Modules.Questions.Application.Queries.GetQuestionSupportsByPublicNoticeId;
 using Estudaki.Modules.Questions.Application.Queries.SearchQuestions;
 using Estudaki.Modules.Questions.Domain.Repositories;
+using Estudaki.Modules.Questions.Infrastructure.Data;
 using Estudaki.Modules.Questions.Infrastructure.Data.Mappings;
 using Estudaki.Modules.Questions.Infrastructure.Data.Repositories;
 using FluentValidation;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace Estudaki.Modules.Questions.Infrastructure.Extensions;
@@ -20,13 +24,20 @@ namespace Estudaki.Modules.Questions.Infrastructure.Extensions;
 public static class ServiceCollectionExtensions
 {
     public static IServiceCollection AddQuestionsModule(
-        this IServiceCollection services)
+        this IServiceCollection services,
+        IConfiguration configuration)
     {
         MongoDbMappings.RegisterMappings();        
 
         services.AddScoped<IQuestionRepository, QuestionRepository>();
         services.AddScoped<IPublicNoticeRepository, PublicNoticeRepository>();
         services.AddScoped<IQuestionSupportRepository, QuestionSupportRepository>();
+
+        var postgresConnectionString = configuration.GetConnectionString("PostgresConnection")
+            ?? throw new InvalidOperationException("Connection string 'PostgresConnection' not found.");
+        services.AddDbContextFactory<QuestionsDbContext>(options =>
+            options.UseNpgsql(postgresConnectionString));
+        services.AddScoped<IAreaRepository, AreaRepository>();
 
         services.AddValidatorsFromAssembly(typeof(UploadPublicNoticeFilesCommandValidator).Assembly);
 
@@ -54,6 +65,9 @@ public static class ServiceCollectionExtensions
         services.AddCQRSHandlers(typeof(CreateQuestionSupportCommandHandler).Assembly);
         services.AddCQRSHandlers(typeof(DeleteQuestionCommandHandler).Assembly);
         services.AddCQRSHandlers(typeof(DeleteQuestionSupportCommandHandler).Assembly);
+        services.AddCQRSHandlers(typeof(CreateAreaCommandHandler).Assembly);
+        services.AddCQRSHandlers(typeof(UpdateAreaCommandHandler).Assembly);
+        services.AddCQRSHandlers(typeof(GetAreasPaginatedQueryHandler).Assembly);
 
         return services;
     }
