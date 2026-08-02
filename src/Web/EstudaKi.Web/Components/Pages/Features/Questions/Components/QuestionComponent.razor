@@ -20,13 +20,21 @@
                     }                    
                 </MudStack>                
 
-                <MudButton Href="@($"/question/{Value?.QuestionId}")" 
-                           Variant="Variant.Text" 
-                           Color="Color.Primary"
-                           Size="Size.Small"
-                           EndIcon="@Icons.Material.Filled.OpenInNew">
-                    Ver Detalhes
-                </MudButton>
+                <MudStack Row="true" Spacing="1" AlignItems="AlignItems.Center">
+                    <MudIconButton Icon="@Icons.Material.Filled.ContentCopy"
+                                   Color="Color.Primary"
+                                   Size="Size.Small"
+                                   Title="Copiar questão"
+                                   OnClick="OnCopyQuestion" />
+
+                    @* <MudButton Href="@($"/question/{Value?.QuestionId}")" 
+                               Variant="Variant.Text" 
+                               Color="Color.Primary"
+                               Size="Size.Small"
+                               EndIcon="@Icons.Material.Filled.OpenInNew">
+                        Ver Detalhes
+                    </MudButton> *@
+                </MudStack>
 
             </MudStack>
         </CardHeaderContent>
