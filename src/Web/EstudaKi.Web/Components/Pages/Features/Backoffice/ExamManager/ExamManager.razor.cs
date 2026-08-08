@@ -1,5 +1,6 @@
 ﻿using Estudaki.Commons.Core.CQRS;
 using Estudaki.Modules.Questions.Application.Commands;
+using Estudaki.Modules.Questions.Application.Commands.ReviewQuestionsByPublicNoticeId;
 using Estudaki.Modules.Questions.Application.DTOs;
 using Estudaki.Modules.Questions.Application.Queries.GetPublicNoticeById;
 using Estudaki.Modules.Questions.Application.Queries.GetQuestionsByExamId;
@@ -39,6 +40,7 @@ namespace EstudaKi.Web.Components.Pages.Features.Backoffice.ExamManager
         protected QuestionDto? SelectedQuestion { get; set; } = null;
         protected Exam? SelectedExam { get; set; } = null;
         protected QuestionSupportDto? SelectedQuestionSupport { get; set; }
+        protected bool IsReviewingQuestions { get; set; }
 
         protected override async Task OnInitializedAsync()
         {
@@ -196,6 +198,18 @@ namespace EstudaKi.Web.Components.Pages.Features.Backoffice.ExamManager
             if (result is not null && !result.Canceled) await LoadContent();
 
             return ;
+        }
+
+        protected async Task ReviewQuestionsWithAIAsync()
+        {
+            if (PublicNotice is null) return;
+
+            var parameters = new DialogParameters<QuestionReviewResultsModal> {
+                { x => x.PublicNoticeId, PublicNotice.Id }
+            };
+
+            var options = new DialogOptions { CloseButton = true, MaxWidth = MaxWidth.False, FullWidth = true };
+            await Dialog.ShowAsync<QuestionReviewResultsModal>("Revisão de Questões (IA)", parameters, options);
         }
 
         protected async Task AddNewQuestionEditorModalAsync()

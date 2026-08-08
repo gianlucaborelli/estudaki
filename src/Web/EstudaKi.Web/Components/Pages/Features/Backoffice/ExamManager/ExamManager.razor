@@ -50,6 +50,9 @@ else
             <MudTooltip Text="Anexar Edital" Arrow="true" Placement="Placement.Top">
                 <MudIconButton Size="Size.Small" Icon="@Icons.Material.Filled.AttachFile" OnClick="() => { }" />
             </MudTooltip>
+            <MudTooltip Text="Revisar Questões com IA" Arrow="true" Placement="Placement.Top">
+                <MudIconButton Size="Size.Small" Icon="@Icons.Material.Filled.FactCheck" OnClick="() => ReviewQuestionsWithAIAsync()" Disabled="@IsReviewingQuestions" />
+            </MudTooltip>
         </MudToolBar>
         <MudStack>
             <MudStack Row="true" AlignItems="AlignItems.Center">

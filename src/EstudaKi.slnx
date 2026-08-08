@@ -7,6 +7,12 @@
     <Project Path="Infrastructure/Estudaki.Infrastructure.Observability/Estudaki.Infrastructure.Observability.csproj" />
   </Folder>
   <Folder Name="/Modules/" />
+  <Folder Name="/Modules/Ai/">
+    <Project Path="Modules/AI/Estudaki.Modules.Ai.Adapter/Estudaki.Modules.Ai.Adapter.csproj" />
+    <Project Path="Modules/AI/Estudaki.Modules.Ai.Application/Estudaki.Modules.Ai.Application.csproj" />
+    <Project Path="Modules/AI/Estudaki.Modules.Ai.Domain/Estudaki.Modules.Ai.Domain.csproj" />
+    <Project Path="Modules/AI/Estudaki.Modules.Ai.Infrastructure/Estudaki.Modules.Ai.Infrastructure.csproj" />
+  </Folder>
   <Folder Name="/Modules/Comunications/">
     <Project Path="Modules/Comunications/Estudaki.Modules.Comunications.Application/Estudaki.Modules.Comunications.Application.csproj" />
     <Project Path="Modules/Comunications/Estudaki.Modules.Comunications.Domain/Estudaki.Modules.Comunications.Domain.csproj" />

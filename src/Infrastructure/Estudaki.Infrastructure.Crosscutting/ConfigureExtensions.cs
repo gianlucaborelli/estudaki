@@ -3,6 +3,7 @@ using Amazon.S3;
 using Estudaki.Commons.Core.CQRS.Extensions;
 using Estudaki.Commons.Core.Data.Context;
 using Estudaki.Commons.Core.Storage;
+using Estudaki.Modules.Ai.Infrastructure;
 using Estudaki.Infrastructure.Crosscutting.Storage;
 using Estudaki.Modules.Comunications.Infrastructure.Extensions;
 using Estudaki.Modules.Questions.Infrastructure.Extensions;
@@ -54,10 +55,11 @@ public static class ConfigureExtensions
             return new AmazonS3Client(credentials, config);
         });
         services.AddScoped<IStorageService, S3StorageService>();
-
+                
         // Modules
         services.AddQuestionsModule(configuration);
         services.AddComunicationsInfrastructure();
         services.AddIdentityModule(configuration);  
+        services.AddAiModule(configuration);
     }
 }

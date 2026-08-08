@@ -1,0 +1,185 @@
+@using Estudaki.Modules.Questions.Application.Commands.ReviewQuestionsByPublicNoticeId
+@using Estudaki.Modules.Questions.Application.AI
+@using EstudaKi.Web.Components.Pages.Features.Questions.Components
+@inherits QuestionReviewResultsModalBase
+
+<style>
+    .selected {
+        background-color: #1E88E5 !important;
+    }
+
+    .selected > td {
+        color: white !important;
+    }
+</style>
+
+<MudDialog Style="width: 80vw; max-width: 80vw; height: 80vh;">
+    <DialogContent>
+      <div style="height: 100%; overflow: hidden;">
+        @if (IsLoading)
+        {
+            <MudStack AlignItems="AlignItems.Center" Class="pa-8" Spacing="3">
+                <MudProgressCircular Color="Color.Primary" Indeterminate="true" />
+                <MudText>Revisando questões com IA, aguarde...</MudText>
+            </MudStack>
+        }
+        else if (Results.Count == 0)
+        {
+            <MudText>Nenhuma questão encontrada para revisão.</MudText>
+        }
+        else
+        {
+            <MudText Class="mb-3">
+                @SuccessCount de @Results.Count questões revisadas com sucesso.
+                @(DefectCount > 0 ? $"{DefectCount} questão(ões) com defeitos encontrados." : "Nenhum defeito encontrado.")
+            </MudText>
+
+            <MudGrid Style="height: calc(80vh - 120px);">
+                @* Coluna 1 - Lista de questões *@
+                <MudItem xs="3" Style="height: 100%; overflow-y: auto;">
+                    <MudTable Items="@Results"
+                              T="QuestionReviewResult"
+                              Hover="true"
+                              Dense="true"
+                              RowsPerPage="10"
+                              RowClassFunc="@((result, index) => result.QuestionId == SelectedResult?.QuestionId ? "selected" : string.Empty)"
+                              OnRowClick="@((TableRowClickEventArgs<QuestionReviewResult> e) => SelectQuestion(e.Item!))">
+                        <HeaderContent>
+                            <MudTh>Status</MudTh>
+                            <MudTh>Questão</MudTh>
+                        </HeaderContent>
+                        <RowTemplate>
+                            <MudTd DataLabel="Status">
+                                @if (!context.Success)
+                                {
+                                    <MudIcon Icon="@Icons.Material.Filled.Error" Color="Color.Error" Size="Size.Small" />
+                                }
+                                else if (context.Review?.HasDefects == true)
+                                {
+                                    <MudIcon Icon="@Icons.Material.Filled.Warning" Color="Color.Warning" Size="Size.Small" />
+                                }
+                                else
+                                {
+                                    <MudIcon Icon="@Icons.Material.Filled.CheckCircle" Color="Color.Success" Size="Size.Small" />
+                                }
+                            </MudTd>
+                            <MudTd DataLabel="Questão">@context.QuestionId</MudTd>
+                        </RowTemplate>
+                        <PagerContent>
+                            <MudTablePager HideRowsPerPage="true" HidePageNumber="true" />
+                        </PagerContent>
+                    </MudTable>
+                </MudItem>
+
+                @if (SelectedResult is not null)
+                {
+                    <MudItem xs="9" Style="height: 100%; overflow-y: auto;">
+                        @* Summary e Defeitos lado a lado, acima das colunas 2 e 3 *@
+                        <MudGrid Class="mb-3">
+                            @{
+                                var hasSummary = !SelectedResult.Success || !string.IsNullOrWhiteSpace(SelectedResult.Review!.Summary);
+                            }
+                            @if (hasSummary)
+                            {
+                                <MudItem xs="6">
+                                    <MudPaper Class="pa-3" Elevation="0" Outlined="true">
+                                        <MudText Typo="Typo.subtitle2" Class="mb-1">Resumo da Avaliação</MudText>
+                                        @if (!SelectedResult.Success)
+                                        {
+                                            <MudText Color="Color.Error">@SelectedResult.ErrorMessage</MudText>
+                                        }
+                                        else
+                                        {
+                                            <MudText Typo="Typo.body2">@SelectedResult.Review!.Summary</MudText>
+                                        }
+                                    </MudPaper>
+                                </MudItem>
+                            }
+                            <MudItem xs="@(hasSummary ? 6 : 12)">
+                                <MudPaper Class="pa-3" Elevation="0" Outlined="true">
+                                    <MudText Typo="Typo.subtitle2" Class="mb-1">Defeitos Encontrados</MudText>
+                                    @if (SelectedResult.Success && SelectedResult.Review!.Defects.Count > 0)
+                                    {
+                                        @foreach (var defect in SelectedResult.Review!.Defects)
+                                        {
+                                            <MudStack Row="true" AlignItems="AlignItems.Start" Spacing="2" Class="mb-1">
+                                                <MudIcon Icon="@GetSeverityIcon(defect.Severity)" Color="@GetSeverityColor(defect.Severity)" Size="Size.Small" />
+                                                <MudText Typo="Typo.body2">
+                                                    <strong>@defect.Type (@defect.Severity):</strong> @defect.Description
+                                                </MudText>
+                                            </MudStack>
+                                        }
+                                    }
+                                    else
+                                    {
+                                        <MudText Typo="Typo.body2">Nenhum defeito encontrado.</MudText>
+                                    }
+                                </MudPaper>
+                            </MudItem>
+                        </MudGrid>
+
+                        <MudGrid>
+                            @* Coluna 2 - Questão avaliada pela IA (checklist) *@
+                            <MudItem xs="6" Style="height: 60vh; overflow-y: auto;">
+                                @if (SelectedResult.Success && SelectedResult.Review?.Question is not null && SelectedState is not null)
+                                {
+                                    var iaQuestion = SelectedResult.Review.Question;
+                                    var state = SelectedState;
+
+                                    <MudText Typo="Typo.subtitle1" Class="mb-2">Questão Avaliada (IA)</MudText>
+
+                                    <MudCheckBox T="bool" Value="state.MainAreaSelected" ValueChanged="@(v => state.MainAreaSelected = v)" Label="@($"Área Principal: {iaQuestion.MainArea}")" Dense="true" />
+
+                                    @for (var i = 0; i < iaQuestion.SubAreas.Count; i++)
+                                    {
+                                        var index = i;
+                                        <MudCheckBox T="bool" Value="state.SubAreasSelected[index]" ValueChanged="@(v => state.SubAreasSelected[index] = v)" Label="@($"Subárea: {iaQuestion.SubAreas[index]}")" Dense="true" />
+                                    }
+
+                                    <MudText Typo="Typo.subtitle2" Class="mt-4 mb-1">Enunciado</MudText>
+                                    @for (var i = 0; i < iaQuestion.QuestionContents.Count; i++)
+                                    {
+                                        var index = i;
+                                        <MudCheckBox T="bool" Value="state.QuestionContentsSelected[index]" ValueChanged="@(v => state.QuestionContentsSelected[index] = v)" Label="@iaQuestion.QuestionContents[index].Text" Dense="true" />
+                                    }
+
+                                    @if (iaQuestion.Alternatives is { Count: > 0 })
+                                    {
+                                        <MudText Typo="Typo.subtitle2" Class="mt-4 mb-1">Alternativas</MudText>
+                                        @for (var i = 0; i < iaQuestion.Alternatives.Count; i++)
+                                        {
+                                            var index = i;
+                                            var alternative = iaQuestion.Alternatives[index];
+                                            <MudCheckBox T="bool" Value="state.AlternativesSelected[index]" ValueChanged="@(v => state.AlternativesSelected[index] = v)" Label="@($"{alternative.Letter}) {alternative.Text}")" Dense="true" />
+                                        }
+                                    }
+                                }
+                                else
+                                {
+                                    <MudText>Revisão da IA indisponível para esta questão.</MudText>
+                                }
+                            </MudItem>
+
+                            @* Coluna 3 - Questão original *@
+                            <MudItem xs="6" Style="height: 60vh; overflow-y: auto;">
+                                <MudText Typo="Typo.subtitle1" Class="mb-2">Questão Original</MudText>
+                                @if (SelectedQuestionDto is not null)
+                                {
+                                    <QuestionComponent Value="SelectedQuestionDto" />
+                                }
+                                else
+                                {
+                                    <MudText>Questão original não encontrada.</MudText>
+                                }
+                            </MudItem>
+                        </MudGrid>
+                    </MudItem>
+                }
+            </MudGrid>
+        }
+      </div>
+    </DialogContent>
+    <DialogActions>
+        <MudButton OnClick="Close">Fechar</MudButton>
+    </DialogActions>
+</MudDialog>
