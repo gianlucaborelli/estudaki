@@ -1,7 +1,6 @@
 @page "/Backoffice/AIPromptManager"
 @using EstudaKi.Web.Components.Pages.Features.Backoffice.AIPromptManager.Components
-@using Estudaki.Commons.Core.AI.Prompts
-@using Estudaki.Modules.Ai.Domain.Entities
+@using Estudaki.Modules.Ai.Application.DTOs
 
 @inherits AIPromptManagerBase
 @attribute [Authorize(Roles = "Admin, BackOffice")]
@@ -19,7 +18,7 @@
 </MudToolBar>
 
 <MudTable Items="@Prompts"
-          T="AIPrompt"
+          T="AIPromptDto"
           Hover="true"
           Dense="true"
           Breakpoint="Breakpoint.Sm"

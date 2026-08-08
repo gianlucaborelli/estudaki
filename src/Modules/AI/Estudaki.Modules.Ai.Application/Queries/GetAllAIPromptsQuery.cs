@@ -1,9 +1,9 @@
 using Estudaki.Commons.Core.CQRS;
-using Estudaki.Modules.Ai.Domain.Entities;
+using Estudaki.Modules.Ai.Application.DTOs;
 
 namespace Estudaki.Modules.Ai.Application.Queries;
 
 /// <summary>
 /// Busca todos os prompts de IA cadastrados.
 /// </summary>
-public record GetAllAIPromptsQuery : IQuery<List<AIPrompt>>;
+public record GetAllAIPromptsQuery : IQuery<List<AIPromptDto>>;

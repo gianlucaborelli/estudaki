@@ -1,7 +1,7 @@
 using Estudaki.Commons.Core.CQRS;
 using Estudaki.Modules.Ai.Application.Commands;
+using Estudaki.Modules.Ai.Application.DTOs;
 using Estudaki.Modules.Ai.Application.Queries;
-using Estudaki.Modules.Ai.Domain.Entities;
 using EstudaKi.Web.Components.Pages.Features.Backoffice.AIPromptManager.Components;
 using Microsoft.AspNetCore.Components;
 using MudBlazor;
@@ -19,7 +19,7 @@ public class AIPromptManagerBase : ComponentBase
     [Inject]
     protected ICommandDispatcher CommandDispatcher { get; set; } = default!;
 
-    protected List<AIPrompt> Prompts { get; set; } = [];
+    protected List<AIPromptDto> Prompts { get; set; } = [];
     protected bool IsLoading { get; set; } = true;
 
     protected override async Task OnInitializedAsync()
@@ -32,7 +32,7 @@ public class AIPromptManagerBase : ComponentBase
         IsLoading = true;
         try
         {
-            Prompts = await QueryDispatcher.DispatchAsync<GetAllAIPromptsQuery, List<AIPrompt>>(new GetAllAIPromptsQuery());
+            Prompts = await QueryDispatcher.DispatchAsync<GetAllAIPromptsQuery, List<AIPromptDto>>(new GetAllAIPromptsQuery());
         }
         catch (Exception ex)
         {
@@ -58,7 +58,7 @@ public class AIPromptManagerBase : ComponentBase
             await LoadPromptsAsync();
     }
 
-    protected async Task OpenEditDialogAsync(AIPrompt prompt)
+    protected async Task OpenEditDialogAsync(AIPromptDto prompt)
     {
         var parameters = new DialogParameters();
         parameters.Add(nameof(AIPromptEditorModal.OriginalPrompt), prompt);
@@ -71,7 +71,7 @@ public class AIPromptManagerBase : ComponentBase
             await LoadPromptsAsync();
     }
 
-    protected async Task DeleteAsync(AIPrompt prompt)
+    protected async Task DeleteAsync(AIPromptDto prompt)
     {
         bool? confirmed = await Dialog.ShowMessageBoxAsync(
             "Atenção",

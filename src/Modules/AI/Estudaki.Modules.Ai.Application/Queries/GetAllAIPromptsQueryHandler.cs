@@ -1,10 +1,10 @@
 using Estudaki.Commons.Core.CQRS;
+using Estudaki.Modules.Ai.Application.DTOs;
 using Estudaki.Modules.Ai.Application.Interfaces;
-using Estudaki.Modules.Ai.Domain.Entities;
 
 namespace Estudaki.Modules.Ai.Application.Queries;
 
-public class GetAllAIPromptsQueryHandler : IQueryHandler<GetAllAIPromptsQuery, List<AIPrompt>>
+public class GetAllAIPromptsQueryHandler : IQueryHandler<GetAllAIPromptsQuery, List<AIPromptDto>>
 {
     private readonly IAiRepository _promptRepository;
 
@@ -13,9 +13,9 @@ public class GetAllAIPromptsQueryHandler : IQueryHandler<GetAllAIPromptsQuery, L
         _promptRepository = promptRepository;
     }
 
-    public async Task<List<AIPrompt>> HandleAsync(GetAllAIPromptsQuery query, CancellationToken cancellationToken = default)
+    public async Task<List<AIPromptDto>> HandleAsync(GetAllAIPromptsQuery query, CancellationToken cancellationToken = default)
     {
         var prompts = await _promptRepository.GetAll();
-        return prompts.ToList();
+        return prompts.Select(AIPromptDto.FromEntity).ToList();
     }
 }

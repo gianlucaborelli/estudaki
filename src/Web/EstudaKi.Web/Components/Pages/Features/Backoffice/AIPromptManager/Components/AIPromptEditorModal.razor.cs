@@ -1,6 +1,6 @@
 using Estudaki.Commons.Core.CQRS;
 using Estudaki.Modules.Ai.Application.Commands;
-using Estudaki.Modules.Ai.Domain.Entities;
+using Estudaki.Modules.Ai.Application.DTOs;
 using Microsoft.AspNetCore.Components;
 using MudBlazor;
 
@@ -17,7 +17,7 @@ public class AIPromptEditorModalBase : ComponentBase
     protected ICommandDispatcher CommandDispatcher { get; set; } = default!;
 
     [Parameter]
-    public AIPrompt? OriginalPrompt { get; set; }
+    public AIPromptDto? OriginalPrompt { get; set; }
 
     protected bool IsEditMode => OriginalPrompt is not null;
     protected bool IsSaving { get; set; }

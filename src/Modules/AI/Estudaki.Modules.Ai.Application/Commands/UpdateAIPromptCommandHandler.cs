@@ -1,4 +1,5 @@
 using Estudaki.Commons.Core.CQRS;
+using Estudaki.Modules.Ai.Application.DTOs;
 using Estudaki.Modules.Ai.Application.Interfaces;
 using FluentValidation;
 
@@ -33,6 +34,6 @@ public class UpdateAIPromptCommandHandler : CommandHandler, ICommandHandler<Upda
         prompt.UpdateContent(command.Content, command.Description);
         await _promptRepository.Update(prompt);
 
-        return new AIPromptCommandResult { ValidationResult = ValidationResult, Prompt = prompt };
+        return new AIPromptCommandResult { ValidationResult = ValidationResult, Prompt = AIPromptDto.FromEntity(prompt) };
     }
 }

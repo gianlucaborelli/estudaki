@@ -1,4 +1,5 @@
 using Estudaki.Commons.Core.CQRS;
+using Estudaki.Modules.Ai.Application.DTOs;
 using Estudaki.Modules.Ai.Application.Interfaces;
 using Estudaki.Modules.Ai.Domain.Entities;
 using FluentValidation;
@@ -34,6 +35,6 @@ public class CreateAIPromptCommandHandler : CommandHandler, ICommandHandler<Crea
         var prompt = new AIPrompt(command.Name, command.Content, command.Description);
         _promptRepository.Add(prompt);
 
-        return new AIPromptCommandResult { ValidationResult = ValidationResult, Prompt = prompt };
+        return new AIPromptCommandResult { ValidationResult = ValidationResult, Prompt = AIPromptDto.FromEntity(prompt) };
     }
 }

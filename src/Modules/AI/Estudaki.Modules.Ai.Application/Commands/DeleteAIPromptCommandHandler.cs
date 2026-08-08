@@ -1,5 +1,5 @@
-using Estudaki.Commons.Core.AI.Prompts;
 using Estudaki.Commons.Core.CQRS;
+using Estudaki.Modules.Ai.Application.DTOs;
 using Estudaki.Modules.Ai.Application.Interfaces;
 using FluentValidation;
 using FluentValidation.Results;
@@ -34,6 +34,6 @@ public class DeleteAIPromptCommandHandler : CommandHandler, ICommandHandler<Dele
 
         await _promptRepository.Remove(command.Id);
 
-        return new AIPromptCommandResult { ValidationResult = ValidationResult, Prompt = prompt };
+        return new AIPromptCommandResult { ValidationResult = ValidationResult, Prompt = AIPromptDto.FromEntity(prompt) };
     }
 }
