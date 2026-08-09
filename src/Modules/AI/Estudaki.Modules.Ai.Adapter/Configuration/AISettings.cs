@@ -20,5 +20,11 @@ public class AISettings
     /// Endpoint para uso com provedores compatíveis com a API da OpenAI.
     /// </summary>
     public string? BaseUrl { get; set; }
+
+    /// <summary>
+    /// Tempo máximo, em segundos, aguardado por uma resposta do provedor de IA
+    /// antes de a requisição ser cancelada por timeout. Padrão: 100 segundos (1m40s).
+    /// </summary>
+    public int TimeoutInSeconds { get; set; } = 100;
 }
 

@@ -29,7 +29,10 @@ public static class ServiceCollectionExtensions
             var aiSettings = configuration.GetSection(AISettings.SectionName).Get<AISettings>()
                 ?? throw new InvalidOperationException("AI configuration not found in appsettings.json");
 
-            var options = new OpenAIClientOptions();
+            var options = new OpenAIClientOptions
+            {
+                NetworkTimeout = TimeSpan.FromSeconds(aiSettings.TimeoutInSeconds)
+            };
             if (!string.IsNullOrWhiteSpace(aiSettings.BaseUrl))
                 options.Endpoint = new Uri(aiSettings.BaseUrl);
 
