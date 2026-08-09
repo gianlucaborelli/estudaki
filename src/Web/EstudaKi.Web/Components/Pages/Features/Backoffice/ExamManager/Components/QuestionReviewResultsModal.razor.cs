@@ -1,8 +1,10 @@
 using Estudaki.Commons.Core.CQRS;
 using Estudaki.Modules.Questions.Application.AI;
+using Estudaki.Modules.Questions.Application.Commands;
 using Estudaki.Modules.Questions.Application.Commands.ReviewQuestionsByPublicNoticeId;
 using Estudaki.Modules.Questions.Application.DTOs;
 using Estudaki.Modules.Questions.Application.Queries.GetQuestionsByPublicNoticeId;
+using Estudaki.Modules.Questions.Domain.ValueObjects;
 using Microsoft.AspNetCore.Components;
 using MudBlazor;
 
@@ -19,6 +21,8 @@ public class QuestionReviewResultsModalBase : ComponentBase
     protected IQueryDispatcher QueryDispatcher { get; set; } = default!;
     [Inject]
     protected ISnackbar Snackbar { get; set; } = default!;
+    [Inject]
+    protected IDialogService DialogService { get; set; } = default!;
 
     [Parameter]
     public string PublicNoticeId { get; set; } = string.Empty;
@@ -93,6 +97,108 @@ public class QuestionReviewResultsModalBase : ComponentBase
     }
 
     protected void Close() => Dialog.Close(DialogResult.Ok(true));
+
+    protected async Task ApproveAsync()
+    {
+        if (SelectedResult?.Review?.Question is null || SelectedQuestionDto is null || SelectedState is null)
+            return;
+
+        var updatedQuestion = BuildUpdatedQuestionDto(SelectedQuestionDto, SelectedResult.Review.Question, SelectedState);
+
+        var parameters = new DialogParameters<ApproveQuestionReviewModal>
+        {
+            { x => x.OriginalQuestion, SelectedQuestionDto },
+            { x => x.UpdatedQuestion, updatedQuestion }
+        };
+
+        var dialog = await DialogService.ShowAsync<ApproveQuestionReviewModal>("Confirmar alterações", parameters);
+        var result = await dialog.Result;
+
+        if (result is null || result.Canceled)
+            return;
+
+        try
+        {
+            var command = new UpdateQuestionCommand(updatedQuestion);
+            var validationResult = await CommandDispatcher.DispatchAsync<UpdateQuestionCommand, FluentValidation.Results.ValidationResult>(command);
+
+            if (!validationResult.IsValid)
+            {
+                Snackbar.Add("Não foi possível aprovar as alterações.", Severity.Error);
+                return;
+            }
+
+            var index = Questions.FindIndex(q => q.QuestionId == updatedQuestion.QuestionId);
+            if (index >= 0)
+            {
+                Questions[index] = updatedQuestion;
+            }
+            SelectedQuestionDto = updatedQuestion;
+
+            Snackbar.Add("Questão atualizada com sucesso.", Severity.Success);
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine("Error approving question review: " + ex.Message);
+            Snackbar.Add("Erro ao aprovar alterações da questão.", Severity.Error);
+        }
+    }
+
+    private static QuestionDto BuildUpdatedQuestionDto(QuestionDto original, IAQuestion iaQuestion, QuestionReviewSelectionState state)
+    {
+        var updated = QuestionDto.Clone(original);
+
+        if (state.MainAreaSelected)
+        {
+            updated.MainArea = iaQuestion.MainArea;
+        }
+
+        // Substitui apenas os itens marcados, mantendo os demais intactos (por posição).
+        for (var i = 0; i < state.SubAreasSelected.Count && i < iaQuestion.SubAreas.Count && i < updated.SubAreas.Length; i++)
+        {
+            if (state.SubAreasSelected[i])
+            {
+                updated.SubAreas[i] = iaQuestion.SubAreas[i];
+            }
+        }
+
+        for (var i = 0; i < state.QuestionContentsSelected.Count && i < iaQuestion.QuestionContents.Count && i < updated.QuestionContents.Count; i++)
+        {
+            if (state.QuestionContentsSelected[i])
+            {
+                var originalOrder = updated.QuestionContents[i].Order;
+                updated.QuestionContents[i] = ToParagraphBlock(iaQuestion.QuestionContents[i], originalOrder);
+            }
+        }
+
+        if (iaQuestion.Alternatives is { Count: > 0 } && updated.Choices is not null)
+        {
+            for (var i = 0; i < state.AlternativesSelected.Count && i < iaQuestion.Alternatives.Count && i < updated.Choices.Count; i++)
+            {
+                if (state.AlternativesSelected[i])
+                {
+                    updated.Choices[i] = ToChoice(iaQuestion.Alternatives[i]);
+                }
+            }
+        }
+
+        return updated;
+    }
+
+    private static ParagraphBlock ToParagraphBlock(SimpleContent content, int order)
+        => new()
+        {
+            Inlines = [new TextInline { Text = content.Text }],
+            Order = order,
+        };
+
+    private static Choice ToChoice(SimpleAlternative alternative)
+        => new()
+        {
+            Option = alternative.Letter,
+            IsCorrect = alternative.IsCorrect,
+            Content = [new TextInline { Text = alternative.Text }],
+        };
 
     protected static string GetSeverityIcon(string severity) => severity?.Trim().ToLowerInvariant() switch
     {

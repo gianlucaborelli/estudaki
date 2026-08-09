@@ -1,6 +1,5 @@
 @using Estudaki.Modules.Questions.Application.Commands.ReviewQuestionsByPublicNoticeId
 @using Estudaki.Modules.Questions.Application.AI
-@using EstudaKi.Web.Components.Pages.Features.Questions.Components
 @inherits QuestionReviewResultsModalBase
 
 <style>
@@ -126,7 +125,16 @@
                                     var iaQuestion = SelectedResult.Review.Question;
                                     var state = SelectedState;
 
-                                    <MudText Typo="Typo.subtitle1" Class="mb-2">Questão Avaliada (IA)</MudText>
+                                    <MudStack Row="true" Justify="Justify.SpaceBetween" AlignItems="AlignItems.Center" Class="mb-2">
+                                        <MudText Typo="Typo.subtitle1">Questão Avaliada (IA)</MudText>
+                                        <MudButton Variant="Variant.Filled"
+                                                   Color="Color.Success"
+                                                   Size="Size.Small"
+                                                   StartIcon="@Icons.Material.Filled.Check"
+                                                   OnClick="ApproveAsync">
+                                            Aprovar
+                                        </MudButton>
+                                    </MudStack>
 
                                     <MudCheckBox T="bool" Value="state.MainAreaSelected" ValueChanged="@(v => state.MainAreaSelected = v)" Label="@($"Área Principal: {iaQuestion.MainArea}")" Dense="true" />
 
@@ -165,7 +173,7 @@
                                 <MudText Typo="Typo.subtitle1" Class="mb-2">Questão Original</MudText>
                                 @if (SelectedQuestionDto is not null)
                                 {
-                                    <QuestionComponent Value="SelectedQuestionDto" />
+                                    <QuestionReviewPreview Value="SelectedQuestionDto" />
                                 }
                                 else
                                 {

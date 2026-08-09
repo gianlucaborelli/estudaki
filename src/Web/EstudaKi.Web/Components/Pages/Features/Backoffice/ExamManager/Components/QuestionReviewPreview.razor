@@ -1,0 +1,45 @@
+@using Estudaki.Modules.Questions.Domain.ValueObjects
+@inherits QuestionReviewPreviewBase
+
+<MudPaper Class="pa-3" Elevation="0" Outlined="true">
+    @if (Value is null)
+    {
+        <MudText>Questão não disponível.</MudText>
+    }
+    else
+    {
+        <MudText Typo="Typo.subtitle2" Class="mb-2"><strong>Área:</strong> @Value.MainArea</MudText>
+        @if (Value.SubAreas is { Length: > 0 })
+        {
+            <MudText Typo="Typo.body2" Class="mb-2"><strong>Subáreas:</strong> @string.Join(", ", Value.SubAreas)</MudText>
+        }
+
+        @if (Value.QuestionSupports is { Count: > 0 })
+        {
+            @foreach (var support in Value.QuestionSupports)
+            {
+                @foreach (var contentBlock in support.Contents.OrderBy(c => c.Order))
+                {
+                    <div class="mb-2">@RenderBlockText(contentBlock)</div>
+                }
+            }
+        }
+
+        @if (Value.QuestionContents is not null)
+        {
+            @foreach (var contentBlock in Value.QuestionContents.OrderBy(c => c.Order))
+            {
+                <div class="mb-2">@RenderBlockText(contentBlock)</div>
+            }
+        }
+
+        @if (Value.Choices is { Count: > 0 })
+        {
+            <MudText Typo="Typo.subtitle2" Class="mt-3 mb-1">Alternativas</MudText>
+            @foreach (var choice in Value.Choices)
+            {
+                <MudText Typo="Typo.body2">@choice.Option) @RenderInlineText(choice.Content)</MudText>
+            }
+        }
+    }
+</MudPaper>

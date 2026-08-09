@@ -16,6 +16,13 @@ namespace Estudaki.Modules.Questions.Application.Commands.ReviewQuestionsByPubli
 public class ReviewQuestionsByPublicNoticeIdCommandHandler
     : CommandHandler, ICommandHandler<ReviewQuestionsByPublicNoticeIdCommand, List<QuestionReviewResult>>
 {
+    /// <summary>
+    /// Limite máximo de requisições concorrentes enviadas à IA. O provedor utilizado
+    /// suporta até 2500 requisições concorrentes, porém um valor mais conservador é
+    /// usado por padrão para evitar sobrecarga desnecessária em lotes muito grandes.
+    /// </summary>
+    private const int MaxConcurrency = 50;
+
     private readonly IValidator<ReviewQuestionsByPublicNoticeIdCommand> _validator;
     private readonly IQuestionRepository _questionRepository;
     private readonly IQuestionSupportRepository _questionSupportRepository;
@@ -54,14 +61,26 @@ public class ReviewQuestionsByPublicNoticeIdCommandHandler
         var questions = await _questionRepository.GetByPublicNoticeId(command.PublicNoticeId);
         var questionSupports = await _questionSupportRepository.GetByPublicNoticeId(command.PublicNoticeId);
 
-        foreach (var question in questions)
-        {
-            var iaQuestion = question.ToIaQuestion(questionSupports);
-            var questionContent = JsonSerializer.Serialize(iaQuestion);
+        using var throttler = new SemaphoreSlim(MaxConcurrency);
 
-            var result = await ReviewQuestionAsync(question.Id, prompt, questionContent, cancellationToken);
-            results.Add(result);
-        }
+        var reviewTasks = questions.Select(async question =>
+        {
+            await throttler.WaitAsync(cancellationToken);
+            try
+            {
+                var iaQuestion = question.ToIaQuestion(questionSupports);
+                var questionContent = JsonSerializer.Serialize(iaQuestion);
+
+                return await ReviewQuestionAsync(question.Id, prompt, questionContent, cancellationToken);
+            }
+            finally
+            {
+                throttler.Release();
+            }
+        });
+
+        var reviewResults = await Task.WhenAll(reviewTasks);
+        results.AddRange(reviewResults);
 
         return results;
     }
