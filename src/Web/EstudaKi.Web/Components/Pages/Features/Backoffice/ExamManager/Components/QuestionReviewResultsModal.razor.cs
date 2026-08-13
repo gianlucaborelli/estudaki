@@ -154,11 +154,15 @@ public class QuestionReviewResultsModalBase : ComponentBase
         }
 
         // Substitui apenas os itens marcados, mantendo os demais intactos (por posição).
-        for (var i = 0; i < state.SubAreasSelected.Count && i < iaQuestion.SubAreas.Count && i < updated.SubAreas.Length; i++)
+        for (var i = 0; i < state.SubAreasSelected.Count && i < iaQuestion.SubAreas.Count; i++)
         {
             if (state.SubAreasSelected[i])
             {
-                updated.SubAreas[i] = iaQuestion.SubAreas[i];
+                var subArea = iaQuestion.SubAreas[i];
+                if (!updated.SubAreas.Contains(subArea))
+                {
+                    updated.SubAreas = updated.SubAreas.Append(subArea).ToArray();
+                }
             }
         }
 
