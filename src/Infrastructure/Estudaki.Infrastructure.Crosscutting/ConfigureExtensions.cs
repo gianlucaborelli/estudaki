@@ -55,7 +55,8 @@ public static class ConfigureExtensions
             return new AmazonS3Client(credentials, config);
         });
         services.AddScoped<IStorageService, S3StorageService>();
-                
+        services.AddScoped<IJsonArtifactStorage, JsonArtifactStorage>();
+
         // Modules
         services.AddQuestionsModule(configuration);
         services.AddComunicationsInfrastructure();
