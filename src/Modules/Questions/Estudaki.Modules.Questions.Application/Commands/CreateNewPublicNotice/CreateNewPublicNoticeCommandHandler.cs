@@ -36,6 +36,7 @@ public class CreateNewPublicNoticeCommandHandler : CommandHandler, ICommandHandl
         }
 
         var publicNotice = command.PublicNotice.ToEntity();
+        publicNotice.CreatedAt = DateTime.UtcNow;
 
         _publicNoticeRepository.Add(publicNotice);
                 
