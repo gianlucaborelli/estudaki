@@ -3,6 +3,7 @@ using Estudaki.Commons.Core.CQRS.Dispatchers;
 using Estudaki.Modules.Questions.Application.Commands;
 using Estudaki.Modules.Questions.Application.DTOs;
 using Estudaki.Modules.Questions.Application.Queries.GetPublicNoticeList;
+using Estudaki.Modules.Questions.Domain.Common;
 using EstudaKi.Web.Components.Pages.Features.Backoffice.ExamManager.Components;
 using EstudaKi.Web.Components.Pages.Features.Backoffice.ExamManager.Modals;
 using EstudaKi.Web.Components.Shared;
@@ -25,31 +26,60 @@ public class ExamListBase : ComponentBase
     [Inject]
     protected ICommandDispatcher CommandDispatcher { get; set; } = default!;
     protected List<PublicNoticeDto> PublicNoticeList { get; set; } = [];
-    protected bool IsLoading { get; set; } = true;
+    protected bool IsLoading { get; set; } = false;
     protected List<PublicNoticeDto> SelectedItems { get; set; } = [];
 
-    protected override async Task OnInitializedAsync()
+    protected MudTable<PublicNoticeDto>? Table;
+    protected string SearchString { get; set; } = string.Empty;
+    protected string FilterByExamCategory { get; set; } = string.Empty;
+
+    //protected override async Task OnInitializedAsync()
+    //{
+    //    await Table.ReloadServerData();
+    //}    
+
+    protected async Task<TableData<PublicNoticeDto>> LoadServerData(
+    TableState state,
+    CancellationToken cancellationToken)
     {
-        await LoadPublicNotices();
+        
+        var page = state.Page;
+        var pageSize = state.PageSize;
+
+        var sortLabel = state.SortLabel;
+        var sortDirection = state.SortDirection;
+
+        var search = SearchString;
+        var category = FilterByExamCategory;
+
+        var query = new GetPublicNoticeListQuery
+        {
+            Page = page,
+            PageSize = pageSize,
+            Search = search,
+            Category = category,
+            SortLabel = sortLabel,
+            SortDirection = sortDirection.ToString(),
+        };
+
+        var result = await QueryDispatcher.DispatchAsync<GetPublicNoticeListQuery, PagedResult<PublicNoticeDto>>(query);
+        
+        return new TableData<PublicNoticeDto>
+        {
+            Items = result.Items,
+            TotalItems = Convert.ToInt32(result.TotalItems)
+        };
     }
 
-    private async Task LoadPublicNotices()
+    protected async Task OnSearchChanged(string value)
     {
-        IsLoading = true;
-        try
-        {
-            PublicNoticeList = await QueryDispatcher.DispatchAsync<GetPublicNoticeListQuery, List<PublicNoticeDto>>(new GetPublicNoticeListQuery());
-        }
-        catch (Exception ex)
-        {
-            // Handle the exception (e.g., log it, show a message to the user, etc.)
-            Console.WriteLine($"Error loading public notices: {ex.Message}");
-            PublicNoticeList = new List<PublicNoticeDto>();
-        }
-        finally
-        {
-            IsLoading = false;
-        }
+        await Table!.ReloadServerData();
+    }
+
+    protected async Task OnCategoryChanged(string? value)
+    {
+        FilterByExamCategory = value;
+        await Table!.ReloadServerData();
     }
 
     protected void OnSelectedItemsChanged(HashSet<PublicNoticeDto> selectedItems)
@@ -85,7 +115,7 @@ public class ExamListBase : ComponentBase
         var dialog = await DialogService.ShowAsync<CreateNewPublicNoticeModal>("Criar Novo Edital", parameters, options);
         var result = await dialog.Result;
 
-        if (result is not null) await LoadPublicNotices();
+        if (result is not null) await Table.ReloadServerData();
 
         return;
     }
@@ -113,11 +143,11 @@ public class ExamListBase : ComponentBase
             if (deleteResult.IsValid)
             {
                 Snackbar.Add("Provas unificadas com sucesso!", Severity.Success);
-                await LoadPublicNotices();
+                await Table.ReloadServerData();
             }
             else
                 Snackbar.Add("Falha ao unificar as provas. Verifique se há dependências.", Severity.Error);
-            await LoadPublicNotices();
+            await Table.ReloadServerData();
         }
 
         return;

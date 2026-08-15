@@ -7,53 +7,82 @@
 
 <MudText Typo="Typo.h5" Align="Align.Center">Lista de Provas</MudText>
 
-<MudToolBar>    
-    <MudTooltip Text="Criar" Arrow="true" Placement="Placement.Top">
-        <MudIconButton OnClick="OpenCreateNewPublicNoticeDialogAsync" Icon="@Icons.Material.Filled.Add" /> @* Criar *@
-    </MudTooltip>
-    <MudSpacer />    
-    @if (SelectedItems.Count > 0)    
-    {
-        <MudText Typo="Typo.subtitle1" Align="Align.Center">@SelectedItems.Count item(s) selecionado(s)</MudText>
-        @if (SelectedItems.Count > 1)
+<MudCard Class="mb-3">
+    <MudToolBar>
+        <MudTooltip Text="Criar" Arrow="true" Placement="Placement.Top">
+            <MudIconButton OnClick="OpenCreateNewPublicNoticeDialogAsync" Icon="@Icons.Material.Filled.Add" /> @* Criar *@
+        </MudTooltip>
+        <MudSpacer />
+        @if (SelectedItems.Count > 0)
         {
-            <MudTooltip Text="Unificar Provas" Arrow="true" Placement="Placement.Top">
-                <MudIconButton OnClick="UnifyPublicNoticeAsync" Icon="@Icons.Material.Filled.FileCopy" /> @* Unificar provas *@
+            <MudText Typo="Typo.subtitle1" Align="Align.Center">@SelectedItems.Count item(s) selecionado(s)</MudText>
+            @if (SelectedItems.Count > 1)
+            {
+                <MudTooltip Text="Unificar Provas" Arrow="true" Placement="Placement.Top">
+                    <MudIconButton OnClick="UnifyPublicNoticeAsync" Icon="@Icons.Material.Filled.FileCopy" /> @* Unificar provas *@
+                </MudTooltip>
+            }
+            <MudTooltip Text="Publicar" Arrow="true" Placement="Placement.Top">
+                <MudIconButton Icon="@Icons.Material.Filled.Publish" /> @* Publica *@
             </MudTooltip>
-        }        
-        <MudTooltip Text="Publicar" Arrow="true" Placement="Placement.Top">
-            <MudIconButton Icon="@Icons.Material.Filled.Publish" /> @* Publica *@
-        </MudTooltip>
-        <MudTooltip Text="Despublicar" Arrow="true" Placement="Placement.Top">
-            <MudIconButton Icon="@Icons.Material.Filled.Download" />   @* Despublica *@
-        </MudTooltip>
-        <MudTooltip Text="Deletar" Arrow="true" Placement="Placement.Top">
-            <MudIconButton Icon="@Icons.Material.Filled.Delete" />   @* Deleta *@
-        </MudTooltip>
-    }
-</MudToolBar>
+            <MudTooltip Text="Despublicar" Arrow="true" Placement="Placement.Top">
+                <MudIconButton Icon="@Icons.Material.Filled.Download" />   @* Despublica *@
+            </MudTooltip>
+            <MudTooltip Text="Deletar" Arrow="true" Placement="Placement.Top">
+                <MudIconButton Icon="@Icons.Material.Filled.Delete" />   @* Deleta *@
+            </MudTooltip>
+        }
+    </MudToolBar>
+</MudCard>
 
-<MudTable 
-    Items="@PublicNoticeList" 
-    T="PublicNoticeDto" 
-    MultiSelection="true" 
+<MudTable @ref="Table"
+    ServerData="LoadServerData"
+    T="PublicNoticeDto"
+    MultiSelection="true"
     SelectedItemsChanged="OnSelectedItemsChanged"
-    Hover="true" 
+    Hover="true"
     Dense="true"
-    Breakpoint="Breakpoint.Sm" 
-    Loading="@IsLoading" 
+    Breakpoint="Breakpoint.Sm"
+    Loading="@IsLoading"
+    SortLabel="Ordenar Por"
     LoadingProgressColor="Color.Info">
+    <ToolBarContent>
+        <MudText Typo="Typo.h6">Provas</MudText>
+        <MudSpacer />
+        <MudTextField @bind-Value="SearchString" 
+                      Immediate="true"
+                      DebounceInterval="500"
+                      Placeholder="Pesquisar"
+                      Adornment="Adornment.Start"
+                      AdornmentIcon="@Icons.Material.Filled.Search"
+                      IconSize="Size.Medium"
+                      Class="mt-0"
+                      OnDebounceIntervalElapsed="OnSearchChanged" />
+        <MudSpacer />
+        <MudSelect T="string"
+                   Value="@FilterByExamCategory"
+                   ValueChanged="OnCategoryChanged"
+                   Label="Categoria do Exame"
+                   Class="mt-0">
+            @foreach (var category in ExamCategories.All)
+            {
+                <MudSelectItem Value="@category">
+                    @ExamCategories.GetDisplayName(category)
+                </MudSelectItem>
+            }
+        </MudSelect>
+    </ToolBarContent>
     <HeaderContent>
-        <MudTh>Banca</MudTh>
-        <MudTh>Contratante</MudTh>
-        <MudTh>Ano</MudTh>
-        <MudTh>Nr</MudTh>
-        <MudTh>Categoria</MudTh>
-        <MudTh>Qt Exames</MudTh>
-        <MudTh>Qt Questões</MudTh>
-        <MudTh>Publicado</MudTh>
-        <MudTh>Revisado</MudTh>
-        <MudTh>Criado em</MudTh>
+        <MudTh><MudTableSortLabel T="PublicNoticeDto" SortLabel="ExaminerOrganization">Banca</MudTableSortLabel></MudTh>
+        <MudTh><MudTableSortLabel T="PublicNoticeDto" SortLabel="ContractingOrganization">Contratante</MudTableSortLabel></MudTh>
+        <MudTh><MudTableSortLabel T="PublicNoticeDto" SortLabel="Year">Ano</MudTableSortLabel></MudTh>
+        <MudTh><MudTableSortLabel T="PublicNoticeDto" SortLabel="Number">Nr</MudTableSortLabel></MudTh>
+        <MudTh><MudTableSortLabel T="PublicNoticeDto" SortLabel="ExamCategory">Categoria</MudTableSortLabel></MudTh>
+        <MudTh><MudTableSortLabel T="PublicNoticeDto" SortLabel="Exams.Count">Qt Exames</MudTableSortLabel></MudTh>
+        <MudTh><MudTableSortLabel T="PublicNoticeDto" SortLabel="QuestionCount">Qt Questões</MudTableSortLabel></MudTh>
+        <MudTh><MudTableSortLabel T="PublicNoticeDto" SortLabel="IsPublished">Publicado</MudTableSortLabel></MudTh>
+        <MudTh><MudTableSortLabel T="PublicNoticeDto" SortLabel="IsReviewed">Revisado</MudTableSortLabel></MudTh>
+        <MudTh><MudTableSortLabel T="PublicNoticeDto" SortLabel="CreatedAt">Criado em</MudTableSortLabel></MudTh>
         <MudTh>Ações</MudTh>
     </HeaderContent>
     <RowTemplate>
@@ -85,7 +114,10 @@
 
         </MudTd>
     </RowTemplate>
+    <PagerContent>
+        <MudTablePager PageSizeOptions="new int[] { 10, 25, 50, 100, int.MaxValue }"
+                       RowsPerPageString="Itens por página"
+                       HorizontalAlignment="HorizontalAlignment.Center"
+                       HidePageNumber="true" />
+    </PagerContent>
 </MudTable>
-
-
-
