@@ -27,6 +27,28 @@ public class Question : Entity
     /// Desnormalizado para melhor performance em queries.
     /// </summary>
     public List<QuestionExam> Exams { get; set; } = [];
+
+    public static Question Create(
+        string type, 
+        string mainArea, 
+        string[] subAreas, 
+        List<string> questionSupports, 
+        List<ContentBlock> questionContents, 
+        List<Choice> choices,
+        QuestionExam questionExam)
+    {
+        return new Question
+        {
+            CreatedAt = DateTime.UtcNow,
+            Type = type,
+            MainArea = mainArea,
+            SubAreas = subAreas,
+            QuestionSupports = questionSupports,
+            QuestionContents = questionContents,
+            Choices = choices,
+            Exams = new List<QuestionExam> { questionExam }
+        };
+    }
 }
 
 

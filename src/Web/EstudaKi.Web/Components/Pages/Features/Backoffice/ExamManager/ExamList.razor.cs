@@ -3,6 +3,8 @@ using Estudaki.Commons.Core.CQRS.Dispatchers;
 using Estudaki.Modules.Questions.Application.Commands;
 using Estudaki.Modules.Questions.Application.DTOs;
 using Estudaki.Modules.Questions.Application.Queries.GetPublicNoticeList;
+using EstudaKi.Web.Components.Pages.Features.Backoffice.ExamManager.Components;
+using EstudaKi.Web.Components.Pages.Features.Backoffice.ExamManager.Modals;
 using EstudaKi.Web.Components.Shared;
 using FluentValidation.Results;
 using Microsoft.AspNetCore.Components;
@@ -73,6 +75,19 @@ public class ExamListBase : ComponentBase
             Snackbar.Add($"Item {item.Id} deletado", Severity.Success);
         }
         StateHasChanged();
+    }
+
+    protected async Task OpenCreateNewPublicNoticeDialogAsync()
+    {
+        var parameters = new DialogParameters<CreateNewPublicNoticeModal>();
+
+        var options = new DialogOptions { CloseButton = true, MaxWidth = MaxWidth.Medium, FullWidth = true };
+        var dialog = await DialogService.ShowAsync<CreateNewPublicNoticeModal>("Criar Novo Edital", parameters, options);
+        var result = await dialog.Result;
+
+        if (result is not null) await LoadPublicNotices();
+
+        return;
     }
 
     protected async Task UnifyPublicNoticeAsync()

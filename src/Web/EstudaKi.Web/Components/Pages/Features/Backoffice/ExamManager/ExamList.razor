@@ -8,7 +8,10 @@
 <MudText Typo="Typo.h5" Align="Align.Center">Lista de Provas</MudText>
 
 <MudToolBar>    
-    <MudSpacer />
+    <MudTooltip Text="Criar" Arrow="true" Placement="Placement.Top">
+        <MudIconButton OnClick="OpenCreateNewPublicNoticeDialogAsync" Icon="@Icons.Material.Filled.Add" /> @* Criar *@
+    </MudTooltip>
+    <MudSpacer />    
     @if (SelectedItems.Count > 0)    
     {
         <MudText Typo="Typo.subtitle1" Align="Align.Center">@SelectedItems.Count item(s) selecionado(s)</MudText>
@@ -17,7 +20,7 @@
             <MudTooltip Text="Unificar Provas" Arrow="true" Placement="Placement.Top">
                 <MudIconButton OnClick="UnifyPublicNoticeAsync" Icon="@Icons.Material.Filled.FileCopy" /> @* Unificar provas *@
             </MudTooltip>
-        }
+        }        
         <MudTooltip Text="Publicar" Arrow="true" Placement="Placement.Top">
             <MudIconButton Icon="@Icons.Material.Filled.Publish" /> @* Publica *@
         </MudTooltip>

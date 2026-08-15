@@ -1,0 +1,110 @@
+﻿@using Estudaki.Commons.Core.DTOs
+@using Estudaki.Modules.Questions.Domain.ValueObjects
+@inherits CreateNewPublicNoticeModalBase
+
+<style>
+    .selected {
+        background-color: #1E88E5 !important;
+    }
+
+    .selected > td {
+        color: white !important;
+    }
+
+    .selected > td .mud-input {
+        color: white !important;
+    }
+</style>
+
+<MudDialog>
+    <DialogContent>
+        <MudGrid>
+            <MudItem xs="4">
+                <MudText Typo="Typo.h6">Listas de Extrações</MudText>
+            </MudItem>
+            <MudItem xs="8">
+                <MudText Typo="Typo.h6">
+                    Edição de Edital
+                    @if (SelectedExam is not null)
+                    {
+                        @($" ({SelectedExam.TotalExamQuestions} Questões)")
+                    }
+                </MudText>
+            </MudItem>
+            <MudItem xs="4">
+                <MudTable  T="@ExamExtractionDto" 
+                           Items="@Exams"          
+                           
+                           SelectedItemChanged="@OnExamSelected"
+                           Hover="true" Breakpoint="Breakpoint.Sm" 
+                           RowClassFunc="@SelectedRowClassFunc">                                         
+                    <HeaderContent>
+                        <MudTh>Nome do Arquivo</MudTh>
+                    </HeaderContent>
+                    <RowTemplate>
+                        <MudTd DataLabel="Nome do Arquivo">@context.ExamFile</MudTd>
+                    </RowTemplate>
+                </MudTable>
+            </MudItem>
+            
+            <MudItem xs="8">
+                @if(!string.IsNullOrEmpty(SelectedExam.Id))
+                {
+                    <MudForm @ref="Form" Model="@NewPublicNotice" Disabled="@IsUploading">
+                        <MudGrid Spacing="3">
+                            <MudItem xs="12" md="6">
+                                <MudTextField @bind-Value="NewPublicNotice.Number" Label="Número" />
+                            </MudItem>
+                            <MudItem xs="12" md="6">
+                                <MudTextField @bind-Value="NewPublicNotice.Year" Label="Ano" />
+                            </MudItem>
+                            <MudItem xs="12" md="6">
+                                <MudTextField @bind-Value="NewPublicNotice.ContractingOrganization" Label="Organização Contratante" />
+                            </MudItem>
+                            <MudItem xs="12" md="6">
+                                <MudTextField @bind-Value="NewPublicNotice.ExaminerOrganization" Label="Banca Examinadora" />
+                            </MudItem>
+                            <MudItem xs="12" md="6">
+                                <MudSelect @bind-Value="NewPublicNotice.ExamCategory" Label="Categoria do Exame">
+                                    @foreach (var category in ExamCategories.All)
+                                    {
+                                        <MudSelectItem Value="@category">@ExamCategories.GetDisplayName(category)</MudSelectItem>
+                                    }
+                                </MudSelect>
+                            </MudItem>                            
+                        </MudGrid>
+
+                        @foreach (var exam in NewPublicNotice.Exams)
+                        {
+                            <MudPaper>
+                                <MudGrid Spacing="3">
+                                    <MudItem xs="12" md="6">
+                                        <MudTextField @bind-Value="exam.Position" Label="Cargo" />
+                                    </MudItem>
+                                    <MudItem xs="12" md="6">
+                                        <MudTextField @bind-Value="exam.Area" Label="Especialização" />
+                                    </MudItem>
+                                    <MudItem xs="12" md="6">
+                                        <MudTextField @bind-Value="exam.Phase" Label="Fase" />
+                                    </MudItem>
+                                    <MudItem xs="12" md="6">
+                                        <MudSelect @bind-Value="exam.EducationLevel" Label="Nivel Educacional">
+                                            @foreach (var category in EducationLevels.All)
+                                            {
+                                                <MudSelectItem Value="@category">@EducationLevels.GetDisplayName(category)</MudSelectItem>
+                                            }
+                                        </MudSelect>
+                                    </MudItem>                                    
+                                </MudGrid>
+                            </MudPaper>
+                        }
+                    </MudForm>
+                }                
+            </MudItem>
+        </MudGrid>        
+    </DialogContent>
+    <DialogActions>
+        <MudButton OnClick="Dialog.Cancel" Disabled="@IsUploading">Cancelar</MudButton>
+        <MudButton Color="Color.Primary" Disabled="@IsUploading" OnClick="SaveAsync">Salvar</MudButton>
+    </DialogActions>
+</MudDialog>

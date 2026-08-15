@@ -32,6 +32,7 @@ public static class ServiceCollectionExtensions
         services.AddScoped<IQuestionRepository, QuestionRepository>();
         services.AddScoped<IPublicNoticeRepository, PublicNoticeRepository>();
         services.AddScoped<IQuestionSupportRepository, QuestionSupportRepository>();
+        services.AddScoped<IExamExtractionRepository, ExamExtractionRepository>();
 
         var postgresConnectionString = configuration.GetConnectionString("PostgresConnection")
             ?? throw new InvalidOperationException("Connection string 'PostgresConnection' not found.");
