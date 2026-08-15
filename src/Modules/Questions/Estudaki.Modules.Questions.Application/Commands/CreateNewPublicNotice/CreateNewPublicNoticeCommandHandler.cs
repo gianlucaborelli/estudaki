@@ -61,7 +61,7 @@ public class CreateNewPublicNoticeCommandHandler : CommandHandler, ICommandHandl
                             {
                                 new TextInline
                                 {
-                                    Text = questionDto.Content,
+                                    Text = questionDto.Content,                                    
                                 }
                             }
                         }
@@ -75,6 +75,7 @@ public class CreateNewPublicNoticeCommandHandler : CommandHandler, ICommandHandl
                                 Text = c.Content,
                             }
                         },
+                        Option = c.Option,
                         IsCorrect = false
                     }).ToList(),
                     questionExam
