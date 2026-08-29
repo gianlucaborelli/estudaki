@@ -1,0 +1,6 @@
+User-agent: *
+Allow: /
+Allow: /questions/
+Disallow: /admin
+
+Sitemap: https://estudaki.com.br/sitemap

@@ -1,0 +1,72 @@
+@import 'tailwindcss';
+@plugin '@tailwindcss/forms';
+@plugin '@tailwindcss/typography';
+
+@plugin 'flowbite/plugin';
+@custom-variant dark (&:where(.dark, .dark *));
+@source '../../node_modules/flowbite-svelte/dist';
+@source '../../node_modules/flowbite-svelte-icons/dist';
+
+:root {
+	--background: #e3e2da;
+	--surface: #f3f2ed;
+	--surface-elevated: #ffffff;
+
+	--primary: #7da184;
+	--primary-hover: #6b8d72;
+	--primary-active: #58765e;
+
+	--secondary: #d16045;
+	--secondary-hover: #b94e35;
+	--secondary-active: #983d2a;
+
+	--tertiary: #9483dd;
+	--tertiary-hover: #7f6cc9;
+
+	--text: #252824;
+	--text-muted: #62655f;
+	--border: #cccbc4;
+}
+
+.dark {
+	--background: #161816;
+	--surface: #202420;
+	--surface-elevated: #292d29;
+
+	--primary: #7da184b3;
+	--primary-hover: #97b39cd6;
+	--primary-active: #b2c9b6;
+
+	--secondary: #d16145d2;
+	--secondary-hover: #e07962;
+	--secondary-active: #e79a88;
+
+	--tertiary: #9483ddc0;
+	--tertiary-hover: #a397e2;
+
+	--text: #f1f2ee;
+	--text-muted: #a8ada6;
+	--border: #3a3e3a;
+}
+
+body {
+	/* font-family: 'Manrope Variable', sans-serif; */
+	font-family: 'Inter Variable', sans-serif;
+	background-color: var(--background);
+	color: var(--text);
+	min-height: 100vh;
+}
+
+html,
+body {
+	margin: 0;
+	min-height: 100%;
+}
+
+.page-container {
+	width: 100%;
+	max-width: 1440px;
+	margin: 0 auto;
+	padding: 0;
+	flex: 1;
+}
