@@ -49,6 +49,10 @@
 		border-top: 1px solid var(--border);
 		padding-top: 1.5rem;
 	}
+
+	.question-card-head{
+		padding-bottom: 1.5rem;
+	}
 	
 	.question-support {
 		margin-bottom: 1.25rem;

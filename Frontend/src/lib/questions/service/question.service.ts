@@ -45,9 +45,7 @@ export async function getQuestions(
     fetch: typeof globalThis.fetch,
     filters: QuestionFilters = {}
 ): Promise<PaginatedResponse<Question>> {
-    console.log('API_URL:', API_URL);
-
-    try{
+    try {
         const query = buildQuestionsQuery(filters);
         const response = await fetch(`${API_URL}/api/questions?${query}`);
 
@@ -56,10 +54,8 @@ export async function getQuestions(
         }
 
         return await response.json();
-    }catch (error) {
+    } catch (error) {
         console.error('Erro ao buscar questões:', error);
         throw error;
     }
-
-    
 }
