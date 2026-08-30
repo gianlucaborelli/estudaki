@@ -203,8 +203,6 @@
 						</li>
 					{/each}
 				</ul>
-			{:else}
-				<span>Nenhum filtro selecionado</span>
 			{/if}
 		</div>
 
@@ -262,7 +260,8 @@
 		align-items: center;
 		gap: 0.35rem;
 		background-color: var(--primary) !important;
-		color: var(--surface-elevated) !important;
+		opacity: 0.85;
+		color: var(--text) !important;
 	}
 
 	:global(.selected-filter-badge:hover) {
@@ -271,8 +270,8 @@
 
 	.filter-label {
 		font-weight: 700;
-        font-size: 0.875rem;
-        margin: 0.35rem;
+		font-size: 0.875rem;
+		margin: 0.35rem;
 	}
 
 	:global(.filter-value) {
@@ -284,7 +283,7 @@
 
 	:global(.tertiary-filter-value) {
 		background-color: var(--secondary) !important;
-		color: var(--surface-elevated) !important;
+		color: var(--text) !important;
 	}
 
 	:global(.tertiary-filter-value:hover) {

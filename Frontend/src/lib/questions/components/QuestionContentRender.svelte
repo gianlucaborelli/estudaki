@@ -26,18 +26,26 @@
 		{/if}
 
 		{#if content.type === 'image' && content.key}
-			<img class="question-content-image" src={content.key} alt={content.description} />
+			<figure class="question-content-figure">
+				<img class="question-content-image" src={content.key} alt={content.description} />
+
+				{#if content.source}
+					<figcaption class="question-content-source">
+						{content.source}
+					</figcaption>
+				{/if}
+			</figure>
 		{:else if content.type === 'paragraph' && content.text}
 			<div class="question-content-text">
 				<!-- eslint-disable-next-line svelte/no-at-html-tags -->
 				{@html sanitizeQuestionContent(content.text)}
 			</div>
-		{/if}
 
-		{#if content.source}
-			<small class="question-content-source">
-				{content.source}
-			</small>
+			{#if content.source}
+				<small class="question-content-source">
+					{content.source}
+				</small>
+			{/if}
 		{/if}
 	{/each}
 </div>
@@ -48,11 +56,16 @@
 		text-align: justify;
 	}
 
+	.question-content-figure {
+		width: fit-content;
+		max-width: 100%;
+		margin: 0 auto 0.5rem;
+	}
+
 	.question-content-image {
 		display: block;
 		max-width: 100%;
 		height: auto;
-		margin: 0 auto 0.5rem;
 	}
 
 	.question-content-source {

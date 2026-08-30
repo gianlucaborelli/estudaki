@@ -1,8 +1,9 @@
 <script lang="ts">
 	import type { Question } from '$lib/questions/types/question';
-	import { Button } from 'flowbite-svelte';
-	import { ClipboardCheckOutline, FlagOutline } from 'flowbite-svelte-icons';
+	
 	import QuestionContentRender from './QuestionContentRender.svelte';
+	
+	import QuestionHeader from './QuestionHeader.svelte';
 
 	type Props = {
 		question: Question;
@@ -10,129 +11,148 @@
 	};
 
 	let { question, class: className = '' }: Props = $props();
+	let selectedChoices = $state<string[]>([]);
 </script>
 
 <div class={`question-card ${className}`}>
 	<div class="question-card-head">
-		<div class="public-notice-info">
-			<h3 class="year">Ano: <span>{question.year}</span></h3>
-			<h3 class="exam-category">Categoria: <span>{question.examCategory}</span></h3>
-			<h3 class="examiner-organization">Banca: <span>{question.examinerOrganization}</span></h3>
-			<h3 class="examiner-organization">
-				Organizadora: <span>{question.contractingOrganization}</span>
-			</h3>
-			<div class="header-actions">
-				<Button class="copy-question">
-					<ClipboardCheckOutline class="h-6 w-6 shrink-0" />
-				</Button>
-				<Button class="signalize-question">
-					<FlagOutline class="h-6 w-6 shrink-0" />
-				</Button>
-			</div>
-		</div>
-		<div class="exam-info">
-			<h3 class="public-notice-number">Edital: <span> {question.publicNoticeNumber}</span></h3>
-			<h3 class="phase">Fase: <span>{question.phase}</span></h3>
-		</div>
-		<div>
-			<h3 class="positions">{question.positions.toString()}</h3>
-		</div>
+		<QuestionHeader {question} />
 	</div>
 
 	<div class="content">
-		<div class="question-support">
-			{#each question.questionSupports as support (support.id)}
-				<QuestionContentRender content={support.contents} />
-			{/each}
-		</div>
-
+		{#if question.questionSupports.length > 0}
+			<div class="question-support">
+				{#each question.questionSupports as support (support.id)}
+					<QuestionContentRender content={support.contents} />
+				{/each}
+			</div>
+		{/if}
 		<div class="statement">
 			<QuestionContentRender content={question.questionContents} />
 		</div>
 	</div>
 
-	<div class="choices">	
+	<fieldset class="choices">
 		{#each question.choices as choice (choice.option)}
-			<div class="choice">			
+			<label class:choice-selected={selectedChoices.includes(choice.option)} class="choice">
+				<input type="checkbox" value={choice.option} bind:group={selectedChoices} />
+				<span class="choice-option" aria-hidden="true">{choice.option}</span>
 				<QuestionContentRender content={choice.contentBlocks} />
-			</div>
+			</label>
 		{/each}
-	</div>
+	</fieldset>
 </div>
 
 <style>
 	.question-card {
 		margin-top: 1.5rem;
 		border-top: 1px solid var(--border);
-		padding-top: 1rem;
+		padding-top: 1.5rem;
+	}
+	
+	.question-support {
+		margin-bottom: 1.25rem;
+		padding: 0 3rem;
+		color: var(--text);
+		font-size: 0.9375rem;
 	}
 
-	.positions {
-		grid-area: positions;
+	.statement {
+		color: var(--text);
+		font-size: 1rem;
+		line-height: 1.7;
 	}
 
-	.public-notice-info,
-	.exam-info {
+	.choices {
+		display: grid;
+		gap: 0.5rem;
+		min-width: 0;
+		margin: 0;
+		padding: 1.25rem 0 0;
+		border: 0;
+	}	
+
+	.choice {
 		display: flex;
-		font-size: 0.875rem;
-		align-items: center;
-		margin-bottom: 0.5rem;
-	}
-
-	.public-notice-info h3,
-	.exam-info h3 {
-		color: var(--font-color);
-		font-weight: 500;
-	}
-
-	.public-notice-info span,
-	.exam-info span {
-		color: var(--secondary);
-		size: 0.875rem;
-		font-weight: 400;
-	}
-
-	.header-actions {
-		display: flex;
-		size: 0.875rem;
-	}
-
-	:global(.signalize-question, .copy-question) {
-		background-color: transparent;
-		color: var(--tertiary);
+		gap: 0.875rem;
+		align-items: flex-start;
+		padding: 0.875rem 1rem;
+		border: 1px solid var(--border);
+		border-radius: 0.375rem;
+		color: var(--text);
 		cursor: pointer;
-		padding: 0px 10px;
-		border: none;
-		outline: none;
-		box-shadow: none;
-
+		line-height: 1.55;
+		line-height: 1.7;
+		font-size: 0.85rem;
 		transition:
-			color 0.2s ease,
-			transform 0.2s ease-in-out;
-	}
-	:global(.signalize-question:active, .copy-question:active) {
-		transform: scale(1.5);
+			border-color 0.18s ease,
+			background-color 0.18s ease;
 	}
 
-	:global(.signalize-question:hover, .copy-question:hover) {
-		color: var(--tertiary-hover);
+	.choice:hover {
+		border-color: var(--tertiary);
 	}
 
-	:global(.signalize-question:focus, .copy-question:focus) {
-		outline: none;
-		box-shadow: none;
-		border: none;
+	.choice-selected {
+		border-color: var(--tertiary);
+		background-color: color-mix(in srgb, var(--tertiary) 9%, transparent);
 	}
 
-	:global(.signalize-question:focus-visible, .copy-question:focus-visible) {
-		outline: none;
-		box-shadow: none;
-		border: none;
+	.choice input {
+		position: absolute;
+		opacity: 0;
+		width: 1px;
+		height: 1px;
+		pointer-events: none;
 	}
 
-	span {
-		font-weight: bold;
-		font-size: 0.875rem;
-		margin-right: 0.25rem;
+	.choice-option {
+		display: grid;
+		flex: 0 0 1.5rem;
+		width: 1.5rem;
+		height: 1.5rem;
+		margin-top: 0.05rem;
+		border: 1px solid var(--tertiary);
+		border-radius: 0.25rem;
+		color: var(--tertiary);
+		font-size: 0.75rem;
+		font-weight: 700;
+		line-height: 1;
+		place-items: center;
+	}
+
+	.choice-selected .choice-option {
+		background-color: var(--tertiary);
+		color: var(--text);
+	}
+
+	.choice:has(input:focus-visible) {
+		outline: 2px solid var(--tertiary);
+		outline-offset: 2px;
+	}
+
+	.choice :global(.question-content) {
+		min-width: 0;
+		flex: 1;
+	}
+
+	@media (max-width: 640px) {
+		.question-card-head {
+			grid-template-columns: 1fr;
+			grid-template-areas:
+				'notice'
+				'exam'
+				'positions';
+			gap: 0.625rem;
+		}
+
+		.positions {
+			max-width: none;
+			text-align: left;
+		}
+
+		.header-actions {
+			margin-left: 0;
+		}
 	}
 </style>
