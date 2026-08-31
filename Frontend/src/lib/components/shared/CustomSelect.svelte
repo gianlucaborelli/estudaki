@@ -9,15 +9,16 @@
 	};
 
 	let { items, value = $bindable<T[]>([]), label, placeholder = 'Selecione...' }: Props = $props();
+	const selectId = $props.id();
 </script>
 
 <div class="select-container">
-	<Label for="select" class="select-label">
+	<Label for={selectId} class="select-label">
 		{#if label}
 			{label}
 		{/if}
 		<MultiSelect
-			id="select"
+			id={selectId}
 			{items}
 			bind:value
 			{placeholder}
