@@ -1,5 +1,6 @@
 <script lang="ts">
 	import CustomSelect from '$lib/components/shared/CustomSelect.svelte';
+	import SearchableSelect from '$lib/components/shared/SearchableSelect.svelte';
 	import { Badge, CloseButton, type SelectOptionType } from 'flowbite-svelte';
 
 	type SelectedFilter = {
@@ -143,28 +144,28 @@
 			placeholder="Selecione uma categoria de exame ..."
 		/>
 
-		<CustomSelect
+		<SearchableSelect
 			items={examinerOrganizations}
 			bind:value={selectedExaminerOrganizations}
 			label="Banca examinadora"
 			placeholder="Selecione uma banca ..."
 		/>
 
-		<CustomSelect
+		<SearchableSelect
 			items={contractingOrganizations}
 			bind:value={selectedContractingOrganizations}
 			label="Instituição"
 			placeholder="Selecione uma instituição ..."
 		/>
 
-		<CustomSelect
+		<SearchableSelect
 			items={areas}
 			bind:value={selectedAreas}
 			label="Área"
 			placeholder="Selecione uma área ..."
 		/>
 
-		<CustomSelect
+		<SearchableSelect
 			items={subAreas}
 			bind:value={selectedSubAreas}
 			label="Subárea"
