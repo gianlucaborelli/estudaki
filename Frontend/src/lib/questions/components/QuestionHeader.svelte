@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
-	import { Button } from 'flowbite-svelte';
-	import { ClipboardCheckOutline, FlagOutline } from 'flowbite-svelte-icons';
+	import { Button, Dropdown, DropdownItem } from 'flowbite-svelte';
+	import { ClipboardCheckOutline, DownloadOutline, FlagOutline } from 'flowbite-svelte-icons';
 	import type { Question } from '$lib/questions/types/question';
 	import { getExamCategoryLabel } from '../types/labels';
 
@@ -13,6 +13,21 @@
 	let subareasValue = $state<HTMLSpanElement>();
 	let canExpandSubareas = $state(false);
 	let subareasExpanded = $state(false);
+	let downloadDropdownOpen = $state(false);
+	const downloadTriggerId = $derived(`download-question-trigger-${question.questionId}`);
+
+	function downloadFile(url: string) {
+		downloadDropdownOpen = false;
+		window.open(url, '_blank', 'noopener,noreferrer');
+	}
+
+	function downloadQuestionBooklet() {
+		downloadFile(question.examBookletUrl);
+	}
+
+	function downloadAnswerKey() {
+		downloadFile(question.answerKeyUrl);
+	}
 
 	function updateSubareasOverflow() {
 		canExpandSubareas = (subareasValue?.scrollWidth ?? 0) > (subareasValue?.clientWidth ?? 0);
@@ -101,6 +116,27 @@
 		<Button class="signalize-question" aria-label="Sinalizar questão" title="Sinalizar questão">
 			<FlagOutline class="h-6 w-6 shrink-0" />
 		</Button>
+		<Button
+			id={downloadTriggerId}
+			class="download-question"
+			aria-label="Baixar questão"
+			title="Baixar questão"
+		>
+			<DownloadOutline class="h-6 w-6 shrink-0" />
+		</Button>
+		<Dropdown
+			simple
+			bind:isOpen={downloadDropdownOpen}
+			triggeredBy="#{downloadTriggerId}"
+			class="download-dropdown"
+		>
+			<DropdownItem disabled={!question.examBookletUrl} onclick={downloadQuestionBooklet}>
+				Caderno de questões
+			</DropdownItem>
+			<DropdownItem disabled={!question.answerKeyUrl} onclick={downloadAnswerKey}>
+				Gabarito
+			</DropdownItem>
+		</Dropdown>
 	</div>
 </header>
 
@@ -112,7 +148,7 @@
 			'identity metadata actions'
 			'identity context actions';
 		gap: 0.75rem 1.25rem;
-		align-items: start;		
+		align-items: start;
 		border-bottom: 1px solid var(--border);
 	}
 
@@ -236,44 +272,74 @@
 	.header-actions {
 		display: flex;
 		grid-area: actions;
-		gap: 0.125rem;
+		gap: 0.375rem;
 	}
 
-	:global(.signalize-question, .copy-question) {
+	:global(.signalize-question, .copy-question, .download-question) {
 		display: inline-flex;
 		align-items: center;
 		justify-content: center;
 		width: 2.25rem;
 		height: 2.25rem;
+		border: 1px solid transparent;
+		border-radius: 0.5rem;
 		background-color: transparent;
 		color: var(--tertiary);
 		cursor: pointer;
 		padding: 0;
-		border: none;
 		outline: none;
 		box-shadow: none;
 
 		transition:
 			color 0.2s ease,
-			transform 0.2s ease-in-out;
-	}
-	:global(.signalize-question:active, .copy-question:active) {
-		transform: scale(1.5);
+			background-color 0.2s ease,
+			border-color 0.2s ease,
+			transform 0.15s ease-in-out;
 	}
 
-	:global(.signalize-question:hover, .copy-question:hover) {
+	:global(.signalize-question:active, .copy-question:active, .download-question:active) {
+		transform: scale(0.92);
+	}
+
+	:global(.signalize-question:hover, .copy-question:hover, .download-question:hover) {
+		border-color: var(--border);
+		background-color: var(--surface-hover, rgba(0, 0, 0, 0.04));
 		color: var(--tertiary-hover);
 	}
 
-	:global(.signalize-question:focus, .copy-question:focus) {
+	:global(.signalize-question:focus, .copy-question:focus, .download-question:focus) {
 		outline: none;
 		box-shadow: none;
-		border: none;
+		border-color: transparent;
 	}
 
-	:global(.signalize-question:focus-visible, .copy-question:focus-visible) {
+	:global(
+		.signalize-question:focus-visible,
+		.copy-question:focus-visible,
+		.download-question:focus-visible
+	) {
 		outline: 2px solid var(--tertiary);
 		outline-offset: 2px;
+	}
+
+	:global(.download-dropdown) {
+		z-index: 20;
+		min-width: 11rem;
+		border: 1px solid var(--border);
+		border-radius: 0.5rem;
+		background-color: var(--surface, #fff);
+		box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+	}
+
+	:global(.download-dropdown li > button) {
+		color: var(--text);
+		font-size: 0.8125rem;
+		font-weight: 600;
+	}
+
+	:global(.download-dropdown li > button:hover) {
+		background-color: var(--surface-hover, rgba(0, 0, 0, 0.04));
+		color: var(--tertiary-hover);
 	}
 
 	@media (max-width: 800px) {

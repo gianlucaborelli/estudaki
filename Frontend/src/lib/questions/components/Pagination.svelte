@@ -10,7 +10,7 @@
 		handlePageSizeChange: (pageSize: number) => void;
 	};
 
-	let {pageNumber, pageSize, totalPages, handlePageChange, handlePageSizeChange }: Props =
+	let { pageNumber, pageSize, totalPages, handlePageChange, handlePageSizeChange }: Props =
 		$props();
 
 	function handlePageSizeSelect(event: Event) {
@@ -51,7 +51,7 @@
 
 <style>
 	.question-pagination {
-        padding: 0 1.5rem;
+		padding: 0 1.5rem;
 		display: grid;
 		grid-template-columns: 1fr auto 1fr;
 		align-items: center;
@@ -134,11 +134,6 @@
 
 	.page-size-control select:hover {
 		border-color: var(--primary);
-	}
-
-	.page-size-control select:focus-visible {
-		outline: 2px solid var(--tertiary);
-		outline-offset: 2px;
 	}
 
 	@media (max-width: 640px) {

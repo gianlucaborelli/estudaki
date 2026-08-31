@@ -63,7 +63,7 @@
 </script>
 
 <svelte:head>
-	<title>Estudaki - Questions</title>
+	<title>Estudaki - Questões</title>
 </svelte:head>
 
 <FilterSection

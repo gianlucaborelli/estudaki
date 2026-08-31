@@ -1,8 +1,8 @@
 <script lang="ts">
 	import type { Question } from '$lib/questions/types/question';
-	
+
 	import QuestionContentRender from './QuestionContentRender.svelte';
-	
+
 	import QuestionHeader from './QuestionHeader.svelte';
 
 	type Props = {
@@ -12,6 +12,12 @@
 
 	let { question, class: className = '' }: Props = $props();
 	let selectedChoices = $state<string[]>([]);
+	let hasSelection = $derived(selectedChoices.length > 0);
+
+	$effect(() => {
+		void question.questionId;
+		selectedChoices = [];
+	});
 </script>
 
 <div class={`question-card ${className}`}>
@@ -34,7 +40,12 @@
 
 	<fieldset class="choices">
 		{#each question.choices as choice (choice.option)}
-			<label class:choice-selected={selectedChoices.includes(choice.option)} class="choice">
+			<label
+				class:choice-selected={selectedChoices.includes(choice.option)}
+				class:choice-correct={hasSelection && choice.isCorrect}
+				class:choice-incorrect={hasSelection && !choice.isCorrect}
+				class="choice"
+			>
 				<input type="checkbox" value={choice.option} bind:group={selectedChoices} />
 				<span class="choice-option" aria-hidden="true">{choice.option}</span>
 				<QuestionContentRender content={choice.contentBlocks} />
@@ -50,10 +61,10 @@
 		padding-top: 1.5rem;
 	}
 
-	.question-card-head{
+	.question-card-head {
 		padding-bottom: 1.5rem;
 	}
-	
+
 	.question-support {
 		margin-bottom: 1.25rem;
 		padding: 0 3rem;
@@ -74,7 +85,7 @@
 		margin: 0;
 		padding: 1.25rem 0 0;
 		border: 0;
-	}	
+	}
 
 	.choice {
 		display: flex;
@@ -102,6 +113,16 @@
 		background-color: color-mix(in srgb, var(--tertiary) 9%, transparent);
 	}
 
+	.choice-correct {
+		border-color: var(--primary);
+		background-color: color-mix(in srgb, var(--primary) 12%, transparent);
+	}
+
+	.choice-incorrect {
+		border-color: var(--secondary);
+		background-color: color-mix(in srgb, var(--secondary) 9%, transparent);
+	}
+
 	.choice input {
 		position: absolute;
 		opacity: 0;
@@ -127,6 +148,18 @@
 
 	.choice-selected .choice-option {
 		background-color: var(--tertiary);
+		color: var(--text);
+	}
+
+	.choice-correct .choice-option {
+		border-color: var(--primary);
+		background-color: color-mix(in srgb, var(--primary) 70%, transparent);
+		color: var(--text);
+	}
+
+	.choice-incorrect .choice-option {
+		border-color: var(--secondary);
+		background-color: color-mix(in srgb, var(--secondary) 70%, transparent);
 		color: var(--text);
 	}
 
