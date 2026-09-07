@@ -3,7 +3,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 
-namespace MudBlazorWebApp1.Data
+namespace Estudaki.Modules.Identity.Infrastructure.Data
 {
     public class ApplicationDbContext : IdentityDbContext<ApplicationUser, IdentityRole, string>
     {
@@ -17,14 +17,14 @@ namespace MudBlazorWebApp1.Data
             base.OnModelCreating(builder);
 
             builder.HasDefaultSchema("Identity");
-            
+
             builder.Entity<ApplicationUser>().ToTable("ApplicationUser", "Identity");
             builder.Entity<IdentityRole>().ToTable("Roles", "Identity");
             builder.Entity<IdentityUserRole<string>>().ToTable("UserRoles", "Identity");
             builder.Entity<IdentityUserClaim<string>>().ToTable("UserClaims", "Identity");
             builder.Entity<IdentityUserLogin<string>>().ToTable("UserLogins", "Identity");
             builder.Entity<IdentityUserToken<string>>().ToTable("UserTokens", "Identity");
-            builder.Entity<IdentityRoleClaim<string>>().ToTable("RoleClaims", "Identity");
+            builder.Entity<IdentityRoleClaim<string>>().ToTable("RoleClaims", "Identity");            
         }
     }
 }

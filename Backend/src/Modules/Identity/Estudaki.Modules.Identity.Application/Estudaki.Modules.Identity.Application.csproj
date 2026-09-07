@@ -6,4 +6,13 @@
     <Nullable>enable</Nullable>
   </PropertyGroup>
 
+  <ItemGroup>
+    <PackageReference Include="FluentValidation" Version="12.1.1" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\Core\Estudaki.Commons.Core\Estudaki.Commons.Core.csproj" />
+    <ProjectReference Include="..\Estudaki.Modules.Identity.Domain\Estudaki.Modules.Identity.Domain.csproj" />
+  </ItemGroup>
+
 </Project>

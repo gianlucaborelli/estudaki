@@ -75,7 +75,7 @@ public static class ConfigureExtensions
         // Modules
         services.AddQuestionsModule(configuration);
         services.AddComunicationsInfrastructure();
-        services.AddIdentityModule(configuration);  
+        //services.AddIdentityModule(configuration);  
         services.AddAiModule(configuration);
     }
 }

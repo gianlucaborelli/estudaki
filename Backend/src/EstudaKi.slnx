@@ -19,6 +19,7 @@
     <Project Path="Modules/Comunications/Estudaki.Modules.Comunications.Infrastructure/Estudaki.Modules.Comunications.Infrastructure.csproj" />
   </Folder>
   <Folder Name="/Modules/Identity/">
+    <Project Path="Modules/Identity/Estudaki.Modules.Identity.Adapter/Estudaki.Modules.Identity.Adapter.csproj" />
     <Project Path="Modules/Identity/Estudaki.Modules.Identity.Application/Estudaki.Modules.Identity.Application.csproj" />
     <Project Path="Modules/Identity/Estudaki.Modules.Identity.Domain/Estudaki.Modules.Identity.Domain.csproj" />
     <Project Path="Modules/Identity/Estudaki.Modules.Identity.Infrastructure/Estudaki.Modules.Identity.Infrastructure.csproj" />
@@ -32,6 +33,6 @@
     <File Path=".editorconfig" />
   </Folder>
   <Folder Name="/Web/">
-    <Project Path="Web/EstudaKi.Web/EstudaKi.Web.csproj" />
+    <Project Path="Web/Estudaki.Api/Estudaki.Api.csproj" Id="4cc8b8e3-1578-4e47-99e7-37946a739093" />
   </Folder>
 </Solution>

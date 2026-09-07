@@ -13,4 +13,8 @@
 	  <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="9.*" />
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\Core\Estudaki.Commons.Core\Estudaki.Commons.Core.csproj" />
+  </ItemGroup>
+
 </Project>
