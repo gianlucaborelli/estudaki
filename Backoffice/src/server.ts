@@ -1,3 +1,5 @@
+import 'dotenv/config';
+
 import {
   AngularNodeAppEngine,
   createNodeRequestHandler,
@@ -12,6 +14,70 @@ const browserDistFolder = join(import.meta.dirname, '../browser');
 const app = express();
 const angularApp = new AngularNodeAppEngine();
 
+
+const apiUrl = process.env['API_URL'];
+
+app.use(express.json());
+
+app.use('/api', async (req, res) => {
+  try {
+    const targetUrl = `${apiUrl}${req.originalUrl}`;
+    console.log(`Proxying request to: ${targetUrl}`);
+    const headers = new Headers();
+
+    // Encaminha headers relevantes
+    for (const [key, value] of Object.entries(req.headers)) {
+      if (value !== undefined && key.toLowerCase() !== 'host') {
+        if (Array.isArray(value)) {
+          value.forEach(v => headers.append(key, v));
+        } else {
+          headers.set(key, value);
+        }
+      }
+    }
+
+    const hasBody = !['GET', 'HEAD'].includes(req.method);
+
+    const response = await fetch(targetUrl, {
+      method: req.method,
+      headers,
+      body: hasBody
+        ? JSON.stringify(req.body)
+        : undefined,
+    });
+
+    // Status
+    res.status(response.status);
+
+    // Headers da resposta
+    response.headers.forEach((value, key) => {
+      // Set-Cookie precisa de tratamento especial
+      if (key.toLowerCase() === 'set-cookie') {
+        return;
+      }
+
+      res.setHeader(key, value);
+    });
+
+    // Repassa cookies
+    const setCookie = response.headers.getSetCookie();
+
+    if (setCookie.length > 0) {
+      res.setHeader('Set-Cookie', setCookie);
+    }
+
+    const body = await response.arrayBuffer();
+
+    res.send(Buffer.from(body));
+
+  } catch (error) {
+    console.error(error);
+
+    res.status(502).json({
+      message: 'Erro ao comunicar com a API',
+    });
+  }
+});
 /**
  * Example Express Rest API endpoints can be defined here.
  * Uncomment and define endpoints as necessary.
