@@ -5,7 +5,7 @@ using FluentValidation.Results;
 
 namespace Estudaki.Modules.Questions.Application.Commands;
 
-public class DeleteQuestionSupportCommandHandler : CommandHandler, ICommandHandler<DeleteQuestionSupportCommand, ValidationResult>
+public class DeleteQuestionSupportCommandHandler : CommandHandler, ICommandHandler<DeleteQuestionSupportCommand, CommandResult>
 {
     private readonly IValidator<DeleteQuestionSupportCommand> _validator;
     private readonly IQuestionSupportRepository _questionSupportRepository;
@@ -16,21 +16,21 @@ public class DeleteQuestionSupportCommandHandler : CommandHandler, ICommandHandl
         _questionSupportRepository = questionSupportRepository;
     }
 
-    public async Task<ValidationResult> HandleAsync(DeleteQuestionSupportCommand command, CancellationToken cancellationToken = default)
+    public async Task<CommandResult> HandleAsync(DeleteQuestionSupportCommand command, CancellationToken cancellationToken = default)
     {
         //To-Do: Deletar referencia em Question
-        ValidationResult = await _validator.ValidateAsync(command, cancellationToken);
-        if (!ValidationResult.IsValid) return ValidationResult;
+        SetValidationResult(await _validator.ValidateAsync(command, cancellationToken));
+        if (!CommandResult.Success) return Result();
 
         var questionSupport = await _questionSupportRepository.GetById(command.QuestionSupportId);
         if (questionSupport == null)
         {
-            ValidationResult.Errors.Add(new ValidationFailure(nameof(command.QuestionSupportId), "Question support not found."));
-            return ValidationResult;
+            AddError("Question support not found.");
+            return Result();
         }
 
         await _questionSupportRepository.Remove(questionSupport.Id);
 
-        return ValidationResult;
+        return Result();
     }
 }

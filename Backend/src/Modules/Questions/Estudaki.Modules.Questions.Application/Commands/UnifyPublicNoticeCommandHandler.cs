@@ -9,7 +9,7 @@ using FluentValidation.Results;
 
 namespace Estudaki.Modules.Questions.Application.Commands;
 
-public class UnifyPublicNoticeCommandHandler : CommandHandler, ICommandHandler<UnifyPublicNoticeCommand, ValidationResult>
+public class UnifyPublicNoticeCommandHandler : CommandHandler, ICommandHandler<UnifyPublicNoticeCommand, CommandResult>
 {
     private readonly IValidator<UnifyPublicNoticeCommand> _validator;
     private readonly IQuestionSupportRepository _questionSupportRepository;
@@ -33,10 +33,10 @@ public class UnifyPublicNoticeCommandHandler : CommandHandler, ICommandHandler<U
 
     private PublicNotice publicNoticeToUnify = new();
 
-    public async Task<ValidationResult> HandleAsync(UnifyPublicNoticeCommand command, CancellationToken cancellationToken = default)
+    public async Task<CommandResult> HandleAsync(UnifyPublicNoticeCommand command, CancellationToken cancellationToken = default)
     {
-        ValidationResult = await _validator.ValidateAsync(command, cancellationToken);
-        if(!ValidationResult.IsValid) return ValidationResult;
+        SetValidationResult(await _validator.ValidateAsync(command, cancellationToken));
+        if (!CommandResult.Success) return Result();
         
         var publicNotices = new List<PublicNotice>();
         var questionSupports = new List<QuestionSupport>();
@@ -47,8 +47,8 @@ public class UnifyPublicNoticeCommandHandler : CommandHandler, ICommandHandler<U
             var publicNotice = await _publicNoticeRepository.GetById(publicNoticeId);
             if (publicNotice is null)
             {
-                ValidationResult.Errors.Add(new ValidationFailure(nameof(command.PublicNoticeIds), $"Public notice with ID {publicNoticeId} not found."));
-                return ValidationResult;
+                AddError($"Public notice with ID {publicNoticeId} not found.");
+                return Result();
             }
             publicNotices.Add(publicNotice);
 
@@ -126,7 +126,7 @@ public class UnifyPublicNoticeCommandHandler : CommandHandler, ICommandHandler<U
             await _publicNoticeRepository.Remove(publicNoticeToRemove.Id);
         }
 
-        return ValidationResult;
+        return Result();
     }
 
     public static string ExtractPathKey(string url)

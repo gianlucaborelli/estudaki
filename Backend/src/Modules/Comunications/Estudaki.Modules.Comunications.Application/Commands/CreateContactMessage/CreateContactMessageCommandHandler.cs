@@ -6,7 +6,7 @@ using FluentValidation.Results;
 
 namespace Estudaki.Modules.Comunications.Application.Commands.CreateContactMessage;
 
-public class CreateContactMessageCommandHandler : CommandHandler, ICommandHandler<CreateContactMessageCommand, ValidationResult>
+public class CreateContactMessageCommandHandler : CommandHandler, ICommandHandler<CreateContactMessageCommand, CommandResult>
 {
     private readonly IContactMessageRepository _contactMessageRepository;
     private readonly IValidator<CreateContactMessageCommand> _validator;
@@ -17,13 +17,10 @@ public class CreateContactMessageCommandHandler : CommandHandler, ICommandHandle
         _validator = validator;
     }
 
-    public async Task<ValidationResult> HandleAsync(CreateContactMessageCommand command, CancellationToken cancellationToken = default)
+    public async Task<CommandResult> HandleAsync(CreateContactMessageCommand command, CancellationToken cancellationToken = default)
     {
-        var validationResult = await _validator.ValidateAsync(command, cancellationToken);
-        if (!validationResult.IsValid)
-        {
-            return validationResult;
-        }
+        SetValidationResult(await _validator.ValidateAsync(command, cancellationToken));
+        if (!CommandResult.Success) return Result();
 
         var contactMessage = new ContactMessage(
             command.Name,
@@ -35,6 +32,6 @@ public class CreateContactMessageCommandHandler : CommandHandler, ICommandHandle
 
         _contactMessageRepository.Add( contactMessage );
 
-        return validationResult;
+        return Result();
     }
 }

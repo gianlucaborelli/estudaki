@@ -6,7 +6,7 @@ using FluentValidation.Results;
 
 namespace Estudaki.Modules.Questions.Application.Commands;
 
-public class AddExistingQuestionIntoExamCommandHandler : CommandHandler, ICommandHandler<AddExistingQuestionIntoExamCommand, ValidationResult>
+public class AddExistingQuestionIntoExamCommandHandler : CommandHandler, ICommandHandler<AddExistingQuestionIntoExamCommand, CommandResult>
 {
     private readonly IQuestionRepository _questionRepository;
     private readonly IPublicNoticeRepository _publicNoticeRepository;
@@ -22,27 +22,24 @@ public class AddExistingQuestionIntoExamCommandHandler : CommandHandler, IComman
         _validator = validator;
     }
 
-    public async Task<ValidationResult> HandleAsync(AddExistingQuestionIntoExamCommand command, CancellationToken cancellationToken = default)
+    public async Task<CommandResult> HandleAsync(AddExistingQuestionIntoExamCommand command, CancellationToken cancellationToken = default)
     {
-        ValidationResult = _validator.Validate(command);
-        if (!ValidationResult.IsValid)
-        {
-            return ValidationResult;
-        }
+        SetValidationResult( _validator.Validate(command));
+        if (!CommandResult.Success) return Result();
 
         var question = await _questionRepository.GetById(command.Question.QuestionId);
         if (question == null) 
         {
-            ValidationResult.Errors.Add(new ValidationFailure(nameof(command.Question.QuestionId), "Question not found."));
-            return ValidationResult;
+            AddError("Question not found.");
+            return Result();
         }
 
         var publicNotice = await _publicNoticeRepository.GetByExamId(command.ExamId);
         var exam = publicNotice.Exams.FirstOrDefault(e => e.Id == command.ExamId);
         if (exam == null)
         {
-            ValidationResult.Errors.Add(new ValidationFailure(nameof(command.ExamId), "Exam not found."));
-            return ValidationResult;
+            AddError("Exam not found.");
+            return Result();
         }
 
         var questionExam = new QuestionExam
@@ -67,6 +64,6 @@ public class AddExistingQuestionIntoExamCommandHandler : CommandHandler, IComman
 
         await _questionRepository.Update(question);
 
-        return ValidationResult;
+        return Result();
     }
 }

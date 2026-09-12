@@ -5,7 +5,7 @@ using FluentValidation.Results;
 
 namespace Estudaki.Modules.Questions.Application.Commands;
 
-public class DeleteQuestionCommandHandler : CommandHandler, ICommandHandler<DeleteQuestionCommand, ValidationResult>
+public class DeleteQuestionCommandHandler : CommandHandler, ICommandHandler<DeleteQuestionCommand, CommandResult>
 {
     private readonly IQuestionRepository _questionRepository;
     private readonly IValidator<DeleteQuestionCommand> _validator;
@@ -18,25 +18,25 @@ public class DeleteQuestionCommandHandler : CommandHandler, ICommandHandler<Dele
         _validator = validator;
     }
 
-    public async Task<ValidationResult> HandleAsync(DeleteQuestionCommand command, CancellationToken cancellationToken = default)
+    public async Task<CommandResult> HandleAsync(DeleteQuestionCommand command, CancellationToken cancellationToken = default)
     {
-        ValidationResult = await _validator.ValidateAsync(command);
-        if(!ValidationResult.IsValid) return ValidationResult;
+        SetValidationResult(await _validator.ValidateAsync(command, cancellationToken));
+        if(!CommandResult.Success) return Result();
 
         var question = await _questionRepository.GetById(command.QuestionId);
 
         if (question == null) 
         { 
-            ValidationResult.Errors.Add(new ValidationFailure("QuestionId", "Questão não encontrada."));
-            return ValidationResult;
+            AddError("Questão não encontrada.");
+            return Result();
         }
 
         // Verificar se a questão está associada ao exame especificado
         var hasExam = question.Exams.Any(qe => qe.ExamId == command.ExamId);
         if (!hasExam)
         {
-            ValidationResult.Errors.Add(new ValidationFailure("ExamId", "Questão não associada a esta prova."));
-            return ValidationResult;
+            AddError("Questão não associada a esta prova.");
+            return Result();
         }
 
         // Se a questão está associada apenas a este exame, remove a questão inteira
@@ -51,6 +51,6 @@ public class DeleteQuestionCommandHandler : CommandHandler, ICommandHandler<Dele
             await _questionRepository.Update(question);
         }
 
-        return ValidationResult;
+        return Result();
     }
 }

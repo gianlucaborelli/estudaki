@@ -7,7 +7,7 @@ using FluentValidation.Results;
 
 namespace Estudaki.Modules.Questions.Application.Commands;
 
-public class CreateAreaCommandHandler : CommandHandler, ICommandHandler<CreateAreaCommand, AreaCommandResult>
+public class CreateAreaCommandHandler : CommandHandler, ICommandHandler<CreateAreaCommand, CommandResult>
 {
     private readonly IValidator<CreateAreaCommand> _validator;
     private readonly IAreaRepository _areaRepository;
@@ -18,18 +18,18 @@ public class CreateAreaCommandHandler : CommandHandler, ICommandHandler<CreateAr
         _areaRepository = areaRepository;
     }
 
-    public async Task<AreaCommandResult> HandleAsync(CreateAreaCommand command, CancellationToken cancellationToken = default)
+    public async Task<CommandResult> HandleAsync(CreateAreaCommand command, CancellationToken cancellationToken = default)
     {
-        ValidationResult = await _validator.ValidateAsync(command, cancellationToken);
-        if (!ValidationResult.IsValid)
+        SetValidationResult(await _validator.ValidateAsync(command, cancellationToken));
+        if (!CommandResult.Success)
         {
-            return new AreaCommandResult { ValidationResult = ValidationResult };
+            return Result();
         }
 
         var area = Area.Create(command.Name, command.Type);
 
         await _areaRepository.AddAsync(area);
 
-        return new AreaCommandResult { ValidationResult = ValidationResult, Area = area.ToDto() };
+        return Result(area.ToDto());
     }
 }

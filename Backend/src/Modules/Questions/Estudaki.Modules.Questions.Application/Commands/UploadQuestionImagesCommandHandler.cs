@@ -7,7 +7,7 @@ using FluentValidation.Results;
 
 namespace Estudaki.Modules.Questions.Application.Commands
 {
-    public class UploadQuestionImagesCommandHandler : CommandHandler, ICommandHandler<UploadQuestionImagesCommand, ValidationResult>
+    public class UploadQuestionImagesCommandHandler : CommandHandler, ICommandHandler<UploadQuestionImagesCommand, CommandResult>
     {
         private readonly IValidator<UploadQuestionImagesCommand> _validator;
         private readonly IPublicNoticeRepository _publicNoticeRepository;
@@ -20,19 +20,18 @@ namespace Estudaki.Modules.Questions.Application.Commands
             _storageService = storageService;
         }
 
-        public async Task<ValidationResult> HandleAsync(UploadQuestionImagesCommand command, CancellationToken cancellationToken = default)
+        public async Task<CommandResult> HandleAsync(UploadQuestionImagesCommand command, CancellationToken cancellationToken = default)
         {
-            var validationResult = await _validator.ValidateAsync(command, cancellationToken);
-            if (!validationResult.IsValid) {
-                return validationResult;
-            }
+            SetValidationResult(await _validator.ValidateAsync(command, cancellationToken));
+            if (!CommandResult.Success) return Result();
+
 
             var publicNotice = await _publicNoticeRepository.GetById(command.PublicNoticeId);
 
             if (publicNotice == null)
             {
-                validationResult.Errors.Add(new ValidationFailure(nameof(command.PublicNoticeId), "Public notice not found."));
-                return validationResult;
+                AddError("Public notice not found.");
+                return Result();
             }
 
             foreach(var file in command.Files)
@@ -56,7 +55,7 @@ namespace Estudaki.Modules.Questions.Application.Commands
                     file.ContentType);
             }
 
-            return validationResult;
+            return Result();
         }
     }
 }

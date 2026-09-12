@@ -5,7 +5,7 @@ using FluentValidation.Results;
 
 namespace Estudaki.Modules.Questions.Application.Commands;
 
-public class UpdateExamCommandHandler : CommandHandler, ICommandHandler<UpdateExamCommand, ValidationResult>
+public class UpdateExamCommandHandler : CommandHandler, ICommandHandler<UpdateExamCommand, CommandResult>
 {
     private readonly IValidator<UpdateExamCommand> _validator;
     private readonly IPublicNoticeRepository _publicNoticeRepository;
@@ -20,20 +20,20 @@ public class UpdateExamCommandHandler : CommandHandler, ICommandHandler<UpdateEx
         _questionRepository = questionRepository;
     }
 
-    public async Task<ValidationResult> HandleAsync(UpdateExamCommand command, CancellationToken cancellationToken = default)
+    public async Task<CommandResult> HandleAsync(UpdateExamCommand command, CancellationToken cancellationToken = default)
     {
-        var result = await _validator.ValidateAsync(command, cancellationToken);
-        if (!result.IsValid)
+        SetValidationResult(await _validator.ValidateAsync(command, cancellationToken));
+        if (!CommandResult.Success)
         {
-            return result;
+            return Result();
         }
 
         var publicNotice = await _publicNoticeRepository.GetByExamId(command.Exam.Id);
 
         if (publicNotice == null)
         {
-            result.Errors.Add(new ValidationFailure(nameof(command.Exam.Id), "Public notice not found for the given exam ID."));
-            return result;
+            AddError("Public notice not found for the given exam ID.");
+            return Result();
         }
 
         var index = publicNotice.Exams
@@ -41,12 +41,8 @@ public class UpdateExamCommandHandler : CommandHandler, ICommandHandler<UpdateEx
 
         if (index == -1)
         {
-            result.Errors.Add(
-                new ValidationFailure(
-                    nameof(command.Exam.Id),
-                    "Exam not found in the public notice."));
-
-            return result;
+            AddError("Exam not found in the public notice.");
+            return Result();
         }
 
         publicNotice.Exams[index] = command.Exam;
@@ -71,6 +67,6 @@ public class UpdateExamCommandHandler : CommandHandler, ICommandHandler<UpdateEx
                 await _questionRepository.Update(question);
             }            
         }
-        return ValidationResult;
+        return Result();
     }
 }

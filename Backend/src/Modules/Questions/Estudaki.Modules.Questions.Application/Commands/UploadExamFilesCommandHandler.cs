@@ -7,7 +7,7 @@ using FluentValidation.Results;
 
 namespace Estudaki.Modules.Questions.Application.Commands
 {
-    public class UploadExamFilesCommandHandler : CommandHandler, ICommandHandler<UploadExamFilesCommand, ValidationResult>
+    public class UploadExamFilesCommandHandler : CommandHandler, ICommandHandler<UploadExamFilesCommand, CommandResult>
     {
         private readonly IValidator<UploadExamFilesCommand> _validator;
         private readonly IPublicNoticeRepository _publicNoticeRepository;
@@ -25,19 +25,18 @@ namespace Estudaki.Modules.Questions.Application.Commands
             _storageService = storageService;
         }
 
-        public async Task<ValidationResult> HandleAsync(UploadExamFilesCommand command, CancellationToken cancellationToken = default)
+        public async Task<CommandResult> HandleAsync(UploadExamFilesCommand command, CancellationToken cancellationToken = default)
         {
-            var validationResult = await _validator.ValidateAsync(command, cancellationToken);
-            if (!validationResult.IsValid) return validationResult;
+            SetValidationResult(await _validator.ValidateAsync(command, cancellationToken));
+            if (!CommandResult.Success) return Result();
 
             var publicNotice = await _publicNoticeRepository.GetById(command.publicNoticeId);
             var exam = publicNotice?.Exams.FirstOrDefault(e => e.Id == command.examId);
 
             if (publicNotice == null)
             {
-                validationResult.Errors
-                    .Add(new ValidationFailure(nameof(command.publicNoticeId), "Public notice not found."));
-                return validationResult;
+                AddError("Public notice not found.");
+                return Result();
             }            
 
             var examFile = await _storageService.UploadFileAsync(
@@ -70,7 +69,7 @@ namespace Estudaki.Modules.Questions.Application.Commands
                 await _questionRepository.Update(question);
             }
 
-            return validationResult;
+            return Result();
         }
     }
 }

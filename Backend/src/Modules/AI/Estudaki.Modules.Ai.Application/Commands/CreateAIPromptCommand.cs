@@ -3,7 +3,7 @@ using FluentValidation;
 
 namespace Estudaki.Modules.Ai.Application.Commands;
 
-public record CreateAIPromptCommand(string Name, string Content, string? Description) : ICommand<AIPromptCommandResult>;
+public record CreateAIPromptCommand(string Name, string Content, string? Description) : ICommand<CommandResult>;
 
 public class CreateAIPromptCommandValidator : AbstractValidator<CreateAIPromptCommand>
 {

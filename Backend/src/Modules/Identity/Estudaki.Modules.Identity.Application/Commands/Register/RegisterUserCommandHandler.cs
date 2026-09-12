@@ -1,10 +1,9 @@
 ﻿using Estudaki.Commons.Core.CQRS;
 using Estudaki.Modules.Identity.Domain.Interfaces;
-using FluentValidation.Results;
 
 namespace Estudaki.Modules.Identity.Application.Commands.Register;
 
-public class RegisterUserCommandHandler : CommandHandler, ICommandHandler<RegisterUserCommand, ValidationResult>
+public class RegisterUserCommandHandler : CommandHandler, ICommandHandler<RegisterUserCommand, CommandResult>
 {
     private readonly IAuthenticationService _authenticationService;
 
@@ -13,15 +12,15 @@ public class RegisterUserCommandHandler : CommandHandler, ICommandHandler<Regist
         _authenticationService = authenticationService ?? throw new ArgumentNullException(nameof(authenticationService));
     }
 
-    public async Task<ValidationResult> HandleAsync(RegisterUserCommand command, CancellationToken cancellationToken = default)
+    public async Task<CommandResult> HandleAsync(RegisterUserCommand command, CancellationToken cancellationToken = default)
     {
         var result = await _authenticationService.Register(command.Name, command.Email, command.Password, cancellationToken);
 
         if (result.Success)
-            return new ValidationResult();
+            return Result();
 
         AddError(result.Message ?? "An error occurred while registering the user.");
 
-        return ValidationResult;
+        return Result();
     }
 }

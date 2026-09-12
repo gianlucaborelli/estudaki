@@ -85,7 +85,7 @@ public class PublicNoticeRepository : BaseRepository<PublicNotice>, IPublicNotic
 
         var descending = string.Equals(
             sortDirection,
-            "Descending",
+            "desc",
             StringComparison.OrdinalIgnoreCase);
 
         return sortLabel switch

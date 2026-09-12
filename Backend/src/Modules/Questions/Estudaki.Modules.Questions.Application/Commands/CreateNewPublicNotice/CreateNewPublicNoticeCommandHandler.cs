@@ -8,7 +8,7 @@ using FluentValidation.Results;
 
 namespace Estudaki.Modules.Questions.Application.Commands.CreateNewPublicNotice;
 
-public class CreateNewPublicNoticeCommandHandler : CommandHandler, ICommandHandler<CreateNewPublicNoticeCommand, ValidationResult>
+public class CreateNewPublicNoticeCommandHandler : CommandHandler, ICommandHandler<CreateNewPublicNoticeCommand, CommandResult>
 {
     private readonly IQuestionRepository _questionRepository;
     private readonly IPublicNoticeRepository _publicNoticeRepository;
@@ -27,13 +27,10 @@ public class CreateNewPublicNoticeCommandHandler : CommandHandler, ICommandHandl
         _validator = validator;
     }
 
-    public async Task<ValidationResult> HandleAsync(CreateNewPublicNoticeCommand command, CancellationToken cancellationToken = default)
+    public async Task<CommandResult> HandleAsync(CreateNewPublicNoticeCommand command, CancellationToken cancellationToken = default)
     {
-        ValidationResult = _validator.Validate(command);
-        if (!ValidationResult.IsValid)
-        {
-            return ValidationResult;
-        }
+        SetValidationResult(await _validator.ValidateAsync(command, cancellationToken));
+        if (!CommandResult.Success) return Result();
 
         var publicNotice = command.PublicNotice.ToEntity();
         publicNotice.CreatedAt = DateTime.UtcNow;
@@ -88,6 +85,6 @@ public class CreateNewPublicNoticeCommandHandler : CommandHandler, ICommandHandl
 
         await _examExtractionRepository.Remove(command.ExamExtraction.Id);
 
-        return ValidationResult;
+        return Result();
     }
 }

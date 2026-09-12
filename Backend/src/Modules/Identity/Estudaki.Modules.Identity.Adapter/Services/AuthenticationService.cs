@@ -22,40 +22,37 @@ public class AuthenticationService : IAuthenticationService
     }
 
     /// <summary>
-    /// Autentica um usuário com email e senha usando Cookies.
+    /// Autentica um usuário com email e senha.
     /// </summary>
-    public async Task<LoginResult?> LoginAsync(string email, string password, CancellationToken cancellationToken = default)
+    public async Task<ServiceResponse<LoginResult>> LoginAsync(string email, string password, CancellationToken cancellationToken = default)
     {
         if (string.IsNullOrEmpty(email) || string.IsNullOrEmpty(password))
-            return null;
-
-        // Buscar o usuário pelo email
+            return ServiceResponse<LoginResult>.Fail("Email or password is empty");
+                
         var user = await _userManager.FindByEmailAsync(email);
         if (user == null)
-            return null;
+            return ServiceResponse<LoginResult>.Fail("Email or password invalid");
 
-        // Verificar a senha
         var result = await _signInManager.CheckPasswordSignInAsync(user, password, lockoutOnFailure: false);
         if (!result.Succeeded)
-            return null;
+            return ServiceResponse<LoginResult>.Fail("Email or password invalid");
 
-        // Verificar se o email foi confirmado (se RequireConfirmedAccount estiver true)
         if (!user.EmailConfirmed)
-            return null;
+            return ServiceResponse<LoginResult>.Fail("Email is not confirmed");
 
-        // Fazer sign in com cookies
         await _signInManager.SignInAsync(user, isPersistent: true);
 
-        // Buscar roles do usuário
         var roles = await _userManager.GetRolesAsync(user);
 
-        return new LoginResult
+        var login = new LoginResult
         {
             UserId = user.Id,
             Email = user.Email ?? string.Empty,
             Name = user.Name ?? string.Empty,
             Roles = roles.ToList()
         };
+
+        return ServiceResponse<LoginResult>.Ok(login);
     }
 
     /// <summary>

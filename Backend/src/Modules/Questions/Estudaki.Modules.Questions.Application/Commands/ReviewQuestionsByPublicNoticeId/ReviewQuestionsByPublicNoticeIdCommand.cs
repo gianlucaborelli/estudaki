@@ -7,7 +7,7 @@ namespace Estudaki.Modules.Questions.Application.Commands.ReviewQuestionsByPubli
 /// Comando que busca todas as questões relacionadas a um edital (PublicNotice) e solicita
 /// à IA a revisão de cada uma delas, retornando os defeitos encontrados.
 /// </summary>
-public record ReviewQuestionsByPublicNoticeIdCommand(string PublicNoticeId) : ICommand<List<QuestionReviewResult>>;
+public record ReviewQuestionsByPublicNoticeIdCommand(string PublicNoticeId) : ICommand<CommandResult>;
 
 public class ReviewQuestionsByPublicNoticeIdCommandValidator : AbstractValidator<ReviewQuestionsByPublicNoticeIdCommand>
 {

@@ -6,7 +6,7 @@ using FluentValidation.Results;
 
 namespace Estudaki.Modules.Questions.Application.Commands;
 
-public class CreatePublicNoticeCommandHandler : CommandHandler, ICommandHandler<CreatePublicNoticeCommand, ValidationResult>
+public class CreatePublicNoticeCommandHandler : CommandHandler, ICommandHandler<CreatePublicNoticeCommand, CommandResult>
 {
     private readonly IValidator<CreatePublicNoticeCommand> _validator;
     private readonly IPublicNoticeRepository _publicNoticeRepository;
@@ -18,18 +18,18 @@ public class CreatePublicNoticeCommandHandler : CommandHandler, ICommandHandler<
         _publicNoticeRepository = publicNoticeRepository;
     }
 
-    public async Task<ValidationResult> HandleAsync(CreatePublicNoticeCommand command, CancellationToken cancellationToken = default)
+    public async Task<CommandResult> HandleAsync(CreatePublicNoticeCommand command, CancellationToken cancellationToken = default)
     {
-        var result = await _validator.ValidateAsync(command, cancellationToken);
-        if (!result.IsValid)
+        SetValidationResult(await _validator.ValidateAsync(command, cancellationToken));
+        if (!CommandResult.Success)
         {
-            return result;
+            return Result();
         }
 
         var publicNotice = command.PublicNoticeDto.ToEntity();
 
         _publicNoticeRepository.Add(publicNotice);
 
-        return ValidationResult;
+        return Result();
     }
 }

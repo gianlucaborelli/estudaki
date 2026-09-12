@@ -5,7 +5,7 @@ using FluentValidation.Results;
 
 namespace Estudaki.Modules.Questions.Application.Commands;
 
-public record UpdatePublicNoticeCommand(PublicNoticeDto PublicNoticeDto) : ICommand<ValidationResult>;
+public record UpdatePublicNoticeCommand(PublicNoticeDto PublicNoticeDto) : ICommand<CommandResult>;
 
 public class UpdatePublicNoticeCommandValidator : AbstractValidator<UpdatePublicNoticeCommand>
 {

@@ -5,7 +5,7 @@ using FluentValidation.Results;
 
 namespace Estudaki.Modules.Questions.Application.Commands;
 
-public class UpdateAreaCommandHandler : CommandHandler, ICommandHandler<UpdateAreaCommand, ValidationResult>
+public class UpdateAreaCommandHandler : CommandHandler, ICommandHandler<UpdateAreaCommand, CommandResult>
 {
     private readonly IValidator<UpdateAreaCommand> _validator;
     private readonly IAreaRepository _areaRepository;
@@ -16,19 +16,19 @@ public class UpdateAreaCommandHandler : CommandHandler, ICommandHandler<UpdateAr
         _areaRepository = areaRepository;
     }
 
-    public async Task<ValidationResult> HandleAsync(UpdateAreaCommand command, CancellationToken cancellationToken = default)
+    public async Task<CommandResult> HandleAsync(UpdateAreaCommand command, CancellationToken cancellationToken = default)
     {
-        ValidationResult = await _validator.ValidateAsync(command, cancellationToken);
-        if (!ValidationResult.IsValid)
+        SetValidationResult(await _validator.ValidateAsync(command, cancellationToken));
+        if (!CommandResult.Success)
         {
-            return ValidationResult;
+            return Result();
         }
 
         var area = await _areaRepository.GetByIdAsync(command.Id);
         if (area == null)
         {
             AddError("Área não encontrada.");
-            return ValidationResult;
+            return Result();
         }
 
         area.Name = command.Name;
@@ -36,6 +36,6 @@ public class UpdateAreaCommandHandler : CommandHandler, ICommandHandler<UpdateAr
 
         await _areaRepository.UpdateAsync(area);
 
-        return ValidationResult;
+        return Result();
     }
 }

@@ -11,7 +11,7 @@ public interface IAuthenticationService
     /// <summary>
     /// Autentica um usuário com email e senha, gerando cookie httpOnly.
     /// </summary>
-    Task<LoginResult?> LoginAsync(string email, string password, CancellationToken cancellationToken = default);
+    Task<ServiceResponse<LoginResult>> LoginAsync(string email, string password, CancellationToken cancellationToken = default);
 
     /// <summary>
     /// Logout de um usuário, removendo seu cookie de autenticação.

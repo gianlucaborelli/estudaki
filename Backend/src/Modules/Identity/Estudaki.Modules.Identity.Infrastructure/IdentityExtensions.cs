@@ -42,8 +42,8 @@ public static class IdentityExtensions
         services.AddScoped<IAuthenticationService, AuthenticationService>();
 
         // Registrar Command Handlers
-        services.AddScoped<ICommandHandler<LoginCommand, LoginCommandResult>, LoginCommandHandler>();
-        services.AddScoped<ICommandHandler<RegisterUserCommand, ValidationResult>, RegisterUserCommandHandler>();
+        services.AddScoped<ICommandHandler<LoginCommand, CommandResult>, LoginCommandHandler>();
+        services.AddScoped<ICommandHandler<RegisterUserCommand, CommandResult>, RegisterUserCommandHandler>();
 
         return services;
     }

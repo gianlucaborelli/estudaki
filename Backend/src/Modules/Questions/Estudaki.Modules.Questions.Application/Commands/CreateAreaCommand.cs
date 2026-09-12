@@ -5,7 +5,7 @@ using FluentValidation.Results;
 
 namespace Estudaki.Modules.Questions.Application.Commands;
 
-public record CreateAreaCommand(string Name, AreaType Type) : ICommand<AreaCommandResult>;
+public record CreateAreaCommand(string Name, AreaType Type) : ICommand<CommandResult>;
 
 public class CreateAreaCommandValidator : AbstractValidator<CreateAreaCommand>
 {

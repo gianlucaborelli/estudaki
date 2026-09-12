@@ -4,15 +4,41 @@ namespace Estudaki.Commons.Core.CQRS;
 
 public abstract class CommandHandler
 {
-    protected ValidationResult ValidationResult;
+    protected CommandResult CommandResult { get; set; }
 
     protected CommandHandler()
     {
-        ValidationResult = new ValidationResult();
+        CommandResult = new CommandResult();
     }
 
     protected void AddError(string mensagem)
     {
-        ValidationResult.Errors.Add(new ValidationFailure(string.Empty, mensagem));
-    }        
+        CommandResult.ValidationResult.Errors.Add(new ValidationFailure(string.Empty, mensagem));
+    }
+
+    protected CommandResult Result()
+    {
+        return CommandResult;
+    }
+
+    protected CommandResult Result(object data)
+    {
+        CommandResult.Data = data;
+
+        return CommandResult;
+    }
+
+    protected void SetValidationResult(ValidationResult validationResult)
+    {
+        CommandResult.ValidationResult = validationResult;
+    }
+}
+
+public class CommandResult
+{
+    public bool Success => !ValidationResult.Errors.Any();
+
+    public object? Data { get; internal set; }
+
+    public ValidationResult ValidationResult { get; internal set; } = new();
 }

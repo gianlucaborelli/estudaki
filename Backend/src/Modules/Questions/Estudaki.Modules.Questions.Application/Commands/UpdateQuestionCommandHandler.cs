@@ -5,7 +5,7 @@ using FluentValidation.Results;
 
 namespace Estudaki.Modules.Questions.Application.Commands;
 
-public class UpdateQuestionCommandHandler : CommandHandler, ICommandHandler<UpdateQuestionCommand, ValidationResult>
+public class UpdateQuestionCommandHandler : CommandHandler, ICommandHandler<UpdateQuestionCommand, CommandResult>
 {
     private readonly IValidator<UpdateQuestionCommand> _validator;
     private readonly IQuestionRepository _questionRepository;
@@ -16,23 +16,23 @@ public class UpdateQuestionCommandHandler : CommandHandler, ICommandHandler<Upda
         _questionRepository = questionRepository;
     }
 
-    public async Task<ValidationResult> HandleAsync(UpdateQuestionCommand command, CancellationToken cancellationToken = default)
+    public async Task<CommandResult> HandleAsync(UpdateQuestionCommand command, CancellationToken cancellationToken = default)
     {
-        ValidationResult = await _validator.ValidateAsync(command, cancellationToken);
-        if (!ValidationResult.IsValid) return ValidationResult;
+        SetValidationResult(await _validator.ValidateAsync(command, cancellationToken));
+        if (!CommandResult.Success) return Result();
 
         var question = await _questionRepository.GetById(command.Question.QuestionId);
         if (question == null)
         {
-            ValidationResult.Errors.Add(new ValidationFailure("Question", "Question not found."));
-            return ValidationResult;
+            AddError("Question not found.");
+            return Result();
         }
 
         var exam = question.Exams.FirstOrDefault(e => e.ExamId == command.Question.ExamId);
         if (exam == null) 
         {
-            ValidationResult.Errors.Add(new ValidationFailure("ExamId", "Exam not found for the question."));
-            return ValidationResult;
+            AddError("Exam not found for the question.");
+            return Result();
         }
 
         question.Type = command.Question.QuestionType;
@@ -46,6 +46,6 @@ public class UpdateQuestionCommandHandler : CommandHandler, ICommandHandler<Upda
         
         await _questionRepository.Update(question);
 
-        return ValidationResult;
+        return Result();
     }
 }

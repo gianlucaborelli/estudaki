@@ -1,12 +1,9 @@
-using System.Net.Mime;
-using System.Text;
 using System.Text.Json;
 using Estudaki.Commons.Core.AI;
 using Estudaki.Commons.Core.AI.Prompts;
 using Estudaki.Commons.Core.CQRS;
 using Estudaki.Modules.Questions.Application.AI;
 using Estudaki.Modules.Questions.Domain.Entities;
-using Estudaki.Modules.Questions.Domain.Extensions;
 using Estudaki.Modules.Questions.Domain.Repositories;
 using Estudaki.Modules.Questions.Domain.ValueObjects;
 using FluentValidation;
@@ -14,7 +11,7 @@ using FluentValidation;
 namespace Estudaki.Modules.Questions.Application.Commands.ReviewQuestionsByPublicNoticeId;
 
 public class ReviewQuestionsByPublicNoticeIdCommandHandler
-    : CommandHandler, ICommandHandler<ReviewQuestionsByPublicNoticeIdCommand, List<QuestionReviewResult>>
+    : CommandHandler, ICommandHandler<ReviewQuestionsByPublicNoticeIdCommand, CommandResult>
 {
     /// <summary>
     /// Limite máximo de requisições concorrentes enviadas à IA. O provedor utilizado
@@ -40,22 +37,19 @@ public class ReviewQuestionsByPublicNoticeIdCommandHandler
         _aiService = aiService;        
     }
 
-    public async Task<List<QuestionReviewResult>> HandleAsync(
+    public async Task<CommandResult> HandleAsync(
         ReviewQuestionsByPublicNoticeIdCommand command,
         CancellationToken cancellationToken = default)
     {
-        var results = new List<QuestionReviewResult>();
-
-        ValidationResult = await _validator.ValidateAsync(command, cancellationToken);
-        if (!ValidationResult.IsValid)
-            return results;
+        SetValidationResult(await _validator.ValidateAsync(command, cancellationToken));
+        if (!CommandResult.Success) return Result();
 
         var prompt = await _aiService.GetPromptAsync(AIPromptNames.ReviewQuestion, cancellationToken);
 
         if(string.IsNullOrEmpty(prompt))
         {
             AddError("Prompt de revisão de questões não configurado.");
-            return results;
+            return Result();
         }
 
         var questions = await _questionRepository.GetByPublicNoticeId(command.PublicNoticeId);
@@ -80,9 +74,10 @@ public class ReviewQuestionsByPublicNoticeIdCommandHandler
         });
 
         var reviewResults = await Task.WhenAll(reviewTasks);
+        var results = new List<QuestionReviewResult>();
         results.AddRange(reviewResults);
 
-        return results;
+        return Result(results);
     }
 
     private async Task<QuestionReviewResult> ReviewQuestionAsync(

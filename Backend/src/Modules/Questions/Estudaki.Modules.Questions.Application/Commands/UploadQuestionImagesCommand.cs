@@ -5,7 +5,7 @@ using FluentValidation.Results;
 
 namespace Estudaki.Modules.Questions.Application.Commands
 {
-    public record UploadQuestionImagesCommand(List<UploadFileDto> Files, string PublicNoticeId) : ICommand<ValidationResult>;
+    public record UploadQuestionImagesCommand(List<UploadFileDto> Files, string PublicNoticeId) : ICommand<CommandResult>;
 
     public class UploadQuestionImagesCommandValidator : AbstractValidator<UploadQuestionImagesCommand>
     {

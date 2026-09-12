@@ -3,7 +3,7 @@ using FluentValidation;
 
 namespace Estudaki.Modules.Ai.Application.Commands;
 
-public record DeleteAIPromptCommand(string Id) : ICommand<AIPromptCommandResult>;
+public record DeleteAIPromptCommand(string Id) : ICommand<CommandResult>;
 
 public class DeleteAIPromptCommandValidator : AbstractValidator<DeleteAIPromptCommand>
 {

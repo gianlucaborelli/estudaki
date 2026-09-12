@@ -6,7 +6,7 @@ using FluentValidation.Results;
 
 namespace Estudaki.Modules.Questions.Application.Commands;
 
-public class UpdateQuestionSupportCommandHandler : CommandHandler, ICommandHandler<UpdateQuestionSupportCommand, ValidationResult>
+public class UpdateQuestionSupportCommandHandler : CommandHandler, ICommandHandler<UpdateQuestionSupportCommand, CommandResult>
 {
     private readonly IValidator<UpdateQuestionSupportCommand> _validator;
     private readonly IQuestionSupportRepository _questionSupportRepository;
@@ -17,25 +17,22 @@ public class UpdateQuestionSupportCommandHandler : CommandHandler, ICommandHandl
         _questionSupportRepository = questionRepository;
     }
 
-    public async Task<ValidationResult> HandleAsync(UpdateQuestionSupportCommand command, CancellationToken cancellationToken = default)
+    public async Task<CommandResult> HandleAsync(UpdateQuestionSupportCommand command, CancellationToken cancellationToken = default)
     {
-        ValidationResult = await _validator.ValidateAsync(command, cancellationToken);
-        if(!ValidationResult.IsValid)
-        {
-            return ValidationResult;
-        }
+        SetValidationResult(await _validator.ValidateAsync(command, cancellationToken));
+        if (!CommandResult.Success) return Result();
 
         var questionSupport = await _questionSupportRepository.GetById(command.QuestionSupportDto.Id);
 
         if (questionSupport == null)
         {
-            ValidationResult.Errors.Add(new ValidationFailure("QuestionSupport", "Question support not found."));
-            return ValidationResult;
+            AddError("Question support not found.");
+            return Result();
         }
 
         var updatedQuestionSupport = command.QuestionSupportDto.ToEntity();
         await _questionSupportRepository.Update(updatedQuestionSupport);
 
-        return ValidationResult;
+        return Result();
     }
 }

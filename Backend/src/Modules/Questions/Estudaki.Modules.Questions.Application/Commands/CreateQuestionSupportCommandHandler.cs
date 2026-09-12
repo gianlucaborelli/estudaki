@@ -6,7 +6,7 @@ using FluentValidation.Results;
 
 namespace Estudaki.Modules.Questions.Application.Commands
 {
-    public class CreateQuestionSupportCommandHandler : CommandHandler, ICommandHandler<CreateQuestionSupportCommand, ValidationResult>
+    public class CreateQuestionSupportCommandHandler : CommandHandler, ICommandHandler<CreateQuestionSupportCommand, CommandResult>
     {
         private readonly IValidator<CreateQuestionSupportCommand> _validator;
         private readonly IQuestionSupportRepository _questionSupportRepository;
@@ -21,18 +21,18 @@ namespace Estudaki.Modules.Questions.Application.Commands
             _publicNoticeRepository = publicNoticeRepository;
         }
 
-        public async Task<ValidationResult> HandleAsync(CreateQuestionSupportCommand command, CancellationToken cancellationToken = default)
+        public async Task<CommandResult> HandleAsync(CreateQuestionSupportCommand command, CancellationToken cancellationToken = default)
         {
-            ValidationResult = await _validator.ValidateAsync(command, cancellationToken);
-            if(!ValidationResult.IsValid) {
-                return ValidationResult;
+            SetValidationResult(await _validator.ValidateAsync(command, cancellationToken));
+            if(!CommandResult.Success) {
+                return Result();
             }
 
             var publicNotice = await _publicNoticeRepository.GetById(command.PublicNoticeId);
             if (publicNotice == null) 
             {
-                ValidationResult.Errors.Add(new ValidationFailure("PublicNoticeId", "Public notice not found."));
-                return ValidationResult;
+                AddError("Public notice not found.");
+                return Result();
             }
 
             var questionSupport = command.QuestionSupportDto.ToEntity();
@@ -40,7 +40,7 @@ namespace Estudaki.Modules.Questions.Application.Commands
 
             _questionSupportRepository.Add(questionSupport);
 
-            return ValidationResult;
+            return Result();
         }
     }
 }

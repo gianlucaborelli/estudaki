@@ -5,7 +5,7 @@ using FluentValidation.Results;
 
 namespace Estudaki.Modules.Questions.Application.Commands;
 
-public record UpdateAreaCommand(string Id, string Name, AreaType Type) : ICommand<ValidationResult>;
+public record UpdateAreaCommand(string Id, string Name, AreaType Type) : ICommand<CommandResult>;
 
 public class UpdateAreaCommandValidator : AbstractValidator<UpdateAreaCommand>
 {

@@ -5,7 +5,7 @@ using FluentValidation.Results;
 
 namespace Estudaki.Modules.Questions.Application.Commands;
 
-public class UnifyQuestionCommandHandler : CommandHandler, ICommandHandler<UnifyQuestionCommand, ValidationResult>
+public class UnifyQuestionCommandHandler : CommandHandler, ICommandHandler<UnifyQuestionCommand, CommandResult>
 {
     private readonly IValidator<UnifyQuestionCommand> _validator;
     private readonly IQuestionRepository _questionRepository;
@@ -16,23 +16,23 @@ public class UnifyQuestionCommandHandler : CommandHandler, ICommandHandler<Unify
         _questionRepository = questionRepository;
     }
 
-    public async Task<ValidationResult> HandleAsync(UnifyQuestionCommand command, CancellationToken cancellationToken = default)
+    public async Task<CommandResult> HandleAsync(UnifyQuestionCommand command, CancellationToken cancellationToken = default)
     {
-        ValidationResult = await _validator.ValidateAsync(command, cancellationToken);
-        if (!ValidationResult.IsValid) return ValidationResult;
+        SetValidationResult(await _validator.ValidateAsync(command, cancellationToken));
+        if (!CommandResult.Success) return Result();
 
         var questions = await _questionRepository.GetManyById(command.QuestionsIds);
 
         if (questions == null)
         {
-            ValidationResult.Errors.Add(new ValidationFailure(nameof(command.QuestionsIds), "Some of the questions were not found."));
-            return ValidationResult;
+            AddError("Some of the questions were not found.");
+            return Result();
         }
 
         var questionToUnify = questions.FirstOrDefault(q => q.Id == command.QuestionsIds.First());        
         if (questionToUnify == null) {
-            ValidationResult.Errors.Add(new ValidationFailure(nameof(command.QuestionsIds), "The question to unify was not found."));
-            return ValidationResult;
+            AddError("The question to unify was not found.");
+            return Result();
         }
         var questionsToDelete = questions.Where(q => q.Id != questionToUnify.Id).ToList();
         var originalExam = questionToUnify.Exams
@@ -40,8 +40,8 @@ public class UnifyQuestionCommandHandler : CommandHandler, ICommandHandler<Unify
                                 .FirstOrDefault();
         if (originalExam == null) 
         {
-            ValidationResult.Errors.Add(new ValidationFailure(nameof(command.QuestionsIds), "The question to unify does not have an original exam."));
-            return ValidationResult;
+            AddError("The question to unify does not have an original exam.");
+            return Result();
         }
 
         var exams = questions.SelectMany(q => q.Exams).ToList();
@@ -57,6 +57,6 @@ public class UnifyQuestionCommandHandler : CommandHandler, ICommandHandler<Unify
         foreach(var questionToDelete in questionsToDelete)
             await _questionRepository.Remove(questionToDelete.Id);
 
-        return ValidationResult;
+        return Result();
     }
 }

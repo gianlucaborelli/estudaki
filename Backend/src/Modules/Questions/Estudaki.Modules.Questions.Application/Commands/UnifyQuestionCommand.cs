@@ -4,7 +4,7 @@ using FluentValidation.Results;
 
 namespace Estudaki.Modules.Questions.Application.Commands;
 
-public record UnifyQuestionCommand(List<string> QuestionsIds) : ICommand<ValidationResult>;
+public record UnifyQuestionCommand(List<string> QuestionsIds) : ICommand<CommandResult>;
 
 public class UnifyQuestionCommandValidator : AbstractValidator<UnifyQuestionCommand>
 {

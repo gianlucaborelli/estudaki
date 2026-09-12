@@ -5,7 +5,7 @@ using FluentValidation.Results;
 
 namespace Estudaki.Modules.Questions.Application.Commands;
 
-public record AddNewQuestionIntoExamCommand(QuestionDto Question) : ICommand<ValidationResult>;
+public record AddNewQuestionIntoExamCommand(QuestionDto Question) : ICommand<CommandResult>;
 
 public class AddNewQuestionIntoExamCommandValidator : AbstractValidator<AddNewQuestionIntoExamCommand>
 {

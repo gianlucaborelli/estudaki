@@ -11,7 +11,7 @@ namespace Estudaki.Modules.Comunications.Application.Commands.CreateContactMessa
         string Message, 
         bool CanBeReplied, 
         string? UserId
-    ) : ICommand<ValidationResult>;
+    ) : ICommand<CommandResult>;
 
     public class CreateContactMessageCommandValidator : AbstractValidator<CreateContactMessageCommand>
     {

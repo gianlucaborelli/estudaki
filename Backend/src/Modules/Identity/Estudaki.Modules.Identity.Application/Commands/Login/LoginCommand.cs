@@ -6,7 +6,7 @@ namespace Estudaki.Modules.Identity.Application.Commands.Login;
 /// <summary>
 /// Command para autenticar um usuário com email e senha.
 /// </summary>
-public record LoginCommand(string Email, string Password) : ICommand<LoginCommandResult>;
+public record LoginCommand(string Email, string Password) : ICommand<CommandResult>;
 
 public record LoginCommandResult(
     string UserId,

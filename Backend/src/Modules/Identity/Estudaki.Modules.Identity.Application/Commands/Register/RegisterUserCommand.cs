@@ -4,7 +4,7 @@ using FluentValidation.Results;
 
 namespace Estudaki.Modules.Identity.Application.Commands.Register;
 
-public record RegisterUserCommand(string Name, string Email, string Password, string ConfirmPassword) : ICommand<ValidationResult>;
+public record RegisterUserCommand(string Name, string Email, string Password, string ConfirmPassword) : ICommand<CommandResult>;
 
 public class RegisterUserCommandValidator : AbstractValidator<RegisterUserCommand>
 {

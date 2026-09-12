@@ -4,7 +4,7 @@ using FluentValidation.Results;
 
 namespace Estudaki.Modules.Questions.Application.Commands;
 
-public record DeleteQuestionSupportCommand(string QuestionSupportId) : ICommand<ValidationResult>;
+public record DeleteQuestionSupportCommand(string QuestionSupportId) : ICommand<CommandResult>;
 
 public class DeleteQuestionSupportCommandValidator : AbstractValidator<DeleteQuestionSupportCommand>
 {

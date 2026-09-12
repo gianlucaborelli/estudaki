@@ -4,7 +4,7 @@ using FluentValidation.Results;
 
 namespace Estudaki.Modules.Questions.Application.Commands;
 
-public record UnifyPublicNoticeCommand (List<string> PublicNoticeIds) : ICommand<ValidationResult>;
+public record UnifyPublicNoticeCommand (List<string> PublicNoticeIds) : ICommand<CommandResult>;
 
 public class UnifyPublicNoticeCommandValidator : AbstractValidator<UnifyPublicNoticeCommand>
 {

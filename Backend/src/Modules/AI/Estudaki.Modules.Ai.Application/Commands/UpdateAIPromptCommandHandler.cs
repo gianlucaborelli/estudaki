@@ -5,7 +5,7 @@ using FluentValidation;
 
 namespace Estudaki.Modules.Ai.Application.Commands;
 
-public class UpdateAIPromptCommandHandler : CommandHandler, ICommandHandler<UpdateAIPromptCommand, AIPromptCommandResult>
+public class UpdateAIPromptCommandHandler : CommandHandler, ICommandHandler<UpdateAIPromptCommand, CommandResult>
 {
     private readonly IValidator<UpdateAIPromptCommand> _validator;
     private readonly IAiRepository _promptRepository;
@@ -16,24 +16,21 @@ public class UpdateAIPromptCommandHandler : CommandHandler, ICommandHandler<Upda
         _promptRepository = promptRepository;
     }
 
-    public async Task<AIPromptCommandResult> HandleAsync(UpdateAIPromptCommand command, CancellationToken cancellationToken = default)
+    public async Task<CommandResult> HandleAsync(UpdateAIPromptCommand command, CancellationToken cancellationToken = default)
     {
-        ValidationResult = await _validator.ValidateAsync(command, cancellationToken);
-        if (!ValidationResult.IsValid)
-        {
-            return new AIPromptCommandResult { ValidationResult = ValidationResult };
-        }
+        SetValidationResult(await _validator.ValidateAsync(command, cancellationToken));
+        if (!CommandResult.Success) return Result();
 
         var prompt = await _promptRepository.GetById(command.Id);
         if (prompt is null)
         {
             AddError("Prompt não encontrado.");
-            return new AIPromptCommandResult { ValidationResult = ValidationResult };
+            return Result();
         }
 
         prompt.UpdateContent(command.Content, command.Description);
         await _promptRepository.Update(prompt);
 
-        return new AIPromptCommandResult { ValidationResult = ValidationResult, Prompt = AIPromptDto.FromEntity(prompt) };
+        return Result(AIPromptDto.FromEntity(prompt));
     }
 }

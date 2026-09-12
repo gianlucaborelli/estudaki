@@ -6,7 +6,7 @@ using FluentValidation.Results;
 
 namespace Estudaki.Modules.Questions.Application.Commands;
 
-public class UpdatePublicNoticeCommandHandler : CommandHandler, ICommandHandler<UpdatePublicNoticeCommand, ValidationResult>
+public class UpdatePublicNoticeCommandHandler : CommandHandler, ICommandHandler<UpdatePublicNoticeCommand, CommandResult>
 {
     private readonly IValidator<UpdatePublicNoticeCommand> _validator;
     private readonly IPublicNoticeRepository _publicNoticeRepository;
@@ -21,19 +21,19 @@ public class UpdatePublicNoticeCommandHandler : CommandHandler, ICommandHandler<
         _questionRepository = questionRepository;
     }
 
-    public async Task<ValidationResult> HandleAsync(UpdatePublicNoticeCommand command, CancellationToken cancellationToken = default)
+    public async Task<CommandResult> HandleAsync(UpdatePublicNoticeCommand command, CancellationToken cancellationToken = default)
     {
-        ValidationResult = await _validator.ValidateAsync(command, cancellationToken);
-        if (!ValidationResult.IsValid) {
-            return ValidationResult;
+        SetValidationResult(await _validator.ValidateAsync(command, cancellationToken));
+        if (!CommandResult.Success) {
+            return Result();
         }
 
         var publicNotice = await _publicNoticeRepository.GetById(command.PublicNoticeDto.Id);
 
         if (publicNotice == null) 
         { 
-            ValidationResult.Errors.Add(new ValidationFailure("PublicNotice", "Public notice not found."));
-            return ValidationResult;
+            AddError("Public notice not found.");
+            return Result();
         }
 
         var updatedPublicNotice = command.PublicNoticeDto.ToEntity();
@@ -56,6 +56,6 @@ public class UpdatePublicNoticeCommandHandler : CommandHandler, ICommandHandler<
             await _questionRepository.Update(question);
         }
 
-        return ValidationResult;
+        return Result();
     }
 }

@@ -6,7 +6,7 @@ using FluentValidation.Results;
 
 namespace Estudaki.Modules.Questions.Application.Commands.CreateNewPublicNotice;
 
-public record CreateNewPublicNoticeCommand(PublicNoticeDto PublicNotice, ExamExtractionDto ExamExtraction) : ICommand<ValidationResult>;
+public record CreateNewPublicNoticeCommand(PublicNoticeDto PublicNotice, ExamExtractionDto ExamExtraction) : ICommand<CommandResult>;
 
 public class CreateNewPublicNoticeCommandValidator : AbstractValidator<CreateNewPublicNoticeCommand>
 {
