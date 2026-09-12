@@ -1,1 +1,12 @@
-<p>home works!</p>
+<div>
+  <h1>Home</h1>
+  <p>
+    Status de autenticação:
+    <strong>{{ isAuthenticated ? 'Autenticado' : 'Não autenticado' }}</strong>
+  </p>
+  @if (currentUser()?.userId) {
+    <p>
+      User ID: <strong>{{ currentUser()?.userId }}</strong>
+    </p>
+  }
+</div>

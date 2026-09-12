@@ -1,2 +1,49 @@
-<p>base.layout works!</p>
-<router-outlet></router-outlet>
+<mat-toolbar class="mat-elevation-z3">
+  @if (sidenav.mode === 'over') {
+    <button mat-icon-button (click)="sidenav.toggle()">
+      @if (!sidenav.opened) {
+        <mat-icon> menu </mat-icon>
+      } @else {
+        <mat-icon> close </mat-icon>
+      }
+    </button>
+  }
+
+  <div class="header">
+    <h1>Estudaki</h1>
+  </div>
+</mat-toolbar>
+
+<mat-sidenav-container>
+  <mat-sidenav #sidenav="matSidenav" class="mat-elevation-z3">
+    <img class="avatar mat-elevation-z3" src="" />
+
+    <!-- <h4 class="name">{{ user.getFullName() }}</h4>
+    <p class="email">{{ user.getEmail() }}</p> -->
+
+    <mat-divider></mat-divider>
+
+    <!-- <button mat-button class="menu-button" (click)="authService.logout()">
+      <mat-icon>logout</mat-icon>
+      <span>Logout</span>
+    </button> -->
+
+    <mat-divider></mat-divider>
+
+    <button mat-button class="menu-button" onclick="location.href='/'">
+      <mat-icon>dashboard</mat-icon>
+      <span>Dashboard</span>
+    </button>
+
+    <button mat-button class="menu-button" onclick="location.href='/exams'">
+      <mat-icon>business</mat-icon>
+      <span>Provas</span>
+    </button>
+  </mat-sidenav>
+
+  <mat-sidenav-content>
+    <div class="content mat-elevation-z3">
+      <router-outlet></router-outlet>
+    </div>
+  </mat-sidenav-content>
+</mat-sidenav-container>

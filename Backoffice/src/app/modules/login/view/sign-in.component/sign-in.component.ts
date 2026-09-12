@@ -3,7 +3,6 @@ import { AuthService } from '../../auth.service';
 import { Router } from '@angular/router';
 import { MATERIAL_MODULES } from '../../../../shared/imports/material.imports';
 
-
 @Component({
   imports: [
     ...MATERIAL_MODULES
@@ -15,7 +14,7 @@ import { MATERIAL_MODULES } from '../../../../shared/imports/material.imports';
 export class SignInComponent {
 
   constructor(private authService: AuthService, private router: Router) {
-    
+
    }
 
   login(email: string, password: string): void {

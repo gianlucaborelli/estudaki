@@ -7,6 +7,8 @@ import { MatCardModule } from '@angular/material/card';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatSidenavModule } from '@angular/material/sidenav';
 import { MatTooltipModule } from '@angular/material/tooltip';
+import { MatPaginator, MatPaginatorModule } from '@angular/material/paginator';
+import { MatSort, MatSortModule } from '@angular/material/sort';
 import {
   MatDialogActions,
   MatDialogClose,
@@ -42,4 +44,8 @@ export const MATERIAL_MODULES = [
   MatTableModule,
   MatChipsModule,
   MatMenuModule,
+  MatPaginator,
+  MatPaginatorModule,
+  MatSort,
+  MatSortModule
 ];
