@@ -4,10 +4,12 @@ import { MatToolbarModule } from '@angular/material/toolbar';
 import { MatInputModule } from '@angular/material/input';
 import { MatDividerModule } from '@angular/material/divider';
 import { MatCardModule } from '@angular/material/card';
+import { MatCheckboxModule } from '@angular/material/checkbox';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatSidenavModule } from '@angular/material/sidenav';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { MatPaginator, MatPaginatorModule } from '@angular/material/paginator';
+import { MatTabsModule } from '@angular/material/tabs';
 import { MatSort, MatSortModule } from '@angular/material/sort';
 import {
   MatDialogActions,
@@ -25,6 +27,7 @@ import { MatMenuModule } from '@angular/material/menu';
 
 export const MATERIAL_MODULES = [
   MatButtonModule,
+  MatCheckboxModule,
   MatIconModule,
   MatToolbarModule,
   MatInputModule,
@@ -47,5 +50,6 @@ export const MATERIAL_MODULES = [
   MatPaginator,
   MatPaginatorModule,
   MatSort,
-  MatSortModule
+  MatSortModule,
+  MatTabsModule
 ];

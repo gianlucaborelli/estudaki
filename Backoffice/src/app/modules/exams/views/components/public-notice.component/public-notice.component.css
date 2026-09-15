@@ -1,0 +1,91 @@
+.publicnotice-card,
+.exam-selector-card,
+.exam-card {
+  margin-top: 10px;
+}
+
+.publicnotice-card,
+.exam-selector-card,
+.exam-card {
+  background-color: #e5f0ec;
+}
+
+.toolbar-actions {
+  background-color: #a5c4b8;
+  min-height: 48px;
+  height: 48px;
+  border-radius: 7px 7px 0 0;
+  gap: 4px;
+}
+
+.public-notice-content {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  margin: 0 20px;
+}
+
+.header-row {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.title {
+  margin: 0;
+  font-size: 1.5rem;
+  font-weight: 700;
+}
+
+.spacer {
+  flex: 1;
+}
+
+.info-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 24px;
+}
+
+.info-item {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.label {
+  font-size: 0.875rem;
+  font-weight: 600;
+}
+
+.value {
+  font-size: 1rem;
+}
+
+.exam-selection {
+  display: flex;
+  align-items: center;
+}
+
+.exam-selection mat-form-field {
+  min-width: 300px;
+  width: 100%;
+}
+
+@media (max-width: 768px) {
+  .header-row {
+    flex-wrap: wrap;
+  }
+
+  .spacer {
+    display: none;
+  }
+
+  .info-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .exam-selection mat-form-field {
+    width: 100%;
+  }
+}

@@ -1,0 +1,253 @@
+<mat-card class="exam-selector-card" appearance="outlined">
+  <mat-form-field class="exam-selector-questions" appearance="outline">
+    <mat-label>Exames</mat-label>
+
+    <mat-select [(value)]="selectedExam" (selectionChange)="onExamSelected($event.value)">
+      @for (exam of publicNotice?.exams; track exam.id) {
+        <mat-option [value]="exam">
+          {{ exam.phase }}
+          -
+          {{ exam.educationLevel | educationLevel }}
+          -
+          {{ exam.position }}
+          -
+          {{ exam.area }}
+        </mat-option>
+      }
+    </mat-select>
+  </mat-form-field>
+
+  <mat-divider />
+  <div class="questions-list">
+    <mat-tab-group>
+      <!-- QUESTÕES -->
+      <mat-tab label="Questões">
+        <div class="questions-layout">
+          <!-- Lista de questões -->
+          <div class="questions-list">
+            <table
+              mat-table
+              [dataSource]="questionDataSource()"
+              class="questions-table"
+              multiTemplateDataRows
+            >
+              <!-- Número -->
+              <ng-container matColumnDef="questionNumber">
+                <th mat-header-cell *matHeaderCellDef>Nr</th>
+
+                <td mat-cell *matCellDef="let question">
+                  {{ question.questionNumber }}
+                </td>
+              </ng-container>
+
+              <!-- Tipo -->
+              <ng-container matColumnDef="questionType">
+                <th mat-header-cell *matHeaderCellDef>Tipo</th>
+
+                <td mat-cell *matCellDef="let question">
+                  {{ question.questionType | questionType }}
+                </td>
+              </ng-container>
+
+              <!-- Quantidade de alternativas -->
+              <ng-container matColumnDef="choicesCount">
+                <th mat-header-cell *matHeaderCellDef>Qt. Alt</th>
+
+                <td mat-cell *matCellDef="let question">
+                  {{ question.choices?.length ?? 0 }}
+                </td>
+              </ng-container>
+
+              <!-- Quantidade de alternativas corretas -->
+              <ng-container matColumnDef="correctChoicesCount">
+                <th mat-header-cell *matHeaderCellDef>C. Alt</th>
+
+                <td mat-cell *matCellDef="let question">
+                  {{ question.choices.lenth }}
+                </td>
+              </ng-container>
+
+              <tr mat-header-row *matHeaderRowDef="questionDisplayedColumns"></tr>
+
+              <tr
+                mat-row
+                *matRowDef="let question; columns: questionDisplayedColumns"
+                [class.selected-row]="selectedQuestion?.questionId === question.id"
+                (click)="onQuestionRowClick(question)"
+              ></tr>
+
+              <!-- Loading -->
+              <tr *matNoDataRow>
+                <td [attr.colspan]="questionDisplayedColumns.length" class="empty-table">
+                  @if (isLoading) {
+                    Carregando questões...
+                  } @else {
+                    Nenhuma questão encontrada.
+                  }
+                </td>
+              </tr>
+            </table>
+
+            <mat-paginator [pageSize]="20" [pageSizeOptions]="[10, 20, 50]" showFirstLastButtons />
+          </div>
+
+          <!-- Conteúdo da questão -->
+          <div class="question-content">
+            <mat-toolbar class="toolbar-actions">
+              <!-- Adicionar -->
+              <button
+                mat-stroked-button
+                [matMenuTriggerFor]="addQuestionMenu"
+                matTooltip="Adicionar Questão"
+              >
+                <mat-icon>add</mat-icon>
+                Adicionar
+              </button>
+
+              <mat-menu #addQuestionMenu="matMenu">
+                <button mat-menu-item (click)="openAddExistingQuestionIntoExamModal()">
+                  <mat-icon>library_add</mat-icon>
+                  <span>Adicionar questão existente</span>
+                </button>
+
+                <button mat-menu-item (click)="addNewQuestionEditorModalAsync()">
+                  <mat-icon>add_circle</mat-icon>
+                  <span>Criar nova questão</span>
+                </button>
+              </mat-menu>
+
+              <!-- Editar -->
+              <button
+                mat-icon-button
+                matTooltip="Editar Questão"
+                [disabled]="!selectedQuestion"
+                (click)="openQuestionEditorModal()"
+              >
+                <mat-icon>edit</mat-icon>
+              </button>
+
+              <!-- Remover -->
+              <button
+                mat-icon-button
+                matTooltip="Remover Questão"
+                [disabled]="!selectedQuestion"
+                (click)="deleteQuestion()"
+              >
+                <mat-icon>delete</mat-icon>
+              </button>
+            </mat-toolbar>
+
+            @if (!selectedQuestion) {
+              <div class="empty-content">
+                <mat-icon>quiz</mat-icon>
+
+                <span> Selecione uma questão para visualizar o conteúdo. </span>
+              </div>
+            } @else {
+              <app-question-render [question]="selectedQuestion" />
+            }
+          </div>
+        </div>
+      </mat-tab>
+
+      <!-- SUPORTE -->
+      <mat-tab label="Suporte de Questões">
+        <div class="questions-layout">
+          <!-- Lista de suportes -->
+          <div class="questions-list">
+            <table mat-table [dataSource]="questionSupportDataSource()" class="questions-table">
+              <ng-container matColumnDef="id">
+                <th mat-header-cell *matHeaderCellDef>Nr</th>
+
+                <td mat-cell *matCellDef="let support">
+                  {{ support.id }}
+                </td>
+              </ng-container>
+
+              <ng-container matColumnDef="contentsCount">
+                <th mat-header-cell *matHeaderCellDef>Itens</th>
+
+                <td mat-cell *matCellDef="let support">
+                  {{ support.contents?.length ?? 0 }}
+                </td>
+              </ng-container>
+
+              <tr mat-header-row *matHeaderRowDef="questionSupportDisplayedColumns"></tr>
+
+              <tr
+                mat-row
+                *matRowDef="let support; columns: questionSupportDisplayedColumns"
+                [class.selected-row]="selectedQuestionSupport?.id === support.id"
+                (click)="onQuestionSupportRowClick(support)"
+              ></tr>
+            </table>
+
+            <mat-paginator [pageSize]="20" [pageSizeOptions]="[10, 20, 50]" showFirstLastButtons />
+          </div>
+
+          <!-- Conteúdo do suporte -->
+          <div class="question-content">
+            <mat-toolbar class="toolbar-actions">
+              <button
+                mat-icon-button
+                matTooltip="Adicionar Suporte"
+                (click)="openQuestionSupportEditorModal(true)"
+              >
+                <mat-icon>add</mat-icon>
+              </button>
+
+              <button
+                mat-icon-button
+                matTooltip="Editar Suporte"
+                [disabled]="!selectedQuestionSupport"
+                (click)="openQuestionSupportEditorModal()"
+              >
+                <mat-icon>edit</mat-icon>
+              </button>
+
+              <button
+                mat-icon-button
+                matTooltip="Remover Suporte"
+                [disabled]="!selectedQuestionSupport"
+                (click)="deleteQuestionSupport()"
+              >
+                <mat-icon>delete</mat-icon>
+              </button>
+            </mat-toolbar>
+
+            @if (!selectedQuestionSupport) {
+              <div class="empty-content">
+                <mat-icon>description</mat-icon>
+
+                <span> Selecione um suporte de questão para visualizar o conteúdo. </span>
+              </div>
+            } @else {
+              <div class="support-header">
+                <h3>Suporte de Questão - ID: {{ selectedQuestionSupport?.id }}</h3>
+
+                <span class="spacer"></span>
+
+                <mat-chip-set>
+                  <mat-chip highlighted>
+                    Total de Itens:
+                    {{ selectedQuestionSupport?.contents?.length ?? 0 }}
+                  </mat-chip>
+                </mat-chip-set>
+              </div>
+
+              <!-- <app-question-support-renderer
+                    [questionSupport]="selectedQuestionSupport"
+                    [publicNotice]="publicNotice"
+                  /> -->
+            }
+          </div>
+        </div>
+      </mat-tab>
+
+      <!-- IMAGENS -->
+      <mat-tab label="Imagens">
+        <div class="tab-placeholder">Content Two</div>
+      </mat-tab>
+    </mat-tab-group>
+  </div>
+</mat-card>

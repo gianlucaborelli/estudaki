@@ -1,0 +1,7 @@
+mat-tab-group {
+  height: auto;
+}
+
+::ng-deep .mat-mdc-tab-body-content {
+  overflow: visible !important;
+}

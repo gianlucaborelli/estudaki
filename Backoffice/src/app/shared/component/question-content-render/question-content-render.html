@@ -1,0 +1,29 @@
+<div class="question-content">
+  @for (block of content(); track block.order) {
+    @if (block.title) {
+      <h3>
+        {{ block.title }}
+      </h3>
+    }
+
+    @if (block.type === 'image' && block.key) {
+      <figure class="question-content-figure">
+        <img class="question-content-image" [src]="block.key" [alt]="block.description ?? ''" />
+
+        @if (block.source) {
+          <figcaption class="question-content-source">
+            {{ block.source }}
+          </figcaption>
+        }
+      </figure>
+    } @else if (block.type === 'paragraph' && block.text) {
+      <div class="question-content-text" [innerHTML]="block.text"></div>
+
+      @if (block.source) {
+        <small class="question-content-source">
+          {{ block.source }}
+        </small>
+      }
+    }
+  }
+</div>

@@ -1,9 +1,11 @@
+import { EducationLevel } from "./education-level";
+
 export interface Exam {
   id: string;
   phase: string;
   position: string;
   area: string;
-  educationLevel: string;
+  educationLevel: EducationLevel;
   examBookletUrl: string;
   answerKeyUrl: string;
   answerKeyItems: AnswerKeyItem[];

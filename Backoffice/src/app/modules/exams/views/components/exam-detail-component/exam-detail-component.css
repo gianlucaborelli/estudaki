@@ -1,0 +1,123 @@
+.exam-selector-card,
+.exam-card {
+  margin-top: 10px;
+}
+
+.exam-selector-card,
+.exam-card {
+  background-color: #e5f0ec;
+}
+
+.toolbar-actions {
+  background-color: #a5c4b8;
+  min-height: 48px;
+  height: 48px;
+  border-radius: 7px 7px 0 0;
+  gap: 4px;
+}
+
+/* EXAMS */
+
+.toolbar-actions {
+  min-height: 48px;
+  height: 48px;
+  padding: 0;
+  gap: 4px;
+}
+
+.exam-details {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  margin: 0 20px;
+}
+
+.header-row {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.title {
+  margin: 0;
+  font-size: 1.5rem;
+  font-weight: 700;
+}
+
+.spacer {
+  flex: 1;
+}
+
+.info-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 24px;
+}
+
+.info-item {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.label {
+  font-size: 0.875rem;
+  font-weight: 600;
+}
+
+.value {
+  font-size: 1rem;
+}
+
+.statistics-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding-bottom: 10px;
+}
+
+.education-chip {
+  background: var(--mat-sys-primary);
+  color: var(--mat-sys-on-primary);
+}
+
+.total-chip {
+  background: var(--mat-sys-tertiary);
+  color: var(--mat-sys-on-tertiary);
+}
+
+.multiple-choice-chip {
+  background: transparent;
+  border: 1px solid var(--mat-sys-primary);
+  color: var(--mat-sys-primary);
+}
+
+.open-ended-chip {
+  background: transparent;
+  border: 1px solid var(--mat-sys-secondary);
+  color: var(--mat-sys-secondary);
+}
+
+.redaction-chip {
+  background: transparent;
+  border: 1px solid var(--mat-sys-tertiary);
+  color: var(--mat-sys-tertiary);
+}
+
+@media (max-width: 768px) {
+  .header-row {
+    flex-wrap: wrap;
+  }
+
+  .spacer {
+    display: none;
+  }
+
+  .info-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .statistics-row {
+    flex-wrap: wrap;
+  }
+}

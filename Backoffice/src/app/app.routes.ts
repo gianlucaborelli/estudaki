@@ -4,6 +4,7 @@ import { BaseLayout } from './shared/layouts/base.layout/base.layout';
 import { Home } from './modules/home/views/home/home';
 import { authGuard, guestGuard } from './core/guards/auth.guard';
 import { ExamList } from './modules/exams/views/exam-list/exam-list';
+import { ExamDetails } from './modules/exams/views/exam-details/exam-details';
 
 export const routes: Routes = [
   {
@@ -25,6 +26,10 @@ export const routes: Routes = [
         path: 'exams',
         component: ExamList,
         pathMatch: 'full'
+      },
+      {
+        path: 'exams/:id',
+        component: ExamDetails
       },
     ]
   }

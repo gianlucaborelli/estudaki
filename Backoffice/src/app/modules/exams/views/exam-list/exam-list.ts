@@ -5,10 +5,12 @@ import { PublicNotice } from '../../models/publicNotice';
 import { MatPaginator } from '@angular/material/paginator';
 import { MatSort } from '@angular/material/sort';
 import { MatTableDataSource } from '@angular/material/table';
+import { RouterLink } from '@angular/router';
 
 @Component({
   imports: [
-    ...MATERIAL_MODULES
+    ...MATERIAL_MODULES,
+    RouterLink
   ],
   selector: 'app-exam-list',
   styleUrl: './exam-list.css',
@@ -53,7 +55,7 @@ export class ExamList {
     const sortDirection = this.sort.direction || undefined;
 
     this.examService
-      .getExamList(
+      .getPubicNoticeList(
         pageNumber,
         pageSize,
         sortColumn,

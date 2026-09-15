@@ -1,0 +1,36 @@
+<article class="question-card">
+  <div class="question-card-head">
+    <app-question-header [question]="question()" />
+  </div>
+
+  <div class="content">
+    @if (question().questionSupports.length > 0) {
+      <div class="question-support">
+        @for (support of question().questionSupports; track support.id) {
+          <app-question-content-render [content]="support.contents" />
+        }
+      </div>
+    }
+
+    <div class="statement">
+      <app-question-content-render [content]="question().questionContents" />
+    </div>
+  </div>
+
+  <fieldset class="choices">
+    @for (choice of question().choices; track choice.option) {
+      <mat-checkbox
+        class="choice"
+        [class.choice-selected]="isSelected(choice.option)"
+        [checked]="isSelected(choice.option)"
+        (change)="toggleChoice(choice.option)"
+      >
+        <span class="choice-option" aria-hidden="true">
+          {{ choice.option }}
+        </span>
+
+        <app-question-content-render [content]="choice.contentBlocks" />
+      </mat-checkbox>
+    }
+  </fieldset>
+</article>

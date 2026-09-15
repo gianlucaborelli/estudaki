@@ -3,12 +3,13 @@ import { HttpClient, HttpParams } from '@angular/common/http';
 import { PagedResult } from '../../../shared/models/pagedResult';
 import { Observable } from 'rxjs';
 import { PublicNotice } from '../models/publicNotice';
+import { Question } from '../models/question';
 
 @Service()
 export class ExamService {
   private http = inject(HttpClient);
 
-  getExamList(
+  getPubicNoticeList(
     pageNumber: number,
     pageSize: number,
     sortColumn?: string,
@@ -33,5 +34,19 @@ export class ExamService {
         withCredentials: true
       }
     );
+  }
+
+  getPubicNoticeById(publicNoticeId: string): Observable<PublicNotice> {
+    return this.http.get<PublicNotice>(
+      `/api/exams/${publicNoticeId}`, {
+      withCredentials: true
+    });
+  }
+
+  getQuestionsByExamId(publicNoticeId: string, examId: string): Observable<Question[]> {
+    return this.http.get<Question[]>(
+      `/api/exams/${publicNoticeId}/exam/${examId}/questions`, {
+      withCredentials: true
+    });
   }
 }

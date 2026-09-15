@@ -1,4 +1,5 @@
 import { Exam } from "./exam";
+import { ExamCategory } from "./exam-category";
 
 export interface PublicNotice {
   id: string;
@@ -6,7 +7,7 @@ export interface PublicNotice {
   year: number;
   examinerOrganization: string | null;
   contractingOrganization: string | null;
-  examCategory: string | null;
+  examCategory: ExamCategory | null;
   isReviewed: boolean;
   isPublished: boolean;
   fileUrl: string | null;
