@@ -4,15 +4,12 @@ import {
   ElementRef,
   OnDestroy,
   ViewChild,
-  forwardRef,
-  input
+  effect,
+  input,
+  model
 } from '@angular/core';
 import Placeholder
   from '@tiptap/extension-placeholder';
-import {
-  ControlValueAccessor,
-  NG_VALUE_ACCESSOR,
-} from '@angular/forms';
 import { Editor } from '@tiptap/core';
 import StarterKit from '@tiptap/starter-kit';
 import Link from '@tiptap/extension-link';
@@ -23,22 +20,12 @@ import Image from '@tiptap/extension-image';
   selector: 'app-content-editor',
   styleUrl: './content-editor.css',
   templateUrl: './content-editor.html',
-  providers: [
-    {
-      provide: NG_VALUE_ACCESSOR,
-      useExisting: forwardRef(
-        () => ContentEditor
-      ),
-      multi: true
-    }
-  ]
 })
 export class ContentEditor
 
   implements
   AfterViewInit,
-  OnDestroy,
-  ControlValueAccessor {
+  OnDestroy {
 
   @ViewChild('editorElement', {
     static: true
@@ -48,22 +35,33 @@ export class ContentEditor
   readonly placeholder =
     input('Digite o conteúdo...');
 
+  readonly content =
+    model<string>('');
+
   private editor!: Editor;
 
-  private value = '';
+  constructor() {
+    // Keeps the editor in sync when content() changes from outside (e.g. switching questions/choices)
+    effect(() => {
+      const value =
+        this.content() || '<p></p>';
 
-  private disabled = false;
+      if (!this.editor) {
+        return;
+      }
 
+      if (this.editor.getHTML() === value) {
+        return;
+      }
 
-  private onChange:
-    (value: string) => void =
-    () => { };
-
-  private onTouched:
-    () => void =
-    () => { };
-
-
+      this.editor.commands.setContent(
+        value,
+        {
+          emitUpdate: false
+        }
+      );
+    });
+  }
 
   ngAfterViewInit(): void {
 
@@ -90,7 +88,7 @@ export class ContentEditor
         })
       ],
 
-      content: this.value,
+      content: this.content() || '<p></p>',
 
       editorProps: {
         attributes: {
@@ -105,87 +103,11 @@ export class ContentEditor
 
       onUpdate: ({ editor }) => {
 
-        const html =
-          editor.getHTML();
-
-        this.value = html;
-
-        this.onChange(html);
-      },
-
-      onBlur: () => {
-
-        this.onTouched();
+        this.content.set(
+          editor.getHTML()
+        );
       }
     });
-
-
-    this.editor.setEditable(
-      !this.disabled
-    );
-  }
-
-
-  /* -------------------------------- */
-  /* ControlValueAccessor             */
-  /* -------------------------------- */
-
-  writeValue(
-    value: string | null
-  ): void {
-
-    this.value =
-      value ?? '';
-
-    if (!this.editor) {
-      return;
-    }
-
-    const current =
-      this.editor.getHTML();
-
-    if (current === this.value) {
-      return;
-    }
-
-    this.editor.commands.setContent(
-      this.value || '<p></p>',
-      {
-        emitUpdate: false
-      }
-    );
-  }
-
-
-  registerOnChange(
-    fn: (value: string) => void
-  ): void {
-
-    this.onChange = fn;
-  }
-
-
-  registerOnTouched(
-    fn: () => void
-  ): void {
-
-    this.onTouched = fn;
-  }
-
-
-  setDisabledState(
-    isDisabled: boolean
-  ): void {
-
-    this.disabled =
-      isDisabled;
-
-    if (this.editor) {
-
-      this.editor.setEditable(
-        !isDisabled
-      );
-    }
   }
 
 

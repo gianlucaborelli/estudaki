@@ -1,14 +1,17 @@
 import { Component, inject } from '@angular/core';
+import { CommonModule } from '@angular/common';
 import { QuestionEditorDialogData } from './question-editor-dialog-data';
-import { Question } from '../../../models/question';
+import { ExamCategory } from '../../../models/exam-category';
+import { Question, QuestionSupport } from '../../../models/question';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { MATERIAL_MODULES } from '../../../../../shared/imports/material.imports';
 import { QuestionType } from '../../../models/question-type';
 import { ContentEditor } from '../content-editor/content-editor';
-import { FormControl, FormGroup, FormsModule } from '@angular/forms';
+import { FormsModule } from '@angular/forms';
 
 @Component({
   imports: [
+    CommonModule,
     ...MATERIAL_MODULES,
     ContentEditor,
     FormsModule
@@ -24,20 +27,18 @@ export class QuestionEditorDialog {
   readonly data =
     inject<QuestionEditorDialogData>(MAT_DIALOG_DATA);
 
+  readonly QuestionType = QuestionType;
+
   question: Question;
 
   constructor() {
     this.question = this.cloneQuestion(
-      this.data.question ?
+      this.data.question ?? null
     );
   }
 
-  form = new FormGroup({
-    content: new FormControl<string>('')
-  });
-
   get isEditing(): boolean {
-    return this.question.questionId !== null;
+    return !!this.question.questionId;
   }
 
   get dialogTitle(): string {
@@ -53,6 +54,7 @@ export class QuestionEditorDialog {
     this.question.choices.push({
       option: nextOption,
       isCorrect: false,
+      content: '',
       contentBlocks: []
     });
   }
@@ -112,10 +114,10 @@ export class QuestionEditorDialog {
     this.question.subAreas.splice(index, 1);
   }
 
-  toggleSupport(supportId: string): void {
+  toggleSupport(support: QuestionSupport): void {
     const index =
-      this.question.questionSupports.indexOf(
-        supportId
+      this.question.questionSupports.findIndex(
+        s => s.id === support.id
       );
 
     if (index >= 0) {
@@ -124,15 +126,15 @@ export class QuestionEditorDialog {
     }
 
     this.question.questionSupports.push(
-      supportId
+      support
     );
   }
 
   isSupportSelected(
-    supportId: string
+    support: QuestionSupport
   ): boolean {
-    return this.question.questionSupports.includes(
-      supportId
+    return this.question.questionSupports.some(
+      s => s.id === support.id
     );
   }
 
@@ -159,7 +161,7 @@ export class QuestionEditorDialog {
 
     if (
       this.isHtmlEmpty(
-        this.question.questionContents
+        this.question.statement
       )
     ) {
       return false;
@@ -218,26 +220,44 @@ export class QuestionEditorDialog {
     if (!question) {
       return {
         questionId: '',
+        publicNoticeId: '',
+        examId: '',
+        publicNoticeNumber: '',
+        year: new Date().getFullYear(),
+        examinerOrganization: '',
+        contractingOrganization: '',
+        examCategory: ExamCategory.PublicServiceExam,
+        phase: '',
+        positions: [],
+        area: '',
+        educationLevel: '',
+        publicNoticeFileUrl: '',
+        examBookletUrl: '',
+        answerKeyUrl: '',
         questionNumber: 1,
         mainArea: '',
         subAreas: [],
         questionType: QuestionType.MultipleChoice,
+        statement: '',
         questionContents: [],
         choices: [
           {
             option: 'A',
             isCorrect: false,
+            content: '',
             contentBlocks: []
           },
           {
             option: 'B',
             isCorrect: false,
+            content: '',
             contentBlocks: []
           }
         ],
         questionSupports: [],
         isNullified: false,
-        isPublished: false
+        isPublished: false,
+        createdAt: new Date().toISOString()
       };
     }
 

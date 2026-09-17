@@ -1,10 +1,12 @@
-<h2 mat-dialog-title>
-  {{ dialogTitle }}
-</h2>
+<div class="dialog-header" mat-dialog-title>
+  <mat-icon>quiz</mat-icon>
+
+  <span>{{ dialogTitle }}</span>
+</div>
 
 <mat-dialog-content class="question-editor">
-  <section class="section">
-    <h3>Informações da questão</h3>
+  <section class="section info-section">
+    <h3><mat-icon>info</mat-icon> Informações da questão</h3>
 
     <div class="form-grid">
       <mat-form-field appearance="outline">
@@ -17,11 +19,11 @@
         <mat-label>Tipo da questão</mat-label>
 
         <mat-select [(ngModel)]="question.questionType">
-          <mat-option value="MultipleChoice"> Múltipla escolha </mat-option>
+          <mat-option [value]="QuestionType.MultipleChoice"> Múltipla escolha </mat-option>
 
-          <mat-option value="Dissertative"> Dissertativa </mat-option>
+          <mat-option [value]="QuestionType.OpenEnded"> Dissertativa </mat-option>
 
-          <mat-option value="Essay"> Redação </mat-option>
+          <mat-option [value]="QuestionType.Redaction"> Redação </mat-option>
         </mat-select>
       </mat-form-field>
 
@@ -43,101 +45,121 @@
         </button>
       </div>
 
-      <div class="subarea" *ngFor="let subArea of question.subAreas; let i = index">
-        <mat-form-field appearance="outline">
-          <mat-label> Subárea {{ i + 1 }} </mat-label>
+      <div class="subarea-list">
+        <div class="subarea-chip" *ngFor="let subArea of question.subAreas; let i = index">
+          <mat-form-field appearance="outline" subscriptSizing="dynamic">
+            <mat-label> Subárea {{ i + 1 }} </mat-label>
 
-          <input matInput [(ngModel)]="question.subAreas[i]" />
+            <input matInput [(ngModel)]="question.subAreas[i]" />
 
-          <button mat-icon-button matSuffix type="button" (click)="removeSubArea(i)">
-            <mat-icon> delete </mat-icon>
-          </button>
-        </mat-form-field>
-      </div>
-    </div>
-
-    <mat-checkbox [(ngModel)]="question.isNullified"> Questão anulada </mat-checkbox>
-  </section>
-
-  <section class="section">
-    <h3>Enunciado</h3>
-
-    <app-content-editor
-      [(value)]="question.questionContents"
-      placeholder="Digite o enunciado da questão..."
-    >
-    </app-content-editor>
-  </section>
-
-  <section class="section">
-    <div class="section-header">
-      <h3>Alternativas</h3>
-
-      <button mat-flat-button type="button" (click)="addChoice()">
-        <mat-icon>add</mat-icon>
-
-        Adicionar alternativa
-      </button>
-    </div>
-
-    <div class="choice" *ngFor="let choice of question.choices; let i = index">
-      <div class="choice-header">
-        <div class="choice-option">
-          <strong> {{ choice.option }}) </strong>
-        </div>
-
-        <mat-checkbox [(ngModel)]="choice.isCorrect"> Resposta correta </mat-checkbox>
-
-        <div class="choice-actions">
-          <button mat-icon-button type="button" [disabled]="i === 0" (click)="moveChoiceUp(i)">
-            <mat-icon> arrow_upward </mat-icon>
-          </button>
-
-          <button
-            mat-icon-button
-            type="button"
-            [disabled]="i === question.choices.length - 1"
-            (click)="moveChoiceDown(i)"
-          >
-            <mat-icon> arrow_downward </mat-icon>
-          </button>
-
-          <button
-            mat-icon-button
-            type="button"
-            [disabled]="question.choices.length <= 1"
-            (click)="removeChoice(i)"
-          >
-            <mat-icon> delete </mat-icon>
-          </button>
+            <button mat-icon-button matSuffix type="button" (click)="removeSubArea(i)">
+              <mat-icon> close </mat-icon>
+            </button>
+          </mat-form-field>
         </div>
       </div>
-
-      <app-content-editor
-        formControlName="content">
-        [placeholder]="'Digite a alternativa ' + choice.option + '...'"
-      >
-      </app-content-editor>
     </div>
+
+    <mat-checkbox class="nullified-checkbox" [(ngModel)]="question.isNullified">
+      <mat-icon>report</mat-icon>
+      Questão anulada
+    </mat-checkbox>
   </section>
 
-  <section class="section">
-    <h3>Conteúdos de apoio</h3>
+  <mat-tab-group class="content-tabs" animationDuration="150ms">
+    <!-- ENUNCIADO -->
+    <mat-tab label="Enunciado">
+      <section class="section tab-section">
+        <app-content-editor
+          [(content)]="question.statement"
+          placeholder="Digite o enunciado da questão..."
+        >
+        </app-content-editor>
+      </section>
+    </mat-tab>
 
-    <div class="support-list">
-      <mat-checkbox
-        *ngFor="let support of data.availableQuestionSupports"
-        [checked]="isSupportSelected(support.id)"
-        (change)="toggleSupport(support.id)"
-      >
-        {{ support.name }}
-      </mat-checkbox>
-    </div>
-  </section>
+    <!-- ALTERNATIVAS -->
+    <mat-tab label="Alternativas">
+      <section class="section tab-section">
+        <div class="section-header">
+          <button mat-flat-button type="button" (click)="addChoice()">
+            <mat-icon>add</mat-icon>
+
+            Adicionar alternativa
+          </button>
+        </div>
+
+        <div
+          class="choice"
+          [class.choice-correct]="choice.isCorrect"
+          *ngFor="let choice of question.choices; let i = index"
+        >
+          <div class="choice-header">
+            <div class="choice-option">{{ choice.option }}</div>
+
+            <mat-checkbox [(ngModel)]="choice.isCorrect"> Resposta correta </mat-checkbox>
+
+            <div class="choice-actions">
+              <button mat-icon-button type="button" [disabled]="i === 0" (click)="moveChoiceUp(i)">
+                <mat-icon> arrow_upward </mat-icon>
+              </button>
+
+              <button
+                mat-icon-button
+                type="button"
+                [disabled]="i === question.choices.length - 1"
+                (click)="moveChoiceDown(i)"
+              >
+                <mat-icon> arrow_downward </mat-icon>
+              </button>
+
+              <button
+                mat-icon-button
+                type="button"
+                [disabled]="question.choices.length <= 1"
+                (click)="removeChoice(i)"
+              >
+                <mat-icon> delete </mat-icon>
+              </button>
+            </div>
+          </div>
+
+          <app-content-editor
+            [(content)]="choice.content"
+            [placeholder]="'Digite a alternativa ' + choice.option + '...'"
+          >
+          </app-content-editor>
+        </div>
+      </section>
+    </mat-tab>
+
+    <!-- SUPORTE DE QUESTÕES -->
+    <mat-tab label="Suporte de questões">
+      <section class="section tab-section">
+        <div class="support-list">
+          <label
+            class="support-item"
+            [class.support-item-selected]="isSupportSelected(support)"
+            *ngFor="let support of data.availableQuestionSupports"
+          >
+            <mat-checkbox [checked]="isSupportSelected(support)" (change)="toggleSupport(support)">
+            </mat-checkbox>
+
+            <mat-icon>description</mat-icon>
+
+            <span>{{ support.id }}</span>
+          </label>
+
+          <div class="empty-support" *ngIf="!data.availableQuestionSupports?.length">
+            Nenhum suporte de questão disponível.
+          </div>
+        </div>
+      </section>
+    </mat-tab>
+  </mat-tab-group>
 </mat-dialog-content>
 
 <mat-dialog-actions align="end">
   <button mat-button type="button" (click)="cancel()">Cancelar</button>
-
   <button mat-flat-button color="primary" type="button" (click)="save()">Salvar</button>
 </mat-dialog-actions>

@@ -23,6 +23,7 @@ export interface Question {
   questionType: QuestionType;
   mainArea: string;
   subAreas: string[];
+  statement: string;
   questionContents: BlockContent[];
   questionSupports: QuestionSupport[];
   choices: QuestionChoice[];
@@ -32,6 +33,7 @@ export interface Question {
 export interface QuestionChoice {
   option: string;
   contentBlocks: BlockContent[];
+  content: string;
   isCorrect: boolean;
 }
 

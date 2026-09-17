@@ -83,17 +83,14 @@ export class QuestionsManagerComponent {
         {
           width: '1200px',
           maxWidth: '95vw',
-
-          height: '90vh',
           maxHeight: '95vh',
-
           autoFocus: false,
 
           data: {
             question,
 
             availableQuestionSupports:
-              question?.questionSupports
+              this.questionSupportDataSource()
           }
         }
       );
