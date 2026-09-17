@@ -63,7 +63,7 @@
                 <th mat-header-cell *matHeaderCellDef>C. Alt</th>
 
                 <td mat-cell *matCellDef="let question">
-                  {{ question.choices.lenth }}
+                  {{ question?.choices?.length ?? 0 }}
                 </td>
               </ng-container>
 
@@ -121,7 +121,7 @@
                 mat-icon-button
                 matTooltip="Editar Questão"
                 [disabled]="!selectedQuestion"
-                (click)="openQuestionEditorModal()"
+                (click)="openQuestionEditorModal(selectedQuestion)"
               >
                 <mat-icon>edit</mat-icon>
               </button>

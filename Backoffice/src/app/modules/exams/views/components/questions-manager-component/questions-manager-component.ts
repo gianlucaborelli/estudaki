@@ -7,6 +7,8 @@ import { Exam } from '../../../models/exam';
 import { Question, QuestionSupport } from '../../../models/question';
 import { ExamService } from '../../../services/exam.service';
 import { QuestionRender } from '../../../../../shared/component/question-render/question-render';
+import { QuestionEditorDialog } from '../question-editor/question-editor-dialog';
+import { MatDialog } from '@angular/material/dialog';
 
 @Component({
   imports: [
@@ -32,6 +34,8 @@ export class QuestionsManagerComponent {
   questionDataSource = signal<Question[]>([]);
   selectedQuestion: Question | null = null;
 
+  private readonly dialog =
+    inject(MatDialog);
 
   isLoading: boolean = false
 
@@ -71,7 +75,44 @@ export class QuestionsManagerComponent {
 
   deleteQuestion() { }
 
-  openQuestionEditorModal() { }
+  openQuestionEditorModal(question: Question | null): void {
+
+    const dialogRef =
+      this.dialog.open(
+        QuestionEditorDialog,
+        {
+          width: '1200px',
+          maxWidth: '95vw',
+
+          height: '90vh',
+          maxHeight: '95vh',
+
+          autoFocus: false,
+
+          data: {
+            question,
+
+            availableQuestionSupports:
+              question?.questionSupports
+          }
+        }
+      );
+
+    dialogRef
+      .afterClosed()
+      .subscribe(
+        (result?: Question) => {
+
+          if (!result) {
+            return;
+          }
+
+          this.saveQuestion(result);
+        }
+      );
+  }
+
+  saveQuestion(question: Question) { }
 
   addNewQuestionEditorModalAsync() { }
 

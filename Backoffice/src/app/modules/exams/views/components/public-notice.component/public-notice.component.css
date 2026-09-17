@@ -1,40 +1,39 @@
-.publicnotice-card,
-.exam-selector-card,
-.exam-card {
-  margin-top: 10px;
-}
-
-.publicnotice-card,
-.exam-selector-card,
-.exam-card {
-  background-color: #e5f0ec;
+.publicnotice-card {
+  overflow: hidden;
+  border-color: var(--mat-sys-outline-variant);
+  border-radius: 0.5rem;
+  background: var(--mat-sys-surface-container-low);
+  box-shadow: 0 1px 2px rgb(25 28 23 / 8%);
 }
 
 .toolbar-actions {
-  background-color: #a5c4b8;
+  padding: 0 0.5rem;
+  border-bottom: 1px solid var(--mat-sys-outline-variant);
+  background: var(--mat-sys-surface-container);
   min-height: 48px;
   height: 48px;
-  border-radius: 7px 7px 0 0;
-  gap: 4px;
+  gap: 0.25rem;
 }
 
 .public-notice-content {
   display: flex;
   flex-direction: column;
-  gap: 24px;
-  margin: 0 20px;
+  gap: 1.5rem;
+  padding: 1.5rem;
 }
 
 .header-row {
   display: flex;
   align-items: center;
-  gap: 16px;
+  gap: 1rem;
 }
 
 .title {
   margin: 0;
-  font-size: 1.5rem;
+  color: var(--mat-sys-on-surface);
+  font-size: 1.375rem;
   font-weight: 700;
+  line-height: 1.25;
 }
 
 .spacer {
@@ -43,28 +42,41 @@
 
 .info-grid {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 24px;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 0.75rem;
 }
 
 .info-item {
   display: flex;
   flex-direction: column;
-  gap: 4px;
+  gap: 0.25rem;
+  min-width: 0;
+  padding: 0.875rem 1rem;
+  border-left: 3px solid var(--mat-sys-secondary);
+  background: var(--mat-sys-surface);
 }
 
 .label {
-  font-size: 0.875rem;
-  font-weight: 600;
+  color: var(--mat-sys-on-surface-variant);
+  font-size: 0.6875rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
 }
 
 .value {
-  font-size: 1rem;
+  overflow: hidden;
+  color: var(--mat-sys-on-surface);
+  font-size: 0.9375rem;
+  line-height: 1.4;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .exam-selection {
   display: flex;
   align-items: center;
+  padding-top: 0.25rem;
 }
 
 .exam-selection mat-form-field {
@@ -87,5 +99,11 @@
 
   .exam-selection mat-form-field {
     width: 100%;
+  }
+}
+
+@media (max-width: 600px) {
+  .public-notice-content {
+    padding: 1rem;
   }
 }
