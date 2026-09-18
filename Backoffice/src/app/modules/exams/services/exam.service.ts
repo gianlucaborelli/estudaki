@@ -46,7 +46,7 @@ export class ExamService {
 
   uploadImage(publicNoticeId: string, file: File): Observable<string> {
     const formData = new FormData();
-    formData.append('fileteste', file);
+    formData.append('file', file);
 
     console.log(file);
     console.log(formData)

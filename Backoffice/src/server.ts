@@ -17,8 +17,6 @@ const angularApp = new AngularNodeAppEngine();
 
 const apiUrl = process.env['API_URL'];
 
-app.use(express.json());
-
 app.use('/api', async (req, res) => {
   try {
     const targetUrl = `${apiUrl}${req.originalUrl}`;
@@ -41,10 +39,10 @@ app.use('/api', async (req, res) => {
     const response = await fetch(targetUrl, {
       method: req.method,
       headers,
-      body: hasBody
-        ? JSON.stringify(req.body)
-        : undefined,
-    });
+      // Node's fetch requires streamed request bodies to be typed as `any` and declare `duplex`
+      body: (hasBody ? req : undefined) as any,
+      duplex: hasBody ? 'half' : undefined,
+    } as RequestInit);
 
     // Status
     res.status(response.status);
