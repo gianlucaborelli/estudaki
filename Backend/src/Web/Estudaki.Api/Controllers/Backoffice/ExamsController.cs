@@ -51,19 +51,14 @@ public class ExamsController(ICommandDispatcher commandDispatcher, IQueryDispatc
     [HttpPost("{publicNoticeId}/contents/images")]
     public async Task<IActionResult> UploadImagensFromPublicNoticeId([FromRoute] string publicNoticeId, [FromForm] IFormFile? file)
     {
-        var imageList = new List<UploadFileDto>();        
-
-        var uploadFileDto = await UploadFileDto.CreateAsync(file);
-        imageList.Add(uploadFileDto);
+        if (file is null)
+        {
+            return BadRequest("File is required.");
+        }        
         
-        var command = new UploadQuestionImagesCommand(imageList, publicNoticeId);
+        var command = new UploadQuestionImagesCommand(file, publicNoticeId);
         var result = await _commandDispatcher.DispatchAsync<UploadQuestionImagesCommand, CommandResult>(command);        
         return Ok(result);
-    }
-
-    public sealed class UploadImageRequest
-    {
-        public IFormFile? File { get; set; }
     }
 
     [HttpGet("{publicNoticeId}/contents/questions-support")]

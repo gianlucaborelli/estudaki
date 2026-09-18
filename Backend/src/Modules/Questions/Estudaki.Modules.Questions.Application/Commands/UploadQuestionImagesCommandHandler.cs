@@ -34,26 +34,24 @@ namespace Estudaki.Modules.Questions.Application.Commands
                 return Result();
             }
 
-            foreach(var file in command.Files)
+            var file = command.File;
+            var extension = file.ContentType switch
             {
-                var extension = file.ContentType switch
-                {
-                    "image/jpeg" => ".jpg",
-                    "image/png" => ".png",
-                    "image/webp" => ".webp",
-                    "image/svg+xml" => ".svg",
-                    _ => throw new ValidationException($"Unsupported file type: {file.ContentType}")
-                };
+                "image/jpeg" => ".jpg",
+                "image/png" => ".png",
+                "image/webp" => ".webp",
+                "image/svg+xml" => ".svg",
+                _ => throw new ValidationException($"Unsupported file type: {file.ContentType}")
+            };
 
-                // Gerar GUID para o arquivo
-                var guid = Guid.NewGuid().ToString();
-                var newFileName = $"{publicNotice.GetImagesFolder()}/{guid}{extension}";
+            // Gerar GUID para o arquivo
+            var guid = Guid.NewGuid().ToString();
+            var newFileName = $"{publicNotice.GetImagesFolder()}/{guid}{extension}";
 
-                await _storageService.UploadFileAsync(
-                    file.OpenReadStream(),
-                    newFileName,
-                    file.ContentType);
-            }
+            await _storageService.UploadFileAsync(
+                file.OpenReadStream(),
+                newFileName,
+                file.ContentType);
 
             return Result();
         }

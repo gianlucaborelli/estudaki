@@ -1,11 +1,10 @@
 ﻿using Estudaki.Commons.Core.CQRS;
-using Estudaki.Commons.Core.Models.DTOs;
 using FluentValidation;
-using FluentValidation.Results;
+using Microsoft.AspNetCore.Http;
 
 namespace Estudaki.Modules.Questions.Application.Commands
 {
-    public record UploadQuestionImagesCommand(List<UploadFileDto> Files, string PublicNoticeId) : ICommand<CommandResult>;
+    public record UploadQuestionImagesCommand(IFormFile File, string PublicNoticeId) : ICommand<CommandResult>;
 
     public class UploadQuestionImagesCommandValidator : AbstractValidator<UploadQuestionImagesCommand>
     {
@@ -13,7 +12,7 @@ namespace Estudaki.Modules.Questions.Application.Commands
         {
             RuleFor(x => x.PublicNoticeId).NotEmpty()
                 .WithMessage("O ID do edital é obrigatório.");
-            RuleFor(x => x.Files).NotNull()
+            RuleFor(x => x.File).NotNull()
                 .WithMessage("Os arquivos do exame são obrigatórios.");
         }
     }
