@@ -246,7 +246,66 @@
 
       <!-- IMAGENS -->
       <mat-tab label="Imagens">
-        <div class="tab-placeholder">Content Two</div>
+        <div class="images-panel">
+          <mat-toolbar class="toolbar-actions">
+            <!-- Adicionar -->
+            <button
+              mat-icon-button
+              [matMenuTriggerFor]="addImageMenu"
+              matTooltip="Adicionar Imagem"
+            >
+              <mat-icon>add_photo_alternate</mat-icon>
+            </button>
+
+            <mat-menu #addImageMenu="matMenu">
+              <button mat-menu-item (click)="fileInput.click()">
+                <mat-icon>folder_open</mat-icon>
+                <span>Selecionar arquivo</span>
+              </button>
+
+              <button mat-menu-item (click)="addImageFromClipboard()">
+                <mat-icon>content_paste</mat-icon>
+                <span>Colar da área de transferência</span>
+              </button>
+            </mat-menu>
+
+            <input
+              #fileInput
+              type="file"
+              accept="image/*"
+              hidden
+              (change)="onFileSelected($event)"
+            />
+
+            <!-- Remover -->
+            <button
+              mat-icon-button
+              matTooltip="Remover Imagem"
+              [disabled]="!selectedImage"
+              (click)="deleteImage()"
+            >
+              <mat-icon>delete</mat-icon>
+            </button>
+          </mat-toolbar>
+
+          <div class="images-grid">
+            @for (image of imageDataSource(); track image) {
+              <div
+                class="image-thumb"
+                [class.selected]="selectedImage === image"
+                (click)="onImageClick(image)"
+              >
+                <img [src]="image" [alt]="image" />
+              </div>
+            } @empty {
+              <div class="empty-content">
+                <mat-icon>image</mat-icon>
+
+                <span>Nenhuma imagem encontrada.</span>
+              </div>
+            }
+          </div>
+        </div>
       </mat-tab>
     </mat-tab-group>
   </div>

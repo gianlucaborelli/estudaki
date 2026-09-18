@@ -5,15 +5,19 @@ import {
   OnDestroy,
   ViewChild,
   effect,
+  inject,
   input,
-  model
+  model,
+  signal
 } from '@angular/core';
+import { MatDialog } from '@angular/material/dialog';
 import Placeholder
   from '@tiptap/extension-placeholder';
 import { Editor } from '@tiptap/core';
 import StarterKit from '@tiptap/starter-kit';
 import Link from '@tiptap/extension-link';
 import Image from '@tiptap/extension-image';
+import { ImagePickerDialog } from './image-picker-dialog/image-picker-dialog';
 
 @Component({
   imports: [],
@@ -37,6 +41,13 @@ export class ContentEditor
 
   readonly content =
     model<string>('');
+
+  private readonly dialog =
+    inject(MatDialog);
+
+  // Imagens já enviadas nesta sessão de edição, reaproveitadas entre aberturas do seletor
+  private readonly uploadedImages =
+    signal<string[]>([]);
 
   private editor!: Editor;
 
@@ -204,6 +215,41 @@ export class ContentEditor
       .focus()
       .setHorizontalRule()
       .run();
+  }
+
+
+  insertImage(): void {
+
+    const dialogRef =
+      this.dialog.open(ImagePickerDialog, {
+        width: '640px',
+        maxWidth: '95vw',
+        data: {
+          images: this.uploadedImages()
+        }
+      });
+
+    dialogRef.afterClosed().subscribe(
+      (result?: string) => {
+
+        if (!result) {
+          return;
+        }
+
+        this.uploadedImages.update(
+          list =>
+            list.includes(result)
+              ? list
+              : [...list, result]
+        );
+
+        this.editor
+          .chain()
+          .focus()
+          .setImage({ src: result })
+          .run();
+      }
+    );
   }
 
 
