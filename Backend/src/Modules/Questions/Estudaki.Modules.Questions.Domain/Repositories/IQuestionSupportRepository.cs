@@ -5,14 +5,14 @@ namespace Estudaki.Modules.Questions.Domain.Repositories
 {
     public interface IQuestionSupportRepository : IRepository<QuestionSupport>
     {
-        /// <summary>
-        /// Busca todos os QuestionSupports de um edital específico
-        /// </summary>
-        Task<List<QuestionSupport>> GetByPublicNoticeId(string publicNoticeId);
+        Task<List<QuestionSupport>> GetAllByPublicNoticeIdAsync(string publicNoticeId);
+        Task<(List<QuestionSupport> items, long totalItems)> GetByPublicNoticeIdPagedAsync(
+            string publicNoticeId,
+            int page,
+            int pageSize,            
+            string? sortLabel,
+            string? sortDirection);
 
-        /// <summary>
-        /// Busca múltiplos QuestionSupports por seus IDs
-        /// </summary>
         Task<List<QuestionSupport>> GetByIds(List<string> ids);
     }
 }

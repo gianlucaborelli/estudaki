@@ -155,6 +155,26 @@ public class QuestionRepository : BaseRepository<Question>, IQuestionRepository
         return questions;
     }
 
+    public async Task<(List<Question> Questions, long TotalCount)> GetByExamIdPaged(string examId, int page, int pageSize, string? sortLabel, string? sortDirection)
+    {
+        var filterBuilder = Builders<Question>.Filter;
+        var filter = filterBuilder.ElemMatch(
+            q => q.Exams,
+            Builders<QuestionExam>.Filter.Eq(qe => qe.ExamId, examId)
+        );
+        var sort = GetSortDefinition<Question>(sortLabel, sortDirection);
+
+        var questions = await DbSet
+            .Find(filter)
+            .Sort(sort)
+            .Skip((page) * pageSize)
+            .Limit(pageSize)
+            .ToListAsync();
+
+        var totalCount = await DbSet.CountDocumentsAsync(filter);
+        return (questions, totalCount);
+    }
+
     public async Task<List<Question>> GetByPublicNoticeId(string publicNoticeId)
     {
         var filterBuilder = Builders<Question>.Filter;

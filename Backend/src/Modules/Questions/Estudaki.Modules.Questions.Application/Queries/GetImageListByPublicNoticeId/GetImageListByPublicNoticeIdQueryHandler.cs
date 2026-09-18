@@ -1,6 +1,5 @@
 ﻿using Estudaki.Commons.Core.CQRS;
 using Estudaki.Commons.Core.Storage;
-using Estudaki.Modules.Questions.Domain.Extensions;
 using Estudaki.Modules.Questions.Domain.Repositories;
 
 namespace Estudaki.Modules.Questions.Application.Queries.GetImageListByPublicNoticeId;

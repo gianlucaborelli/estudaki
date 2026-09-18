@@ -53,7 +53,7 @@ public class ReviewQuestionsByPublicNoticeIdCommandHandler
         }
 
         var questions = await _questionRepository.GetByPublicNoticeId(command.PublicNoticeId);
-        var questionSupports = await _questionSupportRepository.GetByPublicNoticeId(command.PublicNoticeId);
+        var questionSupports = await _questionSupportRepository.GetAllByPublicNoticeIdAsync(command.PublicNoticeId);
 
         using var throttler = new SemaphoreSlim(MaxConcurrency);
 

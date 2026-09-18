@@ -27,7 +27,7 @@ public class GetQuestionsByPublicNoticeIdQueryHandler : IQueryHandler<GetQuestio
     public async Task<List<QuestionDto>> HandleAsync(GetQuestionsByPublicNoticeIdQuery query, CancellationToken cancellationToken = default)
     {
         var publicNotice = await _publicNoticeRepository.GetById(query.PublicNoticeId);
-        var questionSupports = await _questionSupportRepository.GetByPublicNoticeId(query.PublicNoticeId);
+        var questionSupports = await _questionSupportRepository.GetAllByPublicNoticeIdAsync(query.PublicNoticeId);
         var questions = await _questionRepository.GetByPublicNoticeId(query.PublicNoticeId);
 
         var mappedQuestions = questions.Select(q => q.ToDto(publicNotice)).ToList();

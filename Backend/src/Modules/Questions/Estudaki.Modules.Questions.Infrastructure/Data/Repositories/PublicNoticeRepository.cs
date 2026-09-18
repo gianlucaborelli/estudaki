@@ -19,7 +19,7 @@ public class PublicNoticeRepository : BaseRepository<PublicNotice>, IPublicNotic
         return await DbSet.Find(_ => true).ToListAsync();
     }
 
-    public async Task<(List<PublicNotice>, long)> GetPublicNoticesByFilters(
+    public async Task<(List<PublicNotice> items, long totalItems)> GetPublicNoticesByFilters(
         int page, 
         int pageSize, 
         string? search, 
@@ -63,7 +63,7 @@ public class PublicNoticeRepository : BaseRepository<PublicNotice>, IPublicNotic
 
         var totalItems = await DbSet.CountDocumentsAsync(mongoFilter);
 
-        var sort = GetSortDefinition(sortLabel, sortDirection);
+        var sort = GetSortDefinition<PublicNotice>(sortLabel, sortDirection);
 
         page = Math.Max(page, 0);
         pageSize = Math.Max(pageSize, 1);
@@ -78,46 +78,45 @@ public class PublicNoticeRepository : BaseRepository<PublicNotice>, IPublicNotic
         return (items, totalItems);
     }
 
-    private static SortDefinition<PublicNotice> GetSortDefinition(
-    string sortLabel, string sortDirection)
-    {
-        var builder = Builders<PublicNotice>.Sort;
+    //private static SortDefinition<PublicNotice> GetSortDefinition(
+    //string sortLabel, string sortDirection)
+    //{
+    //    var builder = Builders<PublicNotice>.Sort;
 
-        var descending = string.Equals(
-            sortDirection,
-            "desc",
-            StringComparison.OrdinalIgnoreCase);
+    //    var descending = string.Equals(
+    //        sortDirection,
+    //        "desc",
+    //        StringComparison.OrdinalIgnoreCase);
 
-        return sortLabel switch
-        {
-            "ExaminerOrganization" => descending
-                ? builder.Descending(x => x.ExaminerOrganization)
-                : builder.Ascending(x => x.ExaminerOrganization),
+    //    return sortLabel switch
+    //    {
+    //        "ExaminerOrganization" => descending
+    //            ? builder.Descending(x => x.ExaminerOrganization)
+    //            : builder.Ascending(x => x.ExaminerOrganization),
 
-            "ContractingOrganization" => descending
-                ? builder.Descending(x => x.ContractingOrganization)
-                : builder.Ascending(x => x.ContractingOrganization),
+    //        "ContractingOrganization" => descending
+    //            ? builder.Descending(x => x.ContractingOrganization)
+    //            : builder.Ascending(x => x.ContractingOrganization),
 
-            "Year" => descending
-                ? builder.Descending(x => x.Year)
-                : builder.Ascending(x => x.Year),
+    //        "Year" => descending
+    //            ? builder.Descending(x => x.Year)
+    //            : builder.Ascending(x => x.Year),
 
-            "Number" => descending
-                ? builder.Descending(x => x.Number)
-                : builder.Ascending(x => x.Number),
+    //        "Number" => descending
+    //            ? builder.Descending(x => x.Number)
+    //            : builder.Ascending(x => x.Number),
 
-            "ExamCategory" => descending
-                ? builder.Descending(x => x.ExamCategory)
-                : builder.Ascending(x => x.ExamCategory),                
+    //        "ExamCategory" => descending
+    //            ? builder.Descending(x => x.ExamCategory)
+    //            : builder.Ascending(x => x.ExamCategory),                
 
-            "CreatedAt" => descending
-                ? builder.Descending(x => x.CreatedAt)
-                : builder.Ascending(x => x.CreatedAt),
+    //        "CreatedAt" => descending
+    //            ? builder.Descending(x => x.CreatedAt)
+    //            : builder.Ascending(x => x.CreatedAt),
 
-            _ => builder.Descending(x => x.CreatedAt)
-        };
-    }
-    
+    //        _ => builder.Descending(x => x.CreatedAt)
+    //    };
+    //}    
 
     public async Task<List<PublicNotice>> GetByIds(List<string> ids)
     {

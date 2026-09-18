@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Components.Forms;
+using Microsoft.AspNetCore.Http;
 
 namespace Estudaki.Commons.Core.Models.DTOs
 {
@@ -12,12 +13,9 @@ namespace Estudaki.Commons.Core.Models.DTOs
 
         private UploadFileDto() { }
 
-        public static async Task<UploadFileDto> CreateAsync(IBrowserFile file)
+        public static async Task<UploadFileDto> CreateAsync(IFormFile file)
         {
-            using var fileMs = new MemoryStream();
-
-            await file.OpenReadStream(MaxFileSize)
-                      .CopyToAsync(fileMs);
+            using var fileMs = new MemoryStream();            
 
             return new UploadFileDto
             {

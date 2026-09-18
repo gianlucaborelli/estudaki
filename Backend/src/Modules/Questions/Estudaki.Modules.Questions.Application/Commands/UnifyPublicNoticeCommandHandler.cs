@@ -52,7 +52,7 @@ public class UnifyPublicNoticeCommandHandler : CommandHandler, ICommandHandler<U
             }
             publicNotices.Add(publicNotice);
 
-            var supports = await _questionSupportRepository.GetByPublicNoticeId(publicNoticeId);
+            var supports = await _questionSupportRepository.GetAllByPublicNoticeIdAsync(publicNoticeId);
             questionSupports.AddRange(supports);
 
             var examQuestions = await _questionRepository.GetByPublicNoticeId(publicNoticeId);

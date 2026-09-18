@@ -4,7 +4,7 @@ using MongoDB.Driver;
 
 namespace Estudaki.Commons.Core.Data.Repository;
 
-public abstract class BaseRepository<TEntity> : IRepository<TEntity> where TEntity : Entity
+public abstract class BaseRepository<TEntity> : MongoDbHelper, IRepository<TEntity> where TEntity : Entity
 {
     protected readonly IMongoContext Context;
     protected IMongoCollection<TEntity> DbSet;

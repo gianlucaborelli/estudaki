@@ -19,10 +19,10 @@ namespace Estudaki.Modules.Questions.Application.Queries.GetPublicNoticeList
             var publicNotices = await _publicNoticeRepository.GetPublicNoticesByFilters(query.Page, query.PageSize, query.Search, query.Category, query.SortLabel, query.SortDirection);
             var pagedResult = new PagedResult<PublicNoticeDto>
             {
-                Items = publicNotices.Item1.ToDtoList(_storageService),
+                Items = publicNotices.items.ToDtoList(_storageService),
                 PageNumber = query.Page,
                 PageSize = query.PageSize,
-                TotalItems = publicNotices.Item2
+                TotalItems = publicNotices.totalItems
             };
             return pagedResult;
         }
