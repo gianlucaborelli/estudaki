@@ -1,233 +1,214 @@
 <div class="editor-container">
-
-	<!-- Toolbar -->
-
-	<div class="editor-toolbar">
-
-		<!-- Undo / Redo -->
-
-		<div class="toolbar-group">
-
-			<button
-				type="button"
-				class="toolbar-button"
-				title="Desfazer"
-				(click)="undo()">
-
-				↶
-
-			</button>
-
-			<button
-				type="button"
-				class="toolbar-button"
-				title="Refazer"
-				(click)="redo()">
-
-				↷
-
-			</button>
-
-		</div>
-
-
-		<div class="toolbar-divider"></div>
-
-
-		<!-- Paragraph / headings -->
-
-		<div class="toolbar-group">
-
-			<button
-				type="button"
-				class="toolbar-button"
-				[class.active]="isActive('paragraph')"
-				(click)="setParagraph()">
-
-				P
-
-			</button>
-
-			<button
-				type="button"
-				class="toolbar-button"
-				[class.active]="isHeading(1)"
-				(click)="setHeading(1)">
-
-				H1
-
-			</button>
-
-			<button
-				type="button"
-				class="toolbar-button"
-				[class.active]="isHeading(2)"
-				(click)="setHeading(2)">
-
-				H2
-
-			</button>
-
-			<button
-				type="button"
-				class="toolbar-button"
-				[class.active]="isHeading(3)"
-				(click)="setHeading(3)">
-
-				H3
-
-			</button>
-
-		</div>
-
-
-		<div class="toolbar-divider"></div>
-
-
-		<!-- Formatting -->
-
-		<div class="toolbar-group">
-
-			<button
-				type="button"
-				class="toolbar-button bold"
-				[class.active]="isActive('bold')"
-				(click)="toggleBold()">
-
-				B
-
-			</button>
-
-			<button
-				type="button"
-				class="toolbar-button italic"
-				[class.active]="isActive('italic')"
-				(click)="toggleItalic()">
-
-				I
-
-			</button>
-
-			<button
-				type="button"
-				class="toolbar-button strike"
-				[class.active]="isActive('strike')"
-				(click)="toggleStrike()">
-
-				S
-
-			</button>
-
-		</div>
-
-
-		<div class="toolbar-divider"></div>
-
-
-		<!-- Lists -->
-
-		<div class="toolbar-group">
-
-			<button
-				type="button"
-				class="toolbar-button"
-				[class.active]="isActive('bulletList')"
-				(click)="toggleBulletList()">
-
-				☷
-
-			</button>
-
-			<button
-				type="button"
-				class="toolbar-button"
-				[class.active]="isActive('orderedList')"
-				(click)="toggleOrderedList()">
-
-				1.
-
-			</button>
-
-		</div>
-
-
-		<div class="toolbar-divider"></div>
-
-
-		<!-- Block -->
-
-		<div class="toolbar-group">
-
-			<button
-				type="button"
-				class="toolbar-button"
-				[class.active]="isActive('blockquote')"
-				(click)="toggleBlockquote()">
-
-				❝
-
-			</button>
-
-			<button
-				type="button"
-				class="toolbar-button"
-				(click)="setHorizontalRule()">
-
-				―
-
-			</button>
-
-		</div>
-
-
-		<div class="toolbar-divider"></div>
-
-
-		<!-- Link -->
-
-		<div class="toolbar-group">
-
-			<button
-				type="button"
-				class="toolbar-button"
-				[class.active]="isActive('link')"
-				(click)="setLink()">
-
-				🔗
-
-			</button>
-
-		</div>
-
-
-		<div class="toolbar-divider"></div>
-
-
-		<!-- Image -->
-
-		<div class="toolbar-group">
-
-			<button
-				type="button"
-				class="toolbar-button"
-				title="Inserir imagem"
-				(click)="insertImage()">
-
-				🖼
-
-			</button>
-
-		</div>
-
-	</div>
-
-
-	<!-- Editor -->
-
-	<div
-		#editorElement
-		class="editor-content"
-		[attr.data-placeholder]="placeholder()">
-	</div>
-
+  <!-- Toolbar -->
+
+  <div class="editor-toolbar">
+    <!-- Undo / Redo -->
+
+    <div class="toolbar-group">
+      <button type="button" class="toolbar-button" title="Desfazer" (click)="undo()">↶</button>
+
+      <button type="button" class="toolbar-button" title="Refazer" (click)="redo()">↷</button>
+    </div>
+
+    <div class="toolbar-divider"></div>
+
+    <div class="toolbar-group">
+      <label class="font-size-control" title="Tamanho da fonte">
+        <span class="visually-hidden">Tamanho da fonte</span>
+        <select (change)="setFontSize($event)">
+          @for (size of fontSizes; track size) {
+            <option [value]="size">{{ size }}</option>
+          }
+        </select>
+      </label>
+
+      <label class="color-control" title="Cor do texto">
+        <span class="visually-hidden">Cor do texto</span>
+        <input type="color" value="#111827" (input)="setTextColor($event)" />
+      </label>
+    </div>
+
+    <div class="toolbar-divider"></div>
+
+    <!-- Formatting -->
+
+    <div class="toolbar-group">
+      <button
+        type="button"
+        class="toolbar-button bold"
+        [class.active]="isActive('bold')"
+        (click)="toggleBold()"
+      >
+        B
+      </button>
+
+      <button
+        type="button"
+        class="toolbar-button italic"
+        [class.active]="isActive('italic')"
+        (click)="toggleItalic()"
+      >
+        I
+      </button>
+
+      <button
+        type="button"
+        class="toolbar-button underline"
+        [class.active]="isActive('underline')"
+        title="Sublinhar"
+        (click)="toggleUnderline()"
+      >
+        U
+      </button>
+
+      <button
+        type="button"
+        class="toolbar-button strike"
+        [class.active]="isActive('strike')"
+        (click)="toggleStrike()"
+      >
+        S
+      </button>
+    </div>
+
+    <div class="toolbar-divider"></div>
+
+    <div class="toolbar-group">
+      <button
+        type="button"
+        class="toolbar-button"
+        title="Alinhar à esquerda"
+        (click)="setTextAlign('left')"
+      >
+        ≡
+      </button>
+      <button
+        type="button"
+        class="toolbar-button"
+        title="Centralizar"
+        (click)="setTextAlign('center')"
+      >
+        ≡
+      </button>
+      <button
+        type="button"
+        class="toolbar-button"
+        title="Alinhar à direita"
+        (click)="setTextAlign('right')"
+      >
+        ≡
+      </button>
+      <button
+        type="button"
+        class="toolbar-button"
+        title="Justificar"
+        (click)="setTextAlign('justify')"
+      >
+        ☰
+      </button>
+    </div>
+
+    <div class="toolbar-divider"></div>
+
+    <!-- Lists -->
+
+    <div class="toolbar-group">
+      <button
+        type="button"
+        class="toolbar-button"
+        [class.active]="isActive('bulletList')"
+        (click)="toggleBulletList()"
+      >
+        ☷
+      </button>
+
+      <button
+        type="button"
+        class="toolbar-button"
+        [class.active]="isActive('orderedList')"
+        (click)="toggleOrderedList()"
+      >
+        1.
+      </button>
+    </div>
+
+    <div class="toolbar-divider"></div>
+
+    <div class="toolbar-group">
+      <button type="button" class="toolbar-button" title="Inserir tabela" (click)="insertTable()">
+        ▦
+      </button>
+      <button type="button" class="toolbar-button" title="Adicionar linha" (click)="addRowAfter()">
+        ⊞
+      </button>
+      <button
+        type="button"
+        class="toolbar-button"
+        title="Adicionar coluna"
+        (click)="addColumnAfter()"
+      >
+        ⊟
+      </button>
+      <button type="button" class="toolbar-button" title="Remover tabela" (click)="deleteTable()">
+        ⊠
+      </button>
+    </div>
+
+    <div class="toolbar-divider"></div>
+
+    <!-- Block -->
+
+    <div class="toolbar-group">
+      <button
+        type="button"
+        class="toolbar-button"
+        [class.active]="isActive('blockquote')"
+        (click)="toggleBlockquote()"
+      >
+        ❝
+      </button>
+
+      <button type="button" class="toolbar-button" (click)="setHorizontalRule()">―</button>
+    </div>
+
+    <div class="toolbar-divider"></div>
+
+    <div class="toolbar-group">
+      <button
+        type="button"
+        class="toolbar-button"
+        title="Limpar formatação"
+        (click)="clearFormatting()"
+      >
+        Tx
+      </button>
+    </div>
+
+    <!-- Link -->
+
+    <div class="toolbar-group">
+      <button
+        type="button"
+        class="toolbar-button"
+        [class.active]="isActive('link')"
+        (click)="setLink()"
+      >
+        🔗
+      </button>
+    </div>
+
+    <div class="toolbar-divider"></div>
+
+    <!-- Image -->
+
+    <div class="toolbar-group">
+      <button type="button" class="toolbar-button" title="Inserir imagem" (click)="insertImage()">
+        🖼
+      </button>
+    </div>
+  </div>
+
+  <!-- Editor -->
+
+  <div #editorElement class="editor-content" [attr.data-placeholder]="placeholder()"></div>
 </div>

@@ -7,18 +7,45 @@ import {
   effect,
   inject,
   input,
-  model,
-  signal
+  model
 } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import Placeholder
   from '@tiptap/extension-placeholder';
-import { Editor } from '@tiptap/core';
+import { Editor, Extension } from '@tiptap/core';
 import StarterKit from '@tiptap/starter-kit';
 import Link from '@tiptap/extension-link';
 import Image from '@tiptap/extension-image';
+import Color from '@tiptap/extension-color';
+import TextAlign from '@tiptap/extension-text-align';
+import { TextStyle } from '@tiptap/extension-text-style';
+import Underline from '@tiptap/extension-underline';
+import { Table } from '@tiptap/extension-table';
+import TableCell from '@tiptap/extension-table-cell';
+import TableHeader from '@tiptap/extension-table-header';
+import TableRow from '@tiptap/extension-table-row';
 import { ImagePickerDialog } from '../image-picker-dialog/image-picker-dialog';
 
+const FontSize = Extension.create({
+  name: 'fontSize',
+
+  addGlobalAttributes() {
+    return [
+      {
+        types: ['textStyle'],
+        attributes: {
+          fontSize: {
+            default: null,
+            parseHTML: element => element.style.fontSize || null,
+            renderHTML: attributes => attributes['fontSize']
+              ? { style: `font-size: ${attributes['fontSize']}` }
+              : {}
+          }
+        }
+      }
+    ];
+  }
+});
 
 @Component({
   imports: [],
@@ -45,6 +72,11 @@ export class ContentEditor
 
   readonly publicNoticeId =
     input<string>('');
+
+  readonly fontSizes = [
+    '8pt', '9pt', '10pt', '11pt', '12pt', '14pt',
+    '16pt', '18pt', '20pt', '24pt', '28pt', '32pt', '36pt'
+  ];
 
   private readonly dialog =
     inject(MatDialog);
@@ -96,7 +128,21 @@ export class ContentEditor
 
         Image.configure({
           inline: false
-        })
+        }),
+
+        TextStyle,
+        FontSize,
+        Color,
+        Underline,
+        TextAlign.configure({
+          types: ['heading', 'paragraph']
+        }),
+        Table.configure({
+          resizable: true
+        }),
+        TableRow,
+        TableHeader,
+        TableCell
       ],
 
       content: this.content() || '<p></p>',
@@ -155,25 +201,11 @@ export class ContentEditor
       .run();
   }
 
-
-  setParagraph(): void {
-
+  toggleUnderline(): void {
     this.editor
       .chain()
       .focus()
-      .setParagraph()
-      .run();
-  }
-
-
-  setHeading(
-    level: 1 | 2 | 3
-  ): void {
-
-    this.editor
-      .chain()
-      .focus()
-      .toggleHeading({ level })
+      .toggleUnderline()
       .run();
   }
 
@@ -214,6 +246,77 @@ export class ContentEditor
       .chain()
       .focus()
       .setHorizontalRule()
+      .run();
+  }
+
+  setFontSize(event: Event): void {
+    const fontSize =
+      (event.target as HTMLSelectElement).value;
+
+    this.editor
+      .chain()
+      .focus()
+      .setMark('textStyle', { fontSize })
+      .run();
+  }
+
+  setTextColor(event: Event): void {
+    const color =
+      (event.target as HTMLInputElement).value;
+
+    this.editor
+      .chain()
+      .focus()
+      .setColor(color)
+      .run();
+  }
+
+  setTextAlign(alignment: 'left' | 'center' | 'right' | 'justify'): void {
+    this.editor
+      .chain()
+      .focus()
+      .setTextAlign(alignment)
+      .run();
+  }
+
+  insertTable(): void {
+    this.editor
+      .chain()
+      .focus()
+      .insertTable({ rows: 3, cols: 3, withHeaderRow: true })
+      .run();
+  }
+
+  addColumnAfter(): void {
+    this.editor
+      .chain()
+      .focus()
+      .addColumnAfter()
+      .run();
+  }
+
+  addRowAfter(): void {
+    this.editor
+      .chain()
+      .focus()
+      .addRowAfter()
+      .run();
+  }
+
+  deleteTable(): void {
+    this.editor
+      .chain()
+      .focus()
+      .deleteTable()
+      .run();
+  }
+
+  clearFormatting(): void {
+    this.editor
+      .chain()
+      .focus()
+      .unsetAllMarks()
+      .clearNodes()
       .run();
   }
 
