@@ -11,19 +11,7 @@ namespace Estudaki.Commons.Core.Models.DTOs
         public string ContentType { get; init; } = string.Empty;
         public byte[] Content { get; init; } = [];
 
-        private UploadFileDto() { }
-
-        public static async Task<UploadFileDto> CreateAsync(IFormFile file)
-        {
-            using var fileMs = new MemoryStream();            
-
-            return new UploadFileDto
-            {
-                FileName = file.Name,
-                ContentType = file.ContentType,
-                Content = fileMs.ToArray()
-            };
-        }
+        private UploadFileDto() { }       
 
         public Stream OpenReadStream()
         {

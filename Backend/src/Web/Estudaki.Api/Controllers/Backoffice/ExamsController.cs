@@ -49,13 +49,8 @@ public class ExamsController(ICommandDispatcher commandDispatcher, IQueryDispatc
     }
 
     [HttpPost("{publicNoticeId}/contents/images")]
-    public async Task<IActionResult> UploadImagensFromPublicNoticeId([FromRoute] string publicNoticeId, [FromForm] IFormFile? file)
-    {
-        if (file is null)
-        {
-            return BadRequest("File is required.");
-        }        
-        
+    public async Task<IActionResult> UploadImagensFromPublicNoticeId([FromRoute] string publicNoticeId, [FromForm] IFormFile file)
+    {        
         var command = new UploadQuestionImagesCommand(file, publicNoticeId);
         var result = await _commandDispatcher.DispatchAsync<UploadQuestionImagesCommand, CommandResult>(command);        
         return Ok(result);
