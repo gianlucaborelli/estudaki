@@ -165,10 +165,10 @@
               </ng-container>
 
               <ng-container matColumnDef="contentsCount">
-                <th mat-header-cell *matHeaderCellDef>Itens</th>
+                <th mat-header-cell *matHeaderCellDef>Conteúdo</th>
 
                 <td mat-cell *matCellDef="let support">
-                  {{ support.contents?.length ?? 0 }}
+                  {{ support.content ? 'Preenchido' : 'Vazio' }}
                 </td>
               </ng-container>
 
@@ -229,8 +229,8 @@
 
                 <mat-chip-set>
                   <mat-chip highlighted>
-                    Total de Itens:
-                    {{ selectedQuestionSupport?.contents?.length ?? 0 }}
+                    Conteúdo:
+                    {{ selectedQuestionSupport?.content ? 'Preenchido' : 'Vazio' }}
                   </mat-chip>
                 </mat-chip-set>
               </div>

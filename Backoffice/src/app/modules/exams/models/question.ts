@@ -39,7 +39,7 @@ export interface QuestionChoice {
 
 export interface QuestionSupport {
   id: string;
-  contents: BlockContent[];
+  content: string;
 }
 
 export type BlockContent = ParagraphBlock | ImageBlock;

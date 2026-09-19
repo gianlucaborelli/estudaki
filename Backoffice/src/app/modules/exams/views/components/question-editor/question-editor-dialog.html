@@ -72,6 +72,7 @@
       <section class="section tab-section">
         <app-content-editor
           [(content)]="question.statement"
+          [publicNoticeId]="question.publicNoticeId"
           placeholder="Digite o enunciado da questão..."
         >
         </app-content-editor>
@@ -126,6 +127,7 @@
 
           <app-content-editor
             [(content)]="choice.content"
+            [publicNoticeId]="question.publicNoticeId"
             [placeholder]="'Digite a alternativa ' + choice.option + '...'"
           >
           </app-content-editor>

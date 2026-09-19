@@ -8,6 +8,7 @@ import { Question, QuestionSupport } from '../../../models/question';
 import { ExamService } from '../../../services/exam.service';
 import { QuestionRender } from '../../../../../shared/component/question-render/question-render';
 import { QuestionEditorDialog } from '../question-editor/question-editor-dialog';
+import { QuestionSupportEditorDialog } from '../question-support-editor/question-support-editor-dialog';
 import { MatDialog } from '@angular/material/dialog';
 
 @Component({
@@ -92,9 +93,58 @@ export class QuestionsManagerComponent implements OnChanges {
 
   deleteQuestionSupport() { }
 
-  openQuestionSupportEditorModal(addMode: boolean = true) { }
+  openQuestionSupportEditorModal(addMode: boolean = true): void {
+    if (!this.publicNotice) {
+      return;
+    }
 
-  onQuestionSupportRowClick(support: QuestionSupport) { }
+    const questionSupport = addMode
+      ? undefined
+      : this.selectedQuestionSupport ?? undefined;
+
+    const dialogRef = this.dialog.open(
+      QuestionSupportEditorDialog,
+      {
+        width: '1200px',
+        maxWidth: '95vw',
+        height: '85vh',
+        maxHeight: '95vh',
+        autoFocus: false,
+        data: {
+          publicNotice: this.publicNotice,
+          questionSupport
+        }
+      }
+    );
+
+    dialogRef.afterClosed().subscribe((result?: QuestionSupport) => {
+      if (!result) {
+        return;
+      }
+
+      this.questionSupportDataSource.update(questionSupports => {
+        const index = questionSupports.findIndex(
+          questionSupport => questionSupport.id === result.id
+        );
+
+        if (index < 0) {
+          return [...questionSupports, result];
+        }
+
+        return questionSupports.map(questionSupport =>
+          questionSupport.id === result.id
+            ? result
+            : questionSupport
+        );
+      });
+
+      this.selectedQuestionSupport = result;
+    });
+  }
+
+  onQuestionSupportRowClick(support: QuestionSupport): void {
+    this.selectedQuestionSupport = support;
+  }
 
   deleteQuestion() { }
 

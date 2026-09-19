@@ -1,11 +1,7 @@
 <h2 mat-dialog-title>Adicionar imagem</h2>
 
 <mat-dialog-content class="image-picker">
-  <div
-    class="drop-area"
-    tabindex="0"
-    (paste)="onPaste($event)"
-  >
+  <div class="drop-area" tabindex="0" (paste)="onPaste($event)">
     <mat-icon>content_paste</mat-icon>
 
     <p>Cole uma imagem aqui (Ctrl+V) ou</p>
@@ -15,13 +11,7 @@
       Selecionar arquivo
     </button>
 
-    <input
-      #fileInput
-      type="file"
-      accept="image/*"
-      hidden
-      (change)="onFileSelected($event)"
-    />
+    <input #fileInput type="file" accept="image/*" hidden (change)="onFileSelected($event)" />
 
     @if (isUploading()) {
       <div class="upload-status">
@@ -36,17 +26,24 @@
   </div>
 
   <div class="image-grid">
-    @for (image of images(); track image) {
-      <button
-        type="button"
-        class="image-thumb"
-        [class.image-thumb-selected]="selectedUrl() === image"
-        (click)="select(image)"
-      >
-        <img [src]="image" alt="" />
-      </button>
-    } @empty {
-      <div class="empty-images">Nenhuma imagem enviada ainda.</div>
+    @if (isLoading()) {
+      <div class="empty-images">
+        <mat-progress-spinner diameter="20" mode="indeterminate" />
+        Carregando imagens...
+      </div>
+    } @else {
+      @for (image of images(); track image) {
+        <button
+          type="button"
+          class="image-thumb"
+          [class.image-thumb-selected]="selectedUrl() === image"
+          (click)="select(image)"
+        >
+          <img [src]="image" alt="" />
+        </button>
+      } @empty {
+        <div class="empty-images">Nenhuma imagem enviada ainda.</div>
+      }
     }
   </div>
 </mat-dialog-content>

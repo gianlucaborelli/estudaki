@@ -1,11 +1,11 @@
-import { Component, ElementRef, ViewChild, inject, signal } from '@angular/core';
+import { Component, ElementRef, OnInit, ViewChild, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
-import { MATERIAL_MODULES } from '../../../../../../shared/imports/material.imports';
+import { MATERIAL_MODULES } from '../../../../../shared/imports/material.imports';
 
 import { ImagePickerDialogData } from './image-picker-dialog-data';
-import { ExamService } from '../../../../services/exam.service';
+import { ExamService } from '../../../services/exam.service';
 
 @Component({
   imports: [
@@ -17,7 +17,7 @@ import { ExamService } from '../../../../services/exam.service';
   styleUrl: './image-picker-dialog.css',
   templateUrl: './image-picker-dialog.html',
 })
-export class ImagePickerDialog {
+export class ImagePickerDialog implements OnInit {
   private readonly dialogRef =
     inject(MatDialogRef<ImagePickerDialog>);
 
@@ -29,15 +29,22 @@ export class ImagePickerDialog {
   @ViewChild('fileInput')
   private fileInput!: ElementRef<HTMLInputElement>;
 
-  readonly images = signal<string[]>(this.data.images ?? []);
+  readonly images = signal<string[]>([]);
 
   readonly selectedUrl = signal<string | null>(null);
 
   readonly isUploading =
     signal(false);
 
+  readonly isLoading =
+    signal(false);
+
   readonly errorMessage =
     signal<string | null>(null);
+
+  ngOnInit(): void {
+    this.loadImages();
+  }
 
   browseFiles(): void {
     this.fileInput.nativeElement.click();
@@ -104,23 +111,42 @@ export class ImagePickerDialog {
     this.errorMessage.set(null);
     this.isUploading.set(true);
 
-    // this.examService.uploadImage(file).subscribe({
-    //   next: uploaded => {
-    //     this.isUploading.set(false);
+    this.examService.uploadImage(this.data.publicNoticeId, file).subscribe({
+      next: uploadedUrl => {
+        this.isUploading.set(false);
 
-    //     // this.images.update(
-    //     //   list => [...list, uploaded.url]
-    //     // );
+        this.images.update(
+          list => [...list, uploadedUrl]
+        );
 
-    //     // this.selectedUrl.set(uploaded.url);
-    //   },
-    //   error: () => {
-    //     this.isUploading.set(false);
+        this.selectedUrl.set(uploadedUrl);
+      },
+      error: () => {
+        this.isUploading.set(false);
 
-    //     this.errorMessage.set(
-    //       'Não foi possível enviar a imagem. Tente novamente.'
-    //     );
-    //   }
-    // });
+        this.errorMessage.set(
+          'Não foi possível enviar a imagem. Tente novamente.'
+        );
+      }
+    });
+  }
+
+  private loadImages(): void {
+    this.isLoading.set(true);
+    this.errorMessage.set(null);
+
+    this.examService.getImagesByPublicNoticeId(this.data.publicNoticeId).subscribe({
+      next: images => {
+        this.isLoading.set(false);
+        this.images.set(images);
+      },
+      error: () => {
+        this.isLoading.set(false);
+
+        this.errorMessage.set(
+          'Não foi possível carregar as imagens.'
+        );
+      }
+    });
   }
 }

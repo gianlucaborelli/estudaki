@@ -7,7 +7,7 @@
     @if (question().questionSupports.length > 0) {
       <div class="question-support">
         @for (support of question().questionSupports; track support.id) {
-          <app-question-content-render [content]="support.contents" />
+          <div [innerHTML]="support.content"></div>
         }
       </div>
     }

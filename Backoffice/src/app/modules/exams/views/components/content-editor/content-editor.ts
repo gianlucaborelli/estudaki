@@ -17,7 +17,8 @@ import { Editor } from '@tiptap/core';
 import StarterKit from '@tiptap/starter-kit';
 import Link from '@tiptap/extension-link';
 import Image from '@tiptap/extension-image';
-import { ImagePickerDialog } from './image-picker-dialog/image-picker-dialog';
+import { ImagePickerDialog } from '../image-picker-dialog/image-picker-dialog';
+
 
 @Component({
   imports: [],
@@ -42,12 +43,11 @@ export class ContentEditor
   readonly content =
     model<string>('');
 
+  readonly publicNoticeId =
+    input<string>('');
+
   private readonly dialog =
     inject(MatDialog);
-
-  // Imagens já enviadas nesta sessão de edição, reaproveitadas entre aberturas do seletor
-  private readonly uploadedImages =
-    signal<string[]>([]);
 
   private editor!: Editor;
 
@@ -225,7 +225,7 @@ export class ContentEditor
         width: '640px',
         maxWidth: '95vw',
         data: {
-          images: this.uploadedImages()
+          publicNoticeId: this.publicNoticeId()
         }
       });
 
@@ -235,13 +235,6 @@ export class ContentEditor
         if (!result) {
           return;
         }
-
-        this.uploadedImages.update(
-          list =>
-            list.includes(result)
-              ? list
-              : [...list, result]
-        );
 
         this.editor
           .chain()

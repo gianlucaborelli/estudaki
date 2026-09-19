@@ -1,0 +1,17 @@
+<div class="dialog-header" mat-dialog-title>
+  <mat-icon>description</mat-icon>
+  <span>{{ dialogTitle }}</span>
+</div>
+
+<mat-dialog-content class="support-editor">
+  <app-content-editor
+    [(content)]="questionSupport.content"
+    [publicNoticeId]="data.publicNotice.id"
+    placeholder="Digite o conteúdo do suporte..."
+  />
+</mat-dialog-content>
+
+<mat-dialog-actions align="end">
+  <button mat-button type="button" (click)="cancel()">Cancelar</button>
+  <button mat-flat-button color="primary" type="button" (click)="save()">Salvar</button>
+</mat-dialog-actions>
