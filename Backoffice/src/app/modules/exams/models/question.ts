@@ -33,7 +33,7 @@ export interface Question {
 export interface QuestionChoice {
   option: string;
   contentBlocks: BlockContent[];
-  content: string;
+  explanation: string;
   isCorrect: boolean;
 }
 

@@ -1,4 +1,4 @@
-import { Component, inject, Input, OnChanges, SimpleChanges, signal } from '@angular/core';
+import { Component, inject, Input, OnChanges, SimpleChanges, signal, ViewChild } from '@angular/core';
 import { MATERIAL_MODULES } from '../../../../../shared/imports/material.imports';
 import { PublicNotice } from '../../../models/publicNotice';
 import { EducationLevelPipe } from '../../../../../shared/pipes/education-level.pipe';
@@ -10,13 +10,17 @@ import { QuestionRender } from '../../../../../shared/component/question-render/
 import { QuestionEditorDialog } from '../question-editor/question-editor-dialog';
 import { QuestionSupportEditorDialog } from '../question-support-editor/question-support-editor-dialog';
 import { MatDialog } from '@angular/material/dialog';
+import { ContentRender } from '../../../../../shared/component/content-render/content-render';
+import { MatPaginator } from '@angular/material/paginator';
+import { MatSort } from '@angular/material/sort';
 
 @Component({
   imports: [
     ...MATERIAL_MODULES,
     EducationLevelPipe,
     QuestionTypePipe,
-    QuestionRender
+    QuestionRender,
+    ContentRender
   ],
   selector: 'app-questions-manager-component',
   styleUrl: './questions-manager-component.css',
@@ -54,35 +58,132 @@ export class QuestionsManagerComponent implements OnChanges {
     'contentsCount'
   ];
 
+  private questionPaginatorRef?: MatPaginator;
+  private questionSortRef?: MatSort;
+  private supportPaginatorRef?: MatPaginator;
+  private supportSortRef?: MatSort;
+
+  @ViewChild('questionPaginator') set questionPaginator(paginator: MatPaginator | undefined) {
+    this.questionPaginatorRef = paginator;
+
+    if (paginator) {
+      paginator.page.subscribe(() => this.loadQuestions());
+    }
+  }
+
+  @ViewChild('questionSort') set questionSort(sort: MatSort | undefined) {
+    this.questionSortRef = sort;
+
+    if (sort) {
+      sort.sortChange.subscribe(() => {
+        this.questionPaginatorRef?.firstPage();
+        this.loadQuestions();
+      });
+    }
+  }
+
+  @ViewChild('supportPaginator') set supportPaginator(paginator: MatPaginator | undefined) {
+    this.supportPaginatorRef = paginator;
+
+    if (paginator) {
+      paginator.page.subscribe(() => this.loadSupports());
+
+      if (this.publicNotice) {
+        this.loadSupports();
+      }
+    }
+  }
+
+  @ViewChild('supportSort') set supportSort(sort: MatSort | undefined) {
+    this.supportSortRef = sort;
+
+    if (sort) {
+      sort.sortChange.subscribe(() => {
+        this.supportPaginatorRef?.firstPage();
+        this.loadSupports();
+      });
+    }
+  }
+
   ngOnChanges(changes: SimpleChanges) {
     if (changes['publicNotice'] && this.publicNotice) {
-      this.loadDate(this.publicNotice.id);
+      this.loadImages(this.publicNotice.id);
+
+      if (this.supportPaginatorRef) {
+        this.supportPaginatorRef.firstPage();
+        this.loadSupports();
+      }
     }
   }
 
   onExamSelected(exam: Exam): void {
     this.selectedExam = exam;
     if (this.publicNotice && this.selectedExam) {
-      this.loadQuestions(this.publicNotice.id, this.selectedExam.id)
+      this.questionPaginatorRef?.firstPage();
+      this.loadQuestions();
     }
   }
 
-  loadQuestions(publicNoticeId: string, examId: string) {
-    this.examService.getQuestionsByExamId(publicNoticeId, examId).subscribe({
-      next: questionDataSource => {
-        this.questionDataSource.set(questionDataSource.items);
+  loadQuestions(): void {
+    if (!this.publicNotice || !this.selectedExam) {
+      return;
+    }
+
+    const pageNumber = (this.questionPaginatorRef?.pageIndex ?? 0) + 1;
+    const pageSize = this.questionPaginatorRef?.pageSize ?? 20;
+    const sortColumn = this.questionSortRef?.active || undefined;
+    const sortDirection = this.questionSortRef?.direction || undefined;
+
+    this.isLoading = true;
+
+    this.examService.getQuestionsByExamId(
+      this.publicNotice.id,
+      this.selectedExam.id,
+      pageNumber,
+      pageSize,
+      sortColumn,
+      sortDirection
+    ).subscribe({
+      next: result => {
+        this.questionDataSource.set(result.items);
+
+        if (this.questionPaginatorRef) {
+          this.questionPaginatorRef.length = result.totalItems;
+        }
+
+        this.isLoading = false;
       }
     });
   }
 
-  loadDate(publicNoticeId: string) {
-    this.examService.getQuestionSupportByPublicNoticeIdPaged(
-      publicNoticeId, 1, 2).subscribe({
-        next: questionDataSource => {
-          this.questionSupportDataSource.set(questionDataSource.items);
-        }
-      });
+  loadSupports(): void {
+    if (!this.publicNotice) {
+      return;
+    }
 
+    const pageNumber = (this.supportPaginatorRef?.pageIndex ?? 0) + 1;
+    const pageSize = this.supportPaginatorRef?.pageSize ?? 20;
+    const sortColumn = this.supportSortRef?.active || undefined;
+    const sortDirection = this.supportSortRef?.direction || undefined;
+
+    this.examService.getQuestionSupportByPublicNoticeIdPaged(
+      this.publicNotice.id,
+      pageNumber,
+      pageSize,
+      sortColumn,
+      sortDirection
+    ).subscribe({
+      next: result => {
+        this.questionSupportDataSource.set(result.items);
+
+        if (this.supportPaginatorRef) {
+          this.supportPaginatorRef.length = result.totalItems;
+        }
+      }
+    });
+  }
+
+  private loadImages(publicNoticeId: string) {
     this.examService.getImagesByPublicNoticeId(
       publicNoticeId).subscribe({
         next: images => {
@@ -90,6 +191,7 @@ export class QuestionsManagerComponent implements OnChanges {
         }
       });
   }
+
 
   deleteQuestionSupport() { }
 

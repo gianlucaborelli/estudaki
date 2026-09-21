@@ -94,10 +94,32 @@ export class ExamService {
     });
   }
 
-  getQuestionsByExamId(publicNoticeId: string, examId: string): Observable<PagedResult<Question>> {
+  getQuestionsByExamId(
+    publicNoticeId: string,
+    examId: string,
+    pageNumber: number,
+    pageSize: number,
+    sortColumn?: string,
+    sortDirection?: 'asc' | 'desc'
+  ): Observable<PagedResult<Question>> {
+    let params = new HttpParams()
+      .set('page', pageNumber)
+      .set('pageSize', pageSize);
+
+    if (sortColumn) {
+      params = params.set('sortLabel', sortColumn);
+    }
+
+    if (sortDirection) {
+      params = params.set('sortDirection', sortDirection);
+    }
+
     return this.http.get<PagedResult<Question>>(
-      `/api/exams/${publicNoticeId}/exams/${examId}/questions`, {
-      withCredentials: true
-    });
+      `/api/exams/${publicNoticeId}/exams/${examId}/questions`,
+      {
+        params,
+        withCredentials: true
+      }
+    );
   }
 }

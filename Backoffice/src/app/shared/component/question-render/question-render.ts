@@ -2,13 +2,13 @@ import { Component, computed, input, signal } from '@angular/core';
 import { Question } from '../../../modules/exams/models/question';
 import { MATERIAL_MODULES } from '../../imports/material.imports';
 import { QuestionHeader } from '../question-header/question-header';
-import { QuestionContentRender } from '../question-content-render/question-content-render';
+import { ContentRender } from '../content-render/content-render';
 
 @Component({
   imports: [
     ...MATERIAL_MODULES,
     QuestionHeader,
-    QuestionContentRender
+    ContentRender
   ],
   selector: 'app-question-render',
   styleUrl: './question-render.css',

@@ -1,260 +1,68 @@
 :host {
   display: flex;
   flex: 1;
-  min-height: 0;
-  width: 100%;
-}
-
-.editor-container {
-  width: 100%;
-
-  border: 1px solid #d1d5db;
-
-  border-radius: 0.5rem;
-
-  background: #ffffff;
-
-  overflow: hidden;
-
-  display: flex;
-  flex: 1;
   flex-direction: column;
   min-height: 0;
+  width: 100%;
 }
 
-.editor-content,
-.editor-content :global(.ProseMirror) {
+.editor-content {
+  display: flex;
   flex: 1;
   min-height: 0;
-  overflow-y: auto;
+  flex-direction: column;
+  width: 100%;
 }
 
-/* Toolbar */
-
-.editor-toolbar {
+:host ::ng-deep .ql-container {
   display: flex;
+  min-height: 0;
+  flex: 1;
+  flex-direction: column;
+  border-color: #d1d5db;
+  font-family: inherit;
+  font-size: 0.95rem;
+}
 
-  align-items: center;
-
-  flex-wrap: wrap;
-
-  gap: 0.25rem;
-
-  padding: 0.5rem;
-
-  border-bottom: 1px solid #e5e7eb;
-
+:host ::ng-deep .ql-toolbar.ql-snow {
+  border-color: #d1d5db;
   background: #f9fafb;
 }
 
-.toolbar-group {
-  display: flex;
-
-  align-items: center;
-
-  gap: 0.125rem;
-}
-
-.toolbar-divider {
-  width: 1px;
-
-  height: 24px;
-
-  margin: 0 0.35rem;
-
-  background: #e5e7eb;
-}
-
-.toolbar-button {
-  display: inline-flex;
-
-  align-items: center;
-
-  justify-content: center;
-
-  min-width: 32px;
-
-  height: 32px;
-
-  padding: 0 0.5rem;
-
-  border: none;
-
-  border-radius: 0.375rem;
-
-  background: transparent;
-
-  color: #374151;
-
-  font-size: 14px;
-
-  cursor: pointer;
-
-  transition:
-    background-color 0.15s,
-    color 0.15s;
-}
-
-.toolbar-button:hover {
-  background: #e5e7eb;
-}
-
-.toolbar-button.active {
-  background: #e5e7eb;
-
-  color: #111827;
-}
-
-.toolbar-button.bold {
-  font-weight: 700;
-}
-
-.toolbar-button.italic {
-  font-style: italic;
-}
-
-.toolbar-button.strike {
-  text-decoration: line-through;
-}
-
-.toolbar-button.underline {
-  text-decoration: underline;
-}
-
-.font-size-control select {
-  height: 32px;
-  padding: 0 0.35rem;
-  border: 1px solid #d1d5db;
-  border-radius: 0.25rem;
-  background: #fff;
-  color: #374151;
-}
-
-.color-control input {
-  width: 32px;
-  height: 32px;
-  padding: 2px;
-  border: 0;
-  border-radius: 0.25rem;
-  background: transparent;
-  cursor: pointer;
-}
-
-.visually-hidden {
-  position: absolute;
-  width: 1px;
-  height: 1px;
-  padding: 0;
-  margin: -1px;
-  overflow: hidden;
-  clip: rect(0, 0, 0, 0);
-  white-space: nowrap;
-  border: 0;
-}
-
-/* Content */
-
-.editor-content {
+:host ::ng-deep .ql-editor {
   min-height: 220px;
-
   padding: 1rem;
-
   color: #111827;
-
-  font-size: 0.95rem;
-
   line-height: 1.4;
-
-  cursor: text;
+  overflow-y: auto;
 }
 
-/*
- * Tiptap / ProseMirror
- */
-
-.editor-content :global(.ProseMirror) {
-  min-height: 220px;
-
-  outline: none;
-}
-
-.editor-content :global(.ProseMirror ul) {
-  margin: 0 0 1rem;
-
-  padding-left: 1.5rem;
-
-  list-style-type: disc;
-}
-
-.editor-content :global(.ProseMirror ol) {
-  margin: 0 0 1rem;
-
-  padding-left: 1.5rem;
-
-  list-style-type: decimal;
-}
-
-.editor-content :global(.ProseMirror blockquote) {
-  margin: 1rem 0;
-
-  padding-left: 1rem;
-
-  border-left: 4px solid #d1d5db;
-
-  color: #6b7280;
-}
-
-.editor-content :global(.ProseMirror hr) {
-  margin: 1.5rem 0;
-
-  border: 0;
-
-  border-top: 1px solid #d1d5db;
-}
-
-.editor-content :global(.ProseMirror a) {
+:host ::ng-deep .ql-editor p,
+:host ::ng-deep .ql-editor ol,
+:host ::ng-deep .ql-editor ul,
+:host ::ng-deep .ql-editor pre,
+:host ::ng-deep .ql-editor blockquote,
+:host ::ng-deep .ql-editor h1,
+:host ::ng-deep .ql-editor h2,
+:host ::ng-deep .ql-editor h3,
+:host ::ng-deep .ql-editor h4,
+:host ::ng-deep .ql-editor h5,
+:host ::ng-deep .ql-editor h6 {
   margin: 0 0 0.5rem;
-
-  text-decoration: underline;
 }
 
-.editor-content :global(.ProseMirror img) {
-  max-width: 100%;
-
-  height: auto;
-}
-
-.editor-content :global(.ProseMirror table) {
+:host ::ng-deep .ql-editor table {
   width: 100%;
   margin: 1rem 0;
   border-collapse: collapse;
-  table-layout: fixed;
 }
 
-.editor-content :global(.ProseMirror th),
-.editor-content :global(.ProseMirror td) {
-  position: relative;
-  min-width: 1.5rem;
+:host ::ng-deep .ql-editor td {
+  min-width: 5rem;
   padding: 0.5rem;
   border: 1px solid #9ca3af;
-  vertical-align: top;
 }
 
-.editor-content :global(.ProseMirror th) {
-  background: #f3f4f6;
-  font-weight: 700;
-}
-
-/* Placeholder */
-
-.editor-content :global(.ProseMirror p.is-editor-empty:first-child::before) {
-  content: attr(data-placeholder);
-
-  float: left;
-
-  height: 0;
-
-  color: #9ca3af;
-
-  pointer-events: none;
+:host ::ng-deep .ql-editor .ql-formula {
+  padding: 0 0.15rem;
 }

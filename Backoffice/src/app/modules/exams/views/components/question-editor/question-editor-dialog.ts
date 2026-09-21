@@ -54,7 +54,7 @@ export class QuestionEditorDialog {
     this.question.choices.push({
       option: nextOption,
       isCorrect: false,
-      content: '',
+      explanation: '',
       contentBlocks: []
     });
   }
@@ -170,7 +170,7 @@ export class QuestionEditorDialog {
     return this.question.choices.every(
       choice =>
         !this.isHtmlEmpty(
-          choice.content
+          choice.explanation
         )
     );
   }
@@ -244,13 +244,13 @@ export class QuestionEditorDialog {
           {
             option: 'A',
             isCorrect: false,
-            content: '',
+            explanation: '',
             contentBlocks: []
           },
           {
             option: 'B',
             isCorrect: false,
-            content: '',
+            explanation: '',
             contentBlocks: []
           }
         ],

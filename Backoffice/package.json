@@ -38,6 +38,8 @@
     "@tiptap/starter-kit": "^3.31.3",
     "dotenv": "^17.4.2",
     "express": "^5.1.0",
+    "katex": "^0.18.7",
+    "quill": "^2.0.3",
     "rxjs": "~7.8.0",
     "tslib": "^2.3.0"
   },

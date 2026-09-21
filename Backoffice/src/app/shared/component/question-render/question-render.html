@@ -7,13 +7,13 @@
     @if (question().questionSupports.length > 0) {
       <div class="question-support">
         @for (support of question().questionSupports; track support.id) {
-          <div [innerHTML]="support.content"></div>
+          <app-content-render [content]="support.content" />
         }
       </div>
     }
 
     <div class="statement">
-      <app-question-content-render [content]="question().questionContents" />
+      <app-content-render [content]="question().statement" />
     </div>
   </div>
 
@@ -29,7 +29,7 @@
           {{ choice.option }}
         </span>
 
-        <app-question-content-render [content]="choice.contentBlocks" />
+        <app-content-render [content]="choice.explanation" />
       </mat-checkbox>
     }
   </fieldset>

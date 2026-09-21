@@ -1,0 +1,11 @@
+:host {
+  all: initial;
+  display: block;
+  /* fallback for content that doesn't set its own font */
+  font-family: Roboto, 'Helvetica Neue', sans-serif;
+  color: var(--mat-sys-on-surface, #1a1c18);
+}
+
+.content-render {
+  min-width: 0;
+}
