@@ -31,7 +31,7 @@ namespace Estudaki.Modules.Questions.Infrastructure.Data.Repositories
             var totalItems = await DbSet.CountDocumentsAsync(filter);
             var sort = GetSortDefinition<QuestionSupport>(sortLabel, sortDirection);
 
-            page = Math.Max(page, 0);
+            page = Math.Max(page-1, 0);
             pageSize = Math.Max(pageSize, 1);
 
             var items = await DbSet

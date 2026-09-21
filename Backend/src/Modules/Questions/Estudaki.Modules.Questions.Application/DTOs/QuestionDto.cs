@@ -26,6 +26,7 @@ public class QuestionDto
     public string MainArea { get; set; } = string.Empty;
     public string[] SubAreas { get; set; } = [];    
     public List<ContentBlock> QuestionContents { get; set; } = [];
+    public string? Statement { get; set; }
     public List<QuestionSupportDto> QuestionSupports { get; set; } = [];
     public List<Choice>? Choices { get; set; }
     public DateTime CreatedAt { get; set; }
@@ -83,6 +84,7 @@ public class QuestionDto
                             Id = s.Id,
                             PublicNoticeId = s.PublicNoticeId
                         }).ToList(),
+            Statement = original.Statement,
             QuestionContents = original.QuestionContents
                         .Select<ContentBlock, ContentBlock>(c => c switch
                         {

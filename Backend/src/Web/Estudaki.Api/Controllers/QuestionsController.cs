@@ -1,6 +1,7 @@
-﻿using Estudaki.Commons.Core.CQRS;
+using Estudaki.Commons.Core.CQRS;
 using Estudaki.Modules.Questions.Application.DTOs;
 using Estudaki.Modules.Questions.Application.Queries.SearchQuestions;
+using Estudaki.Modules.Questions.Application.Services;
 using Estudaki.Modules.Questions.Domain.Common;
 using Estudaki.Modules.Questions.Domain.Repositories;
 using Estudaki.Modules.Questions.Domain.ValueObjects;
@@ -11,13 +12,14 @@ namespace Estudaki.Api.Controllers;
 
 [Route("api/[controller]")]
 [AllowAnonymous]
-public class QuestionsController (ICommandDispatcher commandDispatcher, IQueryDispatcher queryDispatcher, IQuestionRepository questionRepository, IQuestionSupportRepository questionSupportRepository) : Controller
+public class QuestionsController (ICommandDispatcher commandDispatcher, IQueryDispatcher queryDispatcher, IQuestionRepository questionRepository, IQuestionSupportRepository questionSupportRepository, ContentMigrationService contentMigrationService) : Controller
 {
     public ICommandDispatcher CommandDispatcher = commandDispatcher;
     public IQueryDispatcher QueryDispatcher = queryDispatcher;
 
     private readonly IQuestionRepository _questionRepository = questionRepository;
     private readonly IQuestionSupportRepository _questionSupportRepository = questionSupportRepository;
+    private readonly ContentMigrationService _contentMigrationService = contentMigrationService;
 
     [HttpGet]
     public async Task<IActionResult> GetQuestions([FromQuery] SearchParameters query)
@@ -30,108 +32,59 @@ public class QuestionsController (ICommandDispatcher commandDispatcher, IQueryDi
     [HttpPost]
     public async Task<IActionResult> CreateQuestion()
     {
-        //var questions = await _questionRepository.GetAll();
+        var questions = await _questionRepository.GetAll();
 
-        //var cont = 0;
-        //foreach (var question in questions)
-        //{
-        //    if (question.QuestionSupports == null || !question.QuestionSupports.Any())
-        //    {
-        //        question.QuestionSupports = null;
-        //    }
+        var cont = 0;
+        foreach (var question in questions)
+        {
+            // Migra conteúdo da questão (QuestionContents -> Statement)
+            if (question.QuestionContents != null && question.QuestionContents.Any())
+            {
+                var statementHtml = _contentMigrationService.MigrateQuestionContentsToStatement(question.QuestionContents);
+                if (!string.IsNullOrEmpty(statementHtml))
+                {
+                    question.Statement = statementHtml;
+                }
+            }
 
+            // Migra conteúdo das alternativas (Content/ContentBlocks -> Explanation)
+            if (question.Choices != null)
+            {
+                foreach (var choice in question.Choices)
+                {
+                    var explanationHtml = _contentMigrationService.MigrateChoiceContentToExplanation(choice);
+                    if (!string.IsNullOrEmpty(explanationHtml))
+                    {
+                        choice.Explanation = explanationHtml;
+                    }
+                }
+            }
 
-        //    cont++;
-        //    foreach (var content in question.QuestionContents)
-        //    {
-        //        if (content is ParagraphBlock)
-        //        {
-        //            string text = string.Empty;
+            cont++;
+            await _questionRepository.Update(question);
+        }
 
-        //            if (((ParagraphBlock)content).Inlines != null)
-        //            {
-        //                foreach (var inline in ((ParagraphBlock)content).Inlines)
-        //                {
-        //                    if (inline is TextInline textInline)
-        //                    {
-        //                        text += textInline.Text;
-        //                    }
-        //                }
-        //                ((ParagraphBlock)content).Text = text;
-        //                ((ParagraphBlock)content).Inlines = null;
-        //            }
-        //        }
-        //    }
+        Console.WriteLine("Migradas {0} questões", cont);
 
-        //    if (question.Choices != null)
-        //    {
-        //        foreach (var choice in question.Choices)
-        //        {
-        //            if (choice.Content != null)
-        //            {
-        //                var contentBlocks = new List<ContentBlock>();
-        //                string text = string.Empty;
-        //                foreach (var contentBlock in choice.Content)
-        //                {
-        //                    if (contentBlock is TextInline textInline)
-        //                    {
-
-
-        //                        if (textInline.Text != null)
-        //                        {
-        //                            text += textInline.Text;
-        //                        }
-        //                    }
-        //                }
-
-        //                if (!string.IsNullOrEmpty(text))
-        //                {
-        //                    var paragraphBlock = new ParagraphBlock
-        //                    {
-        //                        Inlines = null,
-        //                        Text = text
-        //                    };
-        //                    contentBlocks.Add(paragraphBlock);
-        //                    choice.Content = null;
-        //                    choice.ContentBlocks = contentBlocks;
-        //                }
-        //            }
-        //        }
-        //    }
-
-        //    Console.WriteLine("updated {0} of {1}", cont, questions.Count());
-        //    await _questionRepository.Update(question);
-        //}
-
+        // Migra conteúdo dos suportes (Contents -> Content)
         var supports = await _questionSupportRepository.GetAll();
 
         foreach (var support in supports)
         {
-            if (support.Contents != null)
+            if (support.Contents != null && support.Contents.Any())
             {
-                foreach (var content in support.Contents)
+                var contentHtml = _contentMigrationService.MigrateQuestionSupportContentsToContent(support.Contents);
+                if (!string.IsNullOrEmpty(contentHtml))
                 {
-                    if (content is ParagraphBlock)
-                    {
-                        string text = string.Empty;
-                        if (((ParagraphBlock)content).Inlines != null)
-                        {
-                            foreach (var inline in ((ParagraphBlock)content).Inlines)
-                            {
-                                if (inline is TextInline textInline)
-                                {
-                                    text += textInline.Text;
-                                }
-                            }
-                            ((ParagraphBlock)content).Text = text;
-                            ((ParagraphBlock)content).Inlines = null;
-                        }
-                    }
+                    support.Content = contentHtml;
                 }
             }
+
             await _questionSupportRepository.Update(support);
         }
 
-        return Ok();
+        Console.WriteLine("Migrados {0} suportes", supports.Count());
+
+        return Ok(new { questions = cont, supports = supports.Count() });
     }
 }

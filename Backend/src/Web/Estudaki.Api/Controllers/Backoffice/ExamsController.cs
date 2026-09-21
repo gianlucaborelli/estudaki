@@ -1,5 +1,4 @@
 ﻿using Estudaki.Commons.Core.CQRS;
-using Estudaki.Commons.Core.Models.DTOs;
 using Estudaki.Modules.Questions.Application.Commands;
 using Estudaki.Modules.Questions.Application.DTOs;
 using Estudaki.Modules.Questions.Application.Queries.GetImageListByPublicNoticeId;

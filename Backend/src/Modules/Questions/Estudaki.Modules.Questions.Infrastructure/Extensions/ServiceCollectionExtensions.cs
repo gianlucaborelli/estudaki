@@ -1,5 +1,6 @@
 using Estudaki.Commons.Core.CQRS.Extensions;
 using Estudaki.Modules.Questions.Application.Commands;
+using Estudaki.Modules.Questions.Application.Services;
 using Estudaki.Modules.Questions.Application.Queries.GetAreasPaginated;
 using Estudaki.Modules.Questions.Application.Queries.GetFilterParameters;
 using Estudaki.Modules.Questions.Application.Queries.GetImageListByPublicNoticeId;
@@ -33,6 +34,7 @@ public static class ServiceCollectionExtensions
         services.AddScoped<IPublicNoticeRepository, PublicNoticeRepository>();
         services.AddScoped<IQuestionSupportRepository, QuestionSupportRepository>();
         services.AddScoped<IExamExtractionRepository, ExamExtractionRepository>();
+        services.AddScoped<ContentMigrationService>();
 
         var postgresConnectionString = configuration.GetConnectionString("PostgresConnection")
             ?? throw new InvalidOperationException("Connection string 'PostgresConnection' not found.");

@@ -14,6 +14,7 @@ public class Question : Entity
     public string[] SubAreas { get; set; } = [];
     public List<string>? QuestionSupports { get; set; }
     public List<ContentBlock> QuestionContents { get; set; } = [];
+    public string? Statement { get; set; }
     public List<Choice>? Choices { get; set; }
 
     /// <summary>

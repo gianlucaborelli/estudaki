@@ -9,4 +9,5 @@ public class QuestionSupport : Entity
 {
     public string? PublicNoticeId { get; set; } = string.Empty;
     public List<ContentBlock> Contents{ get; set; } = [];
+    public string? Content { get; set; }
 }
