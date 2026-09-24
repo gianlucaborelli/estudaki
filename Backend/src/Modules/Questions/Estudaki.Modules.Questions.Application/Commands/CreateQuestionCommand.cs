@@ -1,13 +1,12 @@
 ﻿using Estudaki.Commons.Core.CQRS;
 using Estudaki.Modules.Questions.Application.DTOs;
 using FluentValidation;
-using FluentValidation.Results;
 
 namespace Estudaki.Modules.Questions.Application.Commands;
 
-public record AddNewQuestionIntoExamCommand(QuestionDto Question) : ICommand<CommandResult>;
+public record CreateQuestionCommand(QuestionDto Question) : ICommand<CommandResult>;
 
-public class AddNewQuestionIntoExamCommandValidator : AbstractValidator<AddNewQuestionIntoExamCommand>
+public class AddNewQuestionIntoExamCommandValidator : AbstractValidator<CreateQuestionCommand>
 {
     public AddNewQuestionIntoExamCommandValidator()
     {

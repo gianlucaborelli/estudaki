@@ -22,7 +22,7 @@ public class UpdateQuestionSupportCommandHandler : CommandHandler, ICommandHandl
         SetValidationResult(await _validator.ValidateAsync(command, cancellationToken));
         if (!CommandResult.Success) return Result();
 
-        var questionSupport = await _questionSupportRepository.GetById(command.QuestionSupportDto.Id);
+        var questionSupport = await _questionSupportRepository.GetById(command.QuestionSupport.Id);
 
         if (questionSupport == null)
         {
@@ -30,7 +30,7 @@ public class UpdateQuestionSupportCommandHandler : CommandHandler, ICommandHandl
             return Result();
         }
 
-        var updatedQuestionSupport = command.QuestionSupportDto.ToEntity();
+        var updatedQuestionSupport = command.QuestionSupport.ToEntity();
         await _questionSupportRepository.Update(updatedQuestionSupport);
 
         return Result();

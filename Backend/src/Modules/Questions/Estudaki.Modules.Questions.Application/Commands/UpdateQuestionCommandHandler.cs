@@ -40,6 +40,7 @@ public class UpdateQuestionCommandHandler : CommandHandler, ICommandHandler<Upda
         question.SubAreas = command.Question.SubAreas;
         question.QuestionSupports = command.Question.QuestionSupports.Select(s => s.Id).ToList();  
         question.QuestionContents = command.Question.QuestionContents;
+        question.Statement = command.Question.Statement;
         question.Choices = command.Question.Choices;        
 
         exam.QuestionNumber = command.Question.QuestionNumber;

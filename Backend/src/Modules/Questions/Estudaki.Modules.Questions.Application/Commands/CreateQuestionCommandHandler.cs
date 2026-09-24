@@ -3,18 +3,17 @@ using Estudaki.Modules.Questions.Domain.Entities;
 using Estudaki.Modules.Questions.Domain.Repositories;
 using Estudaki.Modules.Questions.Domain.ValueObjects;
 using FluentValidation;
-using FluentValidation.Results;
 
 namespace Estudaki.Modules.Questions.Application.Commands;
 
-public class AddNewQuestionIntoExamCommandHandler : CommandHandler, ICommandHandler<AddNewQuestionIntoExamCommand, CommandResult>
+public class CreateQuestionCommandHandler : CommandHandler, ICommandHandler<CreateQuestionCommand, CommandResult>
 {
-    private readonly IValidator<AddNewQuestionIntoExamCommand> _validator;
+    private readonly IValidator<CreateQuestionCommand> _validator;
     private readonly IQuestionRepository _questionRepository;
     private readonly IPublicNoticeRepository _publicNoticeRepository;
 
-    public AddNewQuestionIntoExamCommandHandler(
-        IValidator<AddNewQuestionIntoExamCommand> validator, 
+    public CreateQuestionCommandHandler(
+        IValidator<CreateQuestionCommand> validator, 
         IQuestionRepository questionRepository, 
         IPublicNoticeRepository publicNoticeRepository)
     {
@@ -22,7 +21,7 @@ public class AddNewQuestionIntoExamCommandHandler : CommandHandler, ICommandHand
         _questionRepository = questionRepository;
         _publicNoticeRepository = publicNoticeRepository;
     }
-    public async Task<CommandResult> HandleAsync(AddNewQuestionIntoExamCommand command, CancellationToken cancellationToken = default)
+    public async Task<CommandResult> HandleAsync(CreateQuestionCommand command, CancellationToken cancellationToken = default)
     {
         SetValidationResult(await _validator.ValidateAsync(command, cancellationToken));
         if (!CommandResult.Success) return Result();
@@ -48,6 +47,7 @@ public class AddNewQuestionIntoExamCommandHandler : CommandHandler, ICommandHand
         question.SubAreas = command.Question.SubAreas;
         question.QuestionSupports = command.Question.QuestionSupports.Select(s => s.Id).ToList();
         question.QuestionContents = command.Question.QuestionContents;
+        question.Statement = command.Question.Statement;
         question.Choices = command.Question.Choices;
 
         var examQuestion = QuestionExam.Create(exam, publicNotice);

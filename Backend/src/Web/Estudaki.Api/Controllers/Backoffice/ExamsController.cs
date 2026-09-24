@@ -66,6 +66,28 @@ public class ExamsController(ICommandDispatcher commandDispatcher, IQueryDispatc
         return Ok(result);
     }
 
+    [HttpPost("{publicNoticeId}/contents/questions-support")]
+    public async Task<IActionResult> CreateQuestionSupport(
+        [FromRoute] string publicNoticeId,
+        [FromBody] CreateQuestionSupportCommand command)
+    {
+        command = command with
+        {
+            PublicNoticeId = publicNoticeId
+        };
+        var result = await _commandDispatcher.DispatchAsync<CreateQuestionSupportCommand, CommandResult>(command);
+        return Ok(result);
+    }
+
+    [HttpPatch("{publicNoticeId}/contents/questions-support")]
+    public async Task<IActionResult> UpdateQuestionSupport(
+        [FromRoute] string publicNoticeId,
+        [FromBody] UpdateQuestionSupportCommand command)
+    {        
+        var result = await _commandDispatcher.DispatchAsync<UpdateQuestionSupportCommand, CommandResult>(command);
+        return Ok(result);
+    }
+
     [HttpGet("{publicNoticeId}/exams/{examId}/questions")]
     public async Task<IActionResult> GetQuestionsByExamId([FromRoute] string publicNoticeId, [FromRoute] string examId, [FromQuery] GetQuestionsByExamIdQuery query)
     {
@@ -75,5 +97,26 @@ public class ExamsController(ICommandDispatcher commandDispatcher, IQueryDispatc
         };
         var result = await _queryDispatcher.DispatchAsync<GetQuestionsByExamIdQuery, PagedResult<QuestionDto>>(query);        
         return Ok(result);
-    }    
+    }
+
+    [HttpPost("{publicNoticeId}/exams/{examId}/questions")]
+    public async Task<IActionResult> CreateQuestion(
+        [FromRoute] string publicNoticeId, 
+        [FromRoute] string examId, 
+        [FromBody] CreateQuestionCommand command)
+    {        
+        var result = await _commandDispatcher.DispatchAsync<CreateQuestionCommand, CommandResult>(command);
+        return Ok(result);
+    }
+
+    [HttpPatch("{publicNoticeId}/exams/{examId}/questions/{questionId}")]
+    public async Task<IActionResult> UpdateQuestion(
+        [FromRoute] string publicNoticeId,
+        [FromRoute] string examId,
+        [FromRoute] string questionId,
+        [FromBody] UpdateQuestionCommand command)
+    {
+        var result = await _commandDispatcher.DispatchAsync<UpdateQuestionCommand, CommandResult>(command);
+        return Ok(result);
+    }
 }
