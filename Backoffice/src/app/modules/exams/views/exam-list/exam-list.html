@@ -27,7 +27,7 @@
 
   <ng-container matColumnDef="ExamCategory">
     <th mat-header-cell *matHeaderCellDef mat-sort-header>Categoria</th>
-    <td mat-cell *matCellDef="let publicNotice">{{ publicNotice.examCategory }}</td>
+    <td mat-cell *matCellDef="let publicNotice">{{ publicNotice.examCategory | examCategory }}</td>
   </ng-container>
 
   <ng-container matColumnDef="IsReviewed">

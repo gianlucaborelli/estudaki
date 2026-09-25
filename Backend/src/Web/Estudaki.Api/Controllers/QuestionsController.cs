@@ -1,5 +1,6 @@
 using Estudaki.Commons.Core.CQRS;
 using Estudaki.Modules.Questions.Application.DTOs;
+using Estudaki.Modules.Questions.Application.Queries.GetFilterParameters;
 using Estudaki.Modules.Questions.Application.Queries.SearchQuestions;
 using Estudaki.Modules.Questions.Application.Services;
 using Estudaki.Modules.Questions.Domain.Common;
@@ -22,10 +23,18 @@ public class QuestionsController (ICommandDispatcher commandDispatcher, IQueryDi
     private readonly ContentMigrationService _contentMigrationService = contentMigrationService;
 
     [HttpGet]
-    public async Task<IActionResult> GetQuestions([FromQuery] SearchParameters query)
+    public async Task<IActionResult> GetQuestions([FromQuery] FilterParameters query)
     {
         var queryRequest = new SearchQuestionsPaginatedQuery(query);
         var result = await QueryDispatcher.DispatchAsync<SearchQuestionsPaginatedQuery, PagedResult<QuestionDto>>(queryRequest);
+        return Ok(result);
+    }
+
+    [HttpGet("parameters")]
+    public async Task<IActionResult> GetParameters([FromQuery] FilterParameters query)
+    {
+        var queryRequest = new GetFilterParametersQuery(query);
+        var result = await QueryDispatcher.DispatchAsync<GetFilterParametersQuery, FilterParameters>(queryRequest);
         return Ok(result);
     }
 

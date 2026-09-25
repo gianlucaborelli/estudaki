@@ -47,10 +47,9 @@ export class QuestionsManagerComponent implements OnChanges {
   isLoading: boolean = false
 
   questionDisplayedColumns = [
-    'questionNumber',
-    'questionType',
-    'choicesCount',
-    'correctChoicesCount'
+    'QuestionNumber',
+    'ChoicesCount',
+    'CorrectChoicesCount'
   ];
 
   questionSupportDisplayedColumns = [
@@ -195,14 +194,14 @@ export class QuestionsManagerComponent implements OnChanges {
 
   deleteQuestionSupport() { }
 
-  openQuestionSupportEditorModal(addMode: boolean = true): void {
+  openQuestionSupportEditorModal(): void {
     if (!this.publicNotice) {
       return;
     }
 
-    const questionSupport = addMode
-      ? undefined
-      : this.selectedQuestionSupport ?? undefined;
+    const questionSupport = this.selectedQuestionSupport
+      ? this.selectedQuestionSupport
+      : undefined;
 
     const dialogRef = this.dialog.open(
       QuestionSupportEditorDialog,
@@ -219,29 +218,15 @@ export class QuestionsManagerComponent implements OnChanges {
       }
     );
 
-    dialogRef.afterClosed().subscribe((result?: QuestionSupport) => {
-      if (!result) {
-        return;
-      }
-
-      this.questionSupportDataSource.update(questionSupports => {
-        const index = questionSupports.findIndex(
-          questionSupport => questionSupport.id === result.id
-        );
-
-        if (index < 0) {
-          return [...questionSupports, result];
+    dialogRef
+      .afterClosed()
+      .subscribe((result?: QuestionSupport) => {
+        if (!result) {
+          return;
         }
-
-        return questionSupports.map(questionSupport =>
-          questionSupport.id === result.id
-            ? result
-            : questionSupport
-        );
+        this.loadSupports();
+        this.selectedQuestionSupport = result;
       });
-
-      this.selectedQuestionSupport = result;
-    });
   }
 
   onQuestionSupportRowClick(support: QuestionSupport): void {
@@ -262,9 +247,10 @@ export class QuestionsManagerComponent implements OnChanges {
 
           data: {
             question,
-
             availableQuestionSupports:
-              this.questionSupportDataSource()
+              this.questionSupportDataSource(),
+            examId: this.selectedExam?.id,
+            publicNoticeId: this.publicNotice?.id
           }
         }
       );
@@ -273,27 +259,21 @@ export class QuestionsManagerComponent implements OnChanges {
       .afterClosed()
       .subscribe(
         (result?: Question) => {
-
           if (!result) {
             return;
           }
 
-          this.saveQuestion(result);
+          this.loadQuestions();
+          this.selectedQuestion = result;
         }
       );
   }
-
-  saveQuestion(question: Question) { }
-
-  addNewQuestionEditorModalAsync() { }
 
   openAddExistingQuestionIntoExamModal() { }
 
   onQuestionRowClick(question: Question) {
     this.selectedQuestion = question
   }
-
-  addImage() { }
 
   onFileSelected(event: Event) {
     const input = event.target as HTMLInputElement;

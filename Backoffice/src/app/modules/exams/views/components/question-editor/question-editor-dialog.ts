@@ -8,6 +8,7 @@ import { MATERIAL_MODULES } from '../../../../../shared/imports/material.imports
 import { QuestionType } from '../../../models/question-type';
 import { ContentEditor } from '../content-editor/content-editor';
 import { FormsModule } from '@angular/forms';
+import { ExamService } from '../../../services/exam.service';
 
 @Component({
   imports: [
@@ -26,6 +27,8 @@ export class QuestionEditorDialog {
 
   readonly data =
     inject<QuestionEditorDialogData>(MAT_DIALOG_DATA);
+
+  readonly service = inject(ExamService);
 
   readonly QuestionType = QuestionType;
 
@@ -139,13 +142,34 @@ export class QuestionEditorDialog {
   }
 
   save(): void {
-    if (!this.isValid()) {
-      return;
-    }
+    this.isEditing
+      ? this.service.updateQuestion(
+        this.data.publicNoticeId,
+        this.data.examId,
+        this.question.questionId,
+        this.question
+      ).subscribe({
+        next: () => {
+          // atualização concluída
+        },
+        error: error => {
+          console.error(error);
+        }
+      })
+      : this.service.createQuestion(
+        this.data.publicNoticeId,
+        this.data.examId,
+        this.question
+      ).subscribe({
+        next: () => {
+          // criação concluída
+        },
+        error: error => {
+          console.error(error);
+        }
+      });
 
-    this.dialogRef.close(
-      this.question
-    );
+    this.dialogRef.close(this.question);
   }
 
   cancel(): void {

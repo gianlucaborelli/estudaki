@@ -1,11 +1,46 @@
+@import 'quill/dist/quill.core.css';
+@import 'katex/dist/katex.min.css';
+
 :host {
   all: initial;
   display: block;
-  /* fallback for content that doesn't set its own font */
-  font-family: Roboto, 'Helvetica Neue', sans-serif;
-  color: var(--mat-sys-on-surface, #1a1c18);
+  font-family: inherit;
+  font-size: 0.95rem;
 }
 
 .content-render {
+  height: auto;
   min-width: 0;
+  overflow: visible;
+  padding: 0;
+}
+
+.content-render p,
+.content-render ol,
+.content-render ul,
+.content-render pre,
+.content-render blockquote,
+.content-render h1,
+.content-render h2,
+.content-render h3,
+.content-render h4,
+.content-render h5,
+.content-render h6 {
+  margin: 0 0 0.5rem;
+}
+
+.content-render table {
+  width: 100%;
+  margin: 1rem 0;
+  border-collapse: collapse;
+}
+
+.content-render td {
+  min-width: 5rem;
+  padding: 0.5rem;
+  border: 1px solid #9ca3af;
+}
+
+.content-render .ql-formula {
+  padding: 0 0.15rem;
 }

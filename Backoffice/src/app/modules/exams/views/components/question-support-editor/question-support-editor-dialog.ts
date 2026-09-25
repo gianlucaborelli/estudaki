@@ -5,6 +5,7 @@ import { MATERIAL_MODULES } from '../../../../../shared/imports/material.imports
 import { QuestionSupport } from '../../../models/question';
 import { ContentEditor } from '../content-editor/content-editor';
 import { QuestionSupportEditorDialogData } from './question-support-editor-dialog-data';
+import { ExamService } from '../../../services/exam.service';
 
 @Component({
   imports: [
@@ -22,6 +23,9 @@ export class QuestionSupportEditorDialog {
 
   readonly data =
     inject<QuestionSupportEditorDialogData>(MAT_DIALOG_DATA);
+
+  service =
+    inject(ExamService)
 
   questionSupport: QuestionSupport;
 
@@ -42,6 +46,30 @@ export class QuestionSupportEditorDialog {
   }
 
   save(): void {
+    this.isEditing
+      ? this.service.updateQuestionSupport(
+        this.data.publicNotice.id,
+        this.questionSupport
+      ).subscribe({
+        next: () => {
+          // atualização concluída
+        },
+        error: error => {
+          console.error(error);
+        }
+      })
+      : this.service.createQuestionSupport(
+        this.data.publicNotice.id,
+        this.questionSupport
+      ).subscribe({
+        next: () => {
+          // criação concluída
+        },
+        error: error => {
+          console.error(error);
+        }
+      });
+
     this.dialogRef.close(this.questionSupport);
   }
 

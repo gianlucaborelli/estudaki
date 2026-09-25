@@ -36,7 +36,7 @@
               matSortDirection="asc"
             >
               <!-- Número -->
-              <ng-container matColumnDef="questionNumber">
+              <ng-container matColumnDef="QuestionNumber">
                 <th mat-header-cell *matHeaderCellDef mat-sort-header>Nr</th>
 
                 <td mat-cell *matCellDef="let question">
@@ -45,7 +45,7 @@
               </ng-container>
 
               <!-- Tipo -->
-              <ng-container matColumnDef="questionType">
+              <ng-container matColumnDef="QuestionType">
                 <th mat-header-cell *matHeaderCellDef mat-sort-header>Tipo</th>
 
                 <td mat-cell *matCellDef="let question">
@@ -54,7 +54,7 @@
               </ng-container>
 
               <!-- Quantidade de alternativas -->
-              <ng-container matColumnDef="choicesCount">
+              <ng-container matColumnDef="ChoicesCount">
                 <th mat-header-cell *matHeaderCellDef>Qt. Alt</th>
 
                 <td mat-cell *matCellDef="let question">
@@ -63,7 +63,7 @@
               </ng-container>
 
               <!-- Quantidade de alternativas corretas -->
-              <ng-container matColumnDef="correctChoicesCount">
+              <ng-container matColumnDef="CorrectChoicesCount">
                 <th mat-header-cell *matHeaderCellDef>C. Alt</th>
 
                 <td mat-cell *matCellDef="let question">
@@ -119,7 +119,7 @@
                   <span>Adicionar questão existente</span>
                 </button>
 
-                <button mat-menu-item (click)="addNewQuestionEditorModalAsync()">
+                <button mat-menu-item (click)="openQuestionEditorModal(null)">
                   <mat-icon>add_circle</mat-icon>
                   <span>Criar nova questão</span>
                 </button>
@@ -211,7 +211,7 @@
               <button
                 mat-icon-button
                 matTooltip="Adicionar Suporte"
-                (click)="openQuestionSupportEditorModal(true)"
+                (click)="openQuestionSupportEditorModal()"
               >
                 <mat-icon>add</mat-icon>
               </button>

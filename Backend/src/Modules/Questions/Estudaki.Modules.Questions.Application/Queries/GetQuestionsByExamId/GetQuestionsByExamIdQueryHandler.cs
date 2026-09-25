@@ -1,9 +1,7 @@
 ﻿using Estudaki.Commons.Core.CQRS;
-using Estudaki.Commons.Core.Storage;
 using Estudaki.Modules.Questions.Application.DTOs;
 using Estudaki.Modules.Questions.Application.Mappers;
 using Estudaki.Modules.Questions.Domain.Common;
-using Estudaki.Modules.Questions.Domain.Entities;
 using Estudaki.Modules.Questions.Domain.Repositories;
 
 namespace Estudaki.Modules.Questions.Application.Queries.GetQuestionsByExamId;

@@ -31,7 +31,7 @@ public class SearchQuestionsPaginatedQueryHandler : IQueryHandler<SearchQuestion
             return new PagedResult<QuestionDto>
             {
                 Items = [],
-                PageNumber = query.SearchParameters.PageIndex,
+                PageNumber = query.SearchParameters.Page,
                 PageSize = query.SearchParameters.PageSize,
                 TotalItems = 0
             };
@@ -79,7 +79,7 @@ public class SearchQuestionsPaginatedQueryHandler : IQueryHandler<SearchQuestion
         return new PagedResult<QuestionDto>
         {
             Items = dtos!,
-            PageNumber = query.SearchParameters.PageIndex,
+            PageNumber = query.SearchParameters.Page,
             PageSize = query.SearchParameters.PageSize,
             TotalItems = totalItems
         };

@@ -6,12 +6,14 @@ import { MatPaginator } from '@angular/material/paginator';
 import { MatSort } from '@angular/material/sort';
 import { MatTableDataSource } from '@angular/material/table';
 import { RouterLink } from '@angular/router';
+import { ExamCategoryPipe } from '../../../../shared/pipes/exam-category.pipe';
 
 @Component({
   imports: [
     ...MATERIAL_MODULES,
-    RouterLink
-  ],
+    RouterLink,
+    ExamCategoryPipe
+],
   selector: 'app-exam-list',
   styleUrl: './exam-list.css',
   templateUrl: './exam-list.html',

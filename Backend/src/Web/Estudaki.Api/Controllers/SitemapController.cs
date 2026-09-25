@@ -46,14 +46,13 @@ namespace EstudaKi.Controllers
             {
                 _logger.LogInformation("Buscando questões para o sitemap...");
 
-                var searchParameters = new SearchParameters
+                var searchParameters = new FilterParameters
                 {
-                    IsPublished = true,
-                    PageIndex = 1,
+                    Page = 1,
                     PageSize = 10000
                 };
 
-                _logger.LogInformation($"Parâmetros de busca - IsPublished: {searchParameters.IsPublished}, PageSize: {searchParameters.PageSize}");
+                _logger.LogInformation($"Parâmetros de busca - PageSize: {searchParameters.PageSize}");
 
                 var result = await _queryDispatcher
                                     .DispatchAsync<SearchQuestionsPaginatedQuery, PagedResult<QuestionDto>>(new SearchQuestionsPaginatedQuery(searchParameters));
@@ -61,7 +60,7 @@ namespace EstudaKi.Controllers
 
                 if (result.Items.Count == 0)
                 {
-                    _logger.LogWarning("⚠️ Nenhuma questão retornada pela busca! Verifique se IsPublished está funcionando.");
+                    _logger.LogWarning("⚠️ Nenhuma questão retornada pela busca!");
                 }
 
                 int addedCount = 0;

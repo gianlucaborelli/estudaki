@@ -104,6 +104,7 @@ public static class QuestionMapper
             QuestionType = question.Type,
             MainArea = question.MainArea,
             SubAreas = question.SubAreas,
+            Statement = question.Statement,
             QuestionContents = question.QuestionContents,
             QuestionSupports = questionSupports?
                     .Where(qs => question.QuestionSupports?.Contains(qs.Id) == true)
