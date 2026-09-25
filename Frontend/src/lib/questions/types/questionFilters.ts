@@ -3,7 +3,7 @@ export interface QuestionFilters {
     wordKey?: string;
     year?: number[];
     contractingOrganization?: string[];
-    examinerOrganization?: [];
+    examinerOrganization?: string[];
     typeQuestions?: string[];
     examCategories?: string[];
     mainAreas?: string[];

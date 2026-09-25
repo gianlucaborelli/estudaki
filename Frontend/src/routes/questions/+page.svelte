@@ -2,6 +2,7 @@
 	import type { PageData } from './$types';
 	import { goto } from '$app/navigation';
 	import { resolve } from '$app/paths';
+	import { page } from '$app/state';
 	import { SvelteURLSearchParams } from 'svelte/reactivity';
 	import { QuestionType } from '$lib/questions/types/question-types';
 	import { ExamCategory } from '$lib/questions/types/exam-category';
@@ -15,7 +16,7 @@
 	function handlePageChange(page: number) {
 		const params = new SvelteURLSearchParams(window.location.search);
 
-		params.set('pageIndex', page.toString());
+		params.set('page', page.toString());
 
 		goto(resolve(`/questions?${params.toString()}`));
 	}
@@ -23,14 +24,28 @@
 	function handlePageSizeChange(pageSize: number) {
 		const params = new SvelteURLSearchParams(window.location.search);
 
-		params.set('pageIndex', '1');
+		params.set('page', '1');
 		params.set('pageSize', pageSize.toString());
 
 		goto(resolve(`/questions?${params.toString()}`));
 	}
 
 	function handleSearch() {
-		handlePageChange(1);
+		const params = new SvelteURLSearchParams();
+
+		params.set('page', '1');
+		params.set('pageSize', data.pageSize.toString());
+
+		for (const value of selectedQuestionTypes) params.append('typeQuestions', value);
+		for (const value of selectedYears) params.append('year', value.toString());
+		for (const value of selectedExamCategories) params.append('examCategories', value);
+		for (const value of selectedExaminerOrganizations) params.append('examinerOrganization', value);
+		for (const value of selectedContractingOrganizations)
+			params.append('contractingOrganization', value);
+		for (const value of selectedAreas) params.append('mainAreas', value);
+		for (const value of selectedSubAreas) params.append('subAreas', value);
+
+		goto(resolve(`/questions?${params.toString()}`));
 	}
 
 	const questionTypes = Object.values(QuestionType).map((type) => ({
@@ -79,13 +94,19 @@
 		}))
 	);
 
-	let selectedQuestionTypes = $state<string[]>([]);
-	let selectedYears = $state<number[]>([]);
-	let selectedExamCategories = $state<string[]>([]);
-	let selectedExaminerOrganizations = $state<string[]>([]);
-	let selectedContractingOrganizations = $state<string[]>([]);
-	let selectedAreas = $state<string[]>([]);
-	let selectedSubAreas = $state<string[]>([]);
+	let selectedQuestionTypes = $state<string[]>(page.url.searchParams.getAll('typeQuestions'));
+	let selectedYears = $state<number[]>(
+		page.url.searchParams.getAll('year').map(Number).filter(Number.isInteger)
+	);
+	let selectedExamCategories = $state<string[]>(page.url.searchParams.getAll('examCategories'));
+	let selectedExaminerOrganizations = $state<string[]>(
+		page.url.searchParams.getAll('examinerOrganization')
+	);
+	let selectedContractingOrganizations = $state<string[]>(
+		page.url.searchParams.getAll('contractingOrganization')
+	);
+	let selectedAreas = $state<string[]>(page.url.searchParams.getAll('mainAreas'));
+	let selectedSubAreas = $state<string[]>(page.url.searchParams.getAll('subAreas'));
 </script>
 
 <svelte:head>

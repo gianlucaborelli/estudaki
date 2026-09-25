@@ -37,6 +37,11 @@ public static class IdentityExtensions
             .AddSignInManager()
             .AddDefaultTokenProviders();
 
+        services.Configure<SecurityStampValidatorOptions>(options =>
+        {
+            options.ValidationInterval = TimeSpan.FromMinutes(30);
+        });
+
         services.AddHostedService<IdentitySeedHostedService>();
 
         services.AddScoped<IAuthenticationService, AuthenticationService>();

@@ -15,7 +15,7 @@ function buildQuestionsQuery(filters: QuestionFilters): string {
     }
 
     if (filters.pageIndex !== undefined) {
-        params.set('pageIndex', String(filters.pageIndex));
+        params.set('page', String(filters.pageIndex));
     }
 
     if (filters.pageSize !== undefined) {
@@ -31,11 +31,11 @@ function buildQuestionsQuery(filters: QuestionFilters): string {
     }
 
     for (const value of filters.contractingOrganization ?? []) {
-        params.append('examCategories', value);
+        params.append('contractingOrganization', value);
     }
 
     for (const value of filters.examinerOrganization ?? []) {
-        params.append('examCategories', value);
+        params.append('examinerOrganization', value);
     }
 
     for (const value of filters.year ?? []) {

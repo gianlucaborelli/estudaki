@@ -193,7 +193,7 @@ public class QuestionRepository : BaseRepository<Question>, IQuestionRepository
 
         // Buscar questões paginadas
         var questions = await DbSet.Find(finalFilter)
-            .Skip((searchParameter.Page) * searchParameter.PageSize)
+            .Skip((searchParameter.Page - 1) * searchParameter.PageSize)
             .Limit(searchParameter.PageSize)
             .ToListAsync();
 

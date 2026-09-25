@@ -1,9 +1,7 @@
-﻿using System.Runtime.InteropServices;
-using System.Security.Claims;
+﻿using System.Security.Claims;
 using Estudaki.Commons.Core.CQRS;
 using Estudaki.Modules.Identity.Application.Commands.Login;
 using Estudaki.Modules.Identity.Application.Commands.Register;
-using FluentValidation.Results;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -35,8 +33,8 @@ public class IdentityController(ICommandDispatcher commandDispatcher, IQueryDisp
         });
     }
 
-
     [HttpPost("Register")]
+    [Authorize]
     public async Task<IActionResult> Register([FromBody] RegisterUserCommand command)
     {
         var result = await CommandDispatcher.DispatchAsync<RegisterUserCommand, CommandResult>(command);

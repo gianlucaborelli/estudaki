@@ -16,7 +16,7 @@ function parseBoolean(value: string | null): boolean | undefined {
 }
 
 export const load: PageServerLoad = async ({ url, fetch }) => {
-    let pageIndex = Number(url.searchParams.get('pageIndex'));
+    let pageIndex = Number(url.searchParams.get('page'));
     let pageSize = Number(url.searchParams.get('pageSize'));
 
     if (!Number.isInteger(pageIndex) || pageIndex < 1) {
@@ -29,12 +29,12 @@ export const load: PageServerLoad = async ({ url, fetch }) => {
 
     // Se não estiverem na URL, normaliza a URL
     if (
-        url.searchParams.get('pageIndex') !== pageIndex.toString() ||
+        url.searchParams.get('page') !== pageIndex.toString() ||
         url.searchParams.get('pageSize') !== pageSize.toString()
     ) {
         const params = new URLSearchParams(url.searchParams);
 
-        params.set('pageIndex', pageIndex.toString());
+        params.set('page', pageIndex.toString());
         params.set('pageSize', pageSize.toString());
 
         throw redirect(307, `${url.pathname}?${params.toString()}`);
@@ -45,6 +45,9 @@ export const load: PageServerLoad = async ({ url, fetch }) => {
         wordKey: url.searchParams.get('wordKey') ?? undefined,
         typeQuestions: url.searchParams.getAll('typeQuestions'),
         examCategories: url.searchParams.getAll('examCategories'),
+        year: url.searchParams.getAll('year').map(Number).filter(Number.isInteger),
+        examinerOrganization: url.searchParams.getAll('examinerOrganization'),
+        contractingOrganization: url.searchParams.getAll('contractingOrganization'),
         mainAreas: url.searchParams.getAll('mainAreas'),
         subAreas: url.searchParams.getAll('subAreas'),
         pageIndex,
