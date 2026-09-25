@@ -1,7 +1,7 @@
 <script lang="ts">
 	import type { Question } from '$lib/questions/types/question';
 
-	import QuestionContentRender from './QuestionContentRender.svelte';
+	import ContentRender from './ContentRender.svelte';
 
 	import QuestionHeader from './QuestionHeader.svelte';
 
@@ -29,12 +29,12 @@
 		{#if question.questionSupports.length > 0}
 			<div class="question-support">
 				{#each question.questionSupports as support (support.id)}
-					<QuestionContentRender content={support.contents} />
+					<ContentRender content={support.content} />
 				{/each}
 			</div>
 		{/if}
 		<div class="statement">
-			<QuestionContentRender content={question.questionContents} />
+			<ContentRender content={question.statement} />
 		</div>
 	</div>
 
@@ -48,7 +48,7 @@
 			>
 				<input type="checkbox" value={choice.option} bind:group={selectedChoices} />
 				<span class="choice-option" aria-hidden="true">{choice.option}</span>
-				<QuestionContentRender content={choice.contentBlocks} />
+				<ContentRender content={choice.explanation} />
 			</label>
 		{/each}
 	</fieldset>
@@ -68,14 +68,12 @@
 	.question-support {
 		margin-bottom: 1.25rem;
 		padding: 0 3rem;
-		color: var(--text);
 		font-size: 0.9375rem;
 	}
 
 	.statement {
-		color: var(--text);
 		font-size: 1rem;
-		line-height: 1.7;
+		line-height: 1.3;
 	}
 
 	.choices {
@@ -98,7 +96,7 @@
 		cursor: pointer;
 		line-height: 1.55;
 		line-height: 1.7;
-		font-size: 0.85rem;
+		font-size: 0.9rem;
 		transition:
 			border-color 0.18s ease,
 			background-color 0.18s ease;

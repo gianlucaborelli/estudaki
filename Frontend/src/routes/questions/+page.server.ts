@@ -1,5 +1,6 @@
 import { redirect } from '@sveltejs/kit';
-import { getQuestions } from '$lib/questions/service/question.service';
+import { getFilterParameters, getQuestions } from '$lib/questions/service/question.service';
+import { sanitizeQuestionContent } from '$lib/server/sanitize-question-content';
 import type { QuestionFilters } from '$lib/questions/types/questionFilters';
 import type { PageServerLoad } from './$types';
 
@@ -52,10 +53,25 @@ export const load: PageServerLoad = async ({ url, fetch }) => {
 
     // Busca no backend
     const data = await getQuestions(fetch, filters);
+    const filterParameters = await getFilterParameters(fetch);
+    const sanitizedItems = data.items.map((question) => ({
+        ...question,
+        statement: sanitizeQuestionContent(question.statement),
+        questionSupports: question.questionSupports.map((support) => ({
+            ...support,
+            content: sanitizeQuestionContent(support.content)
+        })),
+        choices: question.choices.map((choice) => ({
+            ...choice,
+            explanation: sanitizeQuestionContent(choice.explanation)
+        }))
+    }));
 
     return {
         ...data,
+        items: sanitizedItems,
         pageNumber: pageIndex,
-        pageSize
+        pageSize,
+        filterParameters
     };
 };

@@ -30,6 +30,18 @@ function buildQuestionsQuery(filters: QuestionFilters): string {
         params.append('examCategories', value);
     }
 
+    for (const value of filters.contractingOrganization ?? []) {
+        params.append('examCategories', value);
+    }
+
+    for (const value of filters.examinerOrganization ?? []) {
+        params.append('examCategories', value);
+    }
+
+    for (const value of filters.year ?? []) {
+        params.append('year', value.toString());
+    }
+
     for (const value of filters.mainAreas ?? []) {
         params.append('mainAreas', value);
     }
@@ -48,6 +60,23 @@ export async function getQuestions(
     try {
         const query = buildQuestionsQuery(filters);
         const response = await fetch(`${API_URL}/api/questions?${query}`);
+
+        if (!response.ok) {
+            throw new Error(`Erro ao buscar questões: ${response.status}`);
+        }
+
+        return await response.json();
+    } catch (error) {
+        console.error('Erro ao buscar questões:', error);
+        throw error;
+    }
+}
+
+export async function getFilterParameters(
+    fetch: typeof globalThis.fetch
+): Promise<QuestionFilters> {
+    try {
+        const response = await fetch(`${API_URL}/api/questions/parameters`);
 
         if (!response.ok) {
             throw new Error(`Erro ao buscar questões: ${response.status}`);

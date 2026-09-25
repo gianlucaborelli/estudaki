@@ -22,7 +22,7 @@ export interface Question {
     questionType: QuestionType;
     mainArea: string;
     subAreas: string[];
-    questionContents: BlockContent[];
+    statement: string;
     questionSupports: QuestionSupport[];
     choices: QuestionChoice[];
     createdAt: string;
@@ -30,30 +30,11 @@ export interface Question {
 
 export interface QuestionChoice {
     option: string;
-    contentBlocks: BlockContent[];
+    explanation: string;
     isCorrect: boolean;
 }
 
 export interface QuestionSupport {
     id: string;
-    contents: BlockContent[];
-}
-
-export type BlockContent = ParagraphBlock | ImageBlock;
-
-export interface ParagraphBlock {
-    order: number;
-    type: 'paragraph';
-    text: string;
-    title: string,
-    source: string,
-}
-
-export interface ImageBlock {
-    order: number;
-    type: 'image';
-    key: string;
-    title: string;
-    source: string;
-    description: string;
+    content: string;
 }

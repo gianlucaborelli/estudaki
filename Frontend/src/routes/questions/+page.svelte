@@ -37,21 +37,47 @@
 		value: type,
 		name: getQuestionTypeLabel(type)
 	}));
-	const years = [2022, 2023, 2024].map((year) => ({ value: year, name: year.toString() }));
-	const examCategories = Object.values(ExamCategory).map((category) => ({
-		value: category,
-		name: getExamCategoryLabel(category)
-	}));
-	const examinerOrganizations = ['Teste1', 'Teste2', 'Teste3'].map((name) => ({
-		value: name,
-		name
-	}));
-	const contractingOrganizations = ['Teste1', 'Teste2', 'Teste3'].map((name) => ({
-		value: name,
-		name
-	}));
-	const areas = ['Teste1', 'Teste2', 'Teste3'].map((name) => ({ value: name, name }));
-	const subAreas = ['Teste1', 'Teste2', 'Teste3'].map((name) => ({ value: name, name }));
+	const years = $derived(
+		data.filterParameters.year!.map((year) => ({
+			value: year,
+			name: year.toString()
+		}))
+	);
+
+	const examCategories = $derived(
+		Object.values(ExamCategory).map((category) => ({
+			value: category,
+			name: getExamCategoryLabel(category)
+		}))
+	);
+
+	const examinerOrganizations = $derived(
+		data.filterParameters.examinerOrganization!.map((name) => ({
+			value: name,
+			name
+		}))
+	);
+
+	const contractingOrganizations = $derived(
+		data.filterParameters.contractingOrganization!.map((name) => ({
+			value: name,
+			name
+		}))
+	);
+
+	const areas = $derived(
+		data.filterParameters.mainAreas!.map((name) => ({
+			value: name,
+			name
+		}))
+	);
+
+	const subAreas = $derived(
+		data.filterParameters.subAreas!.map((name) => ({
+			value: name,
+			name
+		}))
+	);
 
 	let selectedQuestionTypes = $state<string[]>([]);
 	let selectedYears = $state<number[]>([]);
