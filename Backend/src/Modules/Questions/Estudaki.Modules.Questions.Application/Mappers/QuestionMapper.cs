@@ -114,4 +114,13 @@ public static class QuestionMapper
             CreatedAt = question.CreatedAt
         };
     }
+
+    public static QuestionSitemapDto ToSitemapDto(this Question question)
+    {
+        return new QuestionSitemapDto
+        {
+            QuestionId = question.Id,
+            CreatedAt = question.CreatedAt
+        };
+    }
 }

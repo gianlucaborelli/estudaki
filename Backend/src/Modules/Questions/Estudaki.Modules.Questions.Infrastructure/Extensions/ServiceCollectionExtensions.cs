@@ -19,6 +19,7 @@ using FluentValidation;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Estudaki.Modules.Questions.Application.Queries.GetAllQuestions;
 
 namespace Estudaki.Modules.Questions.Infrastructure.Extensions;
 
@@ -53,6 +54,8 @@ public static class ServiceCollectionExtensions
         services.AddCQRSHandlers(typeof(GetQuestionSupportsByPublicNoticeIdQueryHandler).Assembly);
         services.AddCQRSHandlers(typeof(GetImageListByPublicNoticeIdQueryHandler).Assembly);
         services.AddCQRSHandlers(typeof(GetQuestionsByPublicNoticeIdQueryHandler).Assembly);
+        services.AddCQRSHandlers(typeof(GetAreasPaginatedQueryHandler).Assembly);
+        services.AddCQRSHandlers(typeof(GetAllQuestionsQueryHandler).Assembly);
 
         services.AddCQRSHandlers(typeof(CreateQuestionCommandHandler).Assembly);
         services.AddCQRSHandlers(typeof(AddExistingQuestionIntoExamCommandHandler).Assembly);
@@ -70,7 +73,6 @@ public static class ServiceCollectionExtensions
         services.AddCQRSHandlers(typeof(DeleteQuestionSupportCommandHandler).Assembly);
         services.AddCQRSHandlers(typeof(CreateAreaCommandHandler).Assembly);
         services.AddCQRSHandlers(typeof(UpdateAreaCommandHandler).Assembly);
-        services.AddCQRSHandlers(typeof(GetAreasPaginatedQueryHandler).Assembly);
 
         return services;
     }

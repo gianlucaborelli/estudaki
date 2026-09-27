@@ -1,6 +1,7 @@
 using Estudaki.Commons.Core.CQRS;
 using Estudaki.Modules.Questions.Application.DTOs;
 using Estudaki.Modules.Questions.Application.Queries.GetFilterParameters;
+using Estudaki.Modules.Questions.Application.Queries.GetQuestionById;
 using Estudaki.Modules.Questions.Application.Queries.SearchQuestions;
 using Estudaki.Modules.Questions.Application.Services;
 using Estudaki.Modules.Questions.Domain.Common;
@@ -36,6 +37,15 @@ public class QuestionsController (ICommandDispatcher commandDispatcher, IQueryDi
         var queryRequest = new GetFilterParametersQuery(query);
         var result = await QueryDispatcher.DispatchAsync<GetFilterParametersQuery, FilterParameters>(queryRequest);
         return Ok(result);
+    }
+
+    [HttpGet("{id}")]
+    public async Task<IActionResult> GetQuestionById(string id)
+    {
+        var queryRequest = new GetQuestionByIdQuery(id);
+        var result = await QueryDispatcher.DispatchAsync<GetQuestionByIdQuery, QuestionDto?>(queryRequest);
+
+        return result is null ? NotFound() : Ok(result);
     }
 
     [HttpPost]

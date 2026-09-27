@@ -88,3 +88,20 @@ export async function getFilterParameters(
         throw error;
     }
 }
+
+export async function getQuestionById(
+    fetch: typeof globalThis.fetch,
+    id: string
+): Promise<Question | undefined> {
+    const response = await fetch(`${API_URL}/api/questions/${id}`);
+
+    if (response.status === 404) {
+        return undefined;
+    }
+
+    if (!response.ok) {
+        throw new Error(`Erro ao buscar questão: ${response.status}`);
+    }
+
+    return await response.json();
+}

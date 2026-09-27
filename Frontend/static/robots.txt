@@ -3,4 +3,4 @@ Allow: /
 Allow: /questions/
 Disallow: /admin
 
-Sitemap: https://estudaki.com.br/sitemap
+Sitemap: https://estudaki.com.br/sitemap.xml

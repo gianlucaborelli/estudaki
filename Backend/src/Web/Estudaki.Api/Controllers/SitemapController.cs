@@ -1,7 +1,6 @@
 using Estudaki.Commons.Core.CQRS;
 using Estudaki.Modules.Questions.Application.DTOs;
-using Estudaki.Modules.Questions.Application.Queries.SearchQuestions;
-using Estudaki.Modules.Questions.Domain.Common;
+using Estudaki.Modules.Questions.Application.Queries.GetAllQuestions;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Text;
@@ -36,37 +35,27 @@ namespace EstudaKi.Controllers
 
             // Página principal
             AddUrl(sitemap, "https://estudaki.com.br/", DateTime.UtcNow, "weekly", "1.0");
-            _logger.LogInformation("Adicionada página principal ao sitemap");
 
             // Página de resultados
-            AddUrl(sitemap, "https://estudaki.com.br/result", DateTime.UtcNow, "daily", "0.8");
-            _logger.LogInformation("Adicionada página de resultados ao sitemap");
+            AddUrl(sitemap, "https://estudaki.com.br/questions", DateTime.UtcNow, "daily", "0.8");
 
             try
             {
                 _logger.LogInformation("Buscando questões para o sitemap...");
 
-                var searchParameters = new FilterParameters
-                {
-                    Page = 1,
-                    PageSize = 10000
-                };
-
-                _logger.LogInformation($"Parâmetros de busca - PageSize: {searchParameters.PageSize}");
-
                 var result = await _queryDispatcher
-                                    .DispatchAsync<SearchQuestionsPaginatedQuery, PagedResult<QuestionDto>>(new SearchQuestionsPaginatedQuery(searchParameters));
-                _logger.LogInformation($"Resultado da busca - TotalItems: {result.TotalItems}, Items.Count: {result.Items.Count}");
+                                    .DispatchAsync<GetAllQuestionsQuery, List<QuestionSitemapDto>>(new GetAllQuestionsQuery());
+                _logger.LogInformation($"Resultado da busca - TotalItems: {result.Count}");
 
-                if (result.Items.Count == 0)
+                if (result.Count == 0)
                 {
                     _logger.LogWarning("⚠️ Nenhuma questão retornada pela busca!");
                 }
 
                 int addedCount = 0;
-                foreach (var questionDto in result.Items)
+                foreach (var questionDto in result)
                 {
-                    var questionUrl = $"https://estudaki.com.br/question/{questionDto.QuestionId}";
+                    var questionUrl = $"https://estudaki.com.br/questions/{questionDto.QuestionId}";
                     AddUrl(sitemap, questionUrl, questionDto.CreatedAt, "monthly", "0.7");
                     addedCount++;
                 }

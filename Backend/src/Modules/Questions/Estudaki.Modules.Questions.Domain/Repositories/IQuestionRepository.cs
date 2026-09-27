@@ -12,4 +12,5 @@ public interface IQuestionRepository : IRepository<Question>
     Task<(List<Question> Questions, long TotalCount)> GetByExamIdPaged(string examId, int page, int pageSize, string? sortLabel, string? sortDirection);
     Task<List<Question>> GetManyById(List<string> questionIds);
     Task<List<Question>> GetByPublicNoticeId(string publicNoticeId);
+    Task<List<(string QuestionId, DateTime CreatedAt)>> GetPublishedQuestionsForSitemapAsync();
 }

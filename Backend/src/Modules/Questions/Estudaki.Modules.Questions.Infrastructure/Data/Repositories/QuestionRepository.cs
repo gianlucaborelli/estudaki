@@ -264,4 +264,31 @@ public class QuestionRepository : BaseRepository<Question>, IQuestionRepository
 
         return questions;
     }
+
+    public async Task<List<(string QuestionId, DateTime CreatedAt)>> GetPublishedQuestionsForSitemapAsync()
+    {
+        var filterBuilder = Builders<Question>.Filter;
+        var filter = filterBuilder.Eq(q => q.IsPublished, true);
+
+        var projectionBuilder = Builders<Question>.Projection;
+        var projection = projectionBuilder
+            .Include(q => q.Id)
+            .Include(q => q.CreatedAt);
+
+        var result = await DbSet
+            .Find(filter)
+            .Project<BsonDocument>(projection)
+            .ToListAsync();
+
+        var sitemapdatas = result
+            .Select(doc => (
+                QuestionId: doc["_id"].AsObjectId.ToString(),
+                CreatedAt: doc["CreatedAt"].ToUniversalTime()
+            ))
+            .ToList();
+
+        return sitemapdatas;
+    }
 }
+
+
