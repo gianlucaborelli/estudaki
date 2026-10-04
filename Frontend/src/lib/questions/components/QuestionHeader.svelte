@@ -1,19 +1,23 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
-	import { Button, Dropdown, DropdownItem } from 'flowbite-svelte';
+	import { fly } from 'svelte/transition';
+	import { Button, Dropdown, DropdownItem, Toast, ToastContainer } from 'flowbite-svelte';
 	import { ClipboardCheckOutline, DownloadOutline, FlagOutline } from 'flowbite-svelte-icons';
 	import type { Question } from '$lib/questions/types/question';
 	import { getExamCategoryLabel } from '../types/labels';
+	import QuestionIssueModal from './QuestionIssueModal.svelte';
 
 	type Props = {
 		question: Question;
 	};
+	let showCopyToast = $state(false);
 
 	let { question }: Props = $props();
 	let subareasValue = $state<HTMLSpanElement>();
 	let canExpandSubareas = $state(false);
 	let subareasExpanded = $state(false);
 	let downloadDropdownOpen = $state(false);
+	let issueModalOpen = $state(false);
 	const downloadTriggerId = $derived(`download-question-trigger-${question.questionId}`);
 
 	function downloadFile(url: string) {
@@ -27,6 +31,45 @@
 
 	function downloadAnswerKey() {
 		downloadFile(question.answerKeyUrl);
+	}
+
+	function htmlToPlainText(html: string): string {
+		const document = new DOMParser().parseFromString(html, 'text/html');
+
+		return document.body.textContent?.trim() ?? '';
+	}
+
+	function buildQuestionText(question: Question): string {
+		const header = `(${question.examinerOrganization} - ${question.contractingOrganization} - ${question.year})`;
+
+		const statement = htmlToPlainText(question.statement);
+
+		const choices = question.choices
+			.map((choice, index) => {
+				const letter = String.fromCharCode(65 + index);
+				const text = htmlToPlainText(choice.explanation);
+
+				return `${letter}) ${text}`;
+			})
+			.join('\n');
+
+		return [header, statement, choices].filter(Boolean).join('\n\n');
+	}
+
+	async function copyQuestion() {
+		const text = buildQuestionText(question);
+
+		try {
+			await navigator.clipboard.writeText(text);
+
+			showCopyToast = true;
+
+			setTimeout(() => {
+				showCopyToast = false;
+			}, 2500);
+		} catch (error) {
+			console.error('Não foi possível copiar a questão:', error);
+		}
 	}
 
 	function updateSubareasOverflow() {
@@ -110,10 +153,20 @@
 	{/if}
 
 	<div class="header-actions">
-		<Button class="copy-question" aria-label="Copiar questão" title="Copiar questão">
+		<Button
+			class="copy-question"
+			aria-label="Copiar questão"
+			title="Copiar questão"
+			onclick={copyQuestion}
+		>
 			<ClipboardCheckOutline class="h-6 w-6 shrink-0" />
 		</Button>
-		<Button class="signalize-question" aria-label="Sinalizar questão" title="Sinalizar questão">
+		<Button
+			class="signalize-question"
+			aria-label="Sinalizar questão"
+			title="Sinalizar questão"
+			onclick={() => (issueModalOpen = true)}
+		>
 			<FlagOutline class="h-6 w-6 shrink-0" />
 		</Button>
 		<Button
@@ -139,6 +192,19 @@
 		</Dropdown>
 	</div>
 </header>
+
+{#if showCopyToast}
+	<ToastContainer position="top-right" >
+		<Toast dismissable={true} transition={fly} params={{ x: 200 }}>
+			{#snippet icon()}
+				<ClipboardCheckOutline class="h-6 w-6" />
+			{/snippet}
+			Questão copiada para a área de transferência.
+		</Toast>
+	</ToastContainer>
+{/if}
+
+<QuestionIssueModal questionId={question.questionId} bind:open={issueModalOpen} />
 
 <style>
 	.question-header {

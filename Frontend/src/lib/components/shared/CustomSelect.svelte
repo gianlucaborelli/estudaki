@@ -6,10 +6,27 @@
 		value?: T[];
 		label?: string;
 		placeholder?: string;
+		multiple?: boolean;
+		name?: string;
+		required?: boolean;
 	};
 
-	let { items, value = $bindable<T[]>([]), label, placeholder = 'Selecione...' }: Props = $props();
+	let {
+		items,
+		value = $bindable<T[]>([]),
+		label,
+		placeholder = 'Selecione...',
+		multiple = true,
+		name,
+		required = false
+	}: Props = $props();
 	const selectId = $props.id();
+
+	$effect(() => {
+		if (!multiple && value.length > 1) {
+			value = [value[value.length - 1]];
+		}
+	});
 </script>
 
 <div class="select-container">
@@ -22,17 +39,23 @@
 			{items}
 			bind:value
 			{placeholder}
+			{name}
+			{required}
 			class="select mt-1"
 			classes={{ dropdown: 'select-dropdown' }}
 		>
 			{#snippet children({ item })}
-				{#if value.length > 0 && item.value === value[0]}
-					<div class="flex items-center gap-1">
-						<span class="selected-count">
-							{value.length}
-							{value.length === 1 ? ' selecionado' : ' selecionados'}
-						</span>
-					</div>
+				{#if multiple}
+					{#if value.length > 0 && item.value === value[0]}
+						<div class="flex items-center gap-1">
+							<span class="selected-count">
+								{value.length}
+								{value.length === 1 ? ' selecionado' : ' selecionados'}
+							</span>
+						</div>
+					{/if}
+				{:else}
+					<span class="selected-single">{item.name}</span>
 				{/if}
 			{/snippet}
 		</MultiSelect>
@@ -92,7 +115,8 @@
 
 	:global(.select-dropdown) {
 		margin-top: 0.35rem;
-		overflow: hidden;
+		overflow-x: hidden;
+		overflow-y: auto;
 		border: 1px solid var(--border);
 		border-radius: 0.5rem;
 		background-color: var(--surface-elevated);
@@ -126,5 +150,10 @@
 		font-weight: 700;
 		line-height: 1;
 		padding: 0.3rem 0.5rem;
+	}
+
+	.selected-single {
+		color: var(--text);
+		font-weight: 500;
 	}
 </style>

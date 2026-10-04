@@ -1,5 +1,5 @@
 <script lang="ts">
-    import { resolve } from '$app/paths';	
+	import { resolve } from '$app/paths';
 </script>
 
 <!-- FOOTER -->
@@ -10,37 +10,39 @@
 				<span class="logo-estud">Estud</span><span class="logo-aki">aki</span>
 			</div>
 
-			<p>
-				Estude. Pratique. Conquiste.
-			</p>
+			<p>Estude. Pratique. Conquiste.</p>
 		</div>
 
 		<div class="footer-links">
 			<div>
 				<span>Estude</span>
 				<a href={resolve('/questions')}>Questões</a>
-				<a href={resolve('/questions')}>Vestibulares</a>
-				<a href={resolve('/questions')}>Concursos</a>
-				<a href={resolve('/questions')}>OAB</a>
+				<a href={resolve('/questions?page=1&pageSize=10&examCategories=UniversityEntranceExam')}
+					>Vestibulares</a
+				>
+				<a href={resolve('/questions?page=1&pageSize=10&examCategories=PublicServiceExam')}
+					>Concursos</a
+				>
+				<a href={resolve('/questions?page=1&pageSize=10&examCategories=BarExam')}>OAB</a>
 			</div>
 
 			<div>
 				<span>EstudaKi</span>
-				<a href={resolve('/about')}>Sobre</a>
+				<!-- <a href={resolve('/about')}>Sobre</a> -->
 				<a href={resolve('/contact')}>Contato</a>
 			</div>
 		</div>
 	</div>
 
 	<div class="footer-bottom">
-		<span>© {new Date().getFullYear()} EstudaKi. Todos os direitos reservados.</span>
+		<span>© {new Date().getFullYear()} Estudaki. Todos os direitos reservados.</span>
 	</div>
 </footer>
 
 <style>
 	:global(body) {
-		overflow-x: hidden;        
-	}	
+		overflow-x: hidden;
+	}
 
 	.footer {
 		background: var(--surface-elevated);
@@ -112,7 +114,7 @@
 		border-top: 1px solid var(--border);
 		color: var(--text-muted);
 		font-size: 0.75rem;
-	}	
+	}
 
 	@media (max-width: 640px) {
 		.footer-content {

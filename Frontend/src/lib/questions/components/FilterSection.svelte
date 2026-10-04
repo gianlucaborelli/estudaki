@@ -296,7 +296,7 @@
 		border: 1px solid var(--secondary);
 		border-radius: 0.5rem;
 		background-color: var(--secondary);
-		color: var(--surface-elevated);
+		color: var(--text);
 		cursor: pointer;
 		font-size: 0.875rem;
 		font-weight: 700;
@@ -348,6 +348,7 @@
 
 		.search-button {
 			width: 100%;
+			color: var(--text);
 		}
 	}
 </style>

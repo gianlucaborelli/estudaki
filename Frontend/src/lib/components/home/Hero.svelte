@@ -1,11 +1,11 @@
 <script lang="ts">
-    import { resolve } from '$app/paths';	
+	import { resolve } from '$app/paths';
+	import { ArrowRightOutline } from 'flowbite-svelte-icons';
 </script>
 
 <section class="hero">
 	<div class="hero-content">
-		<div >		
-
+		<div>
 			<h1>
 				Encontre.
 				<span>Resolva.</span>
@@ -13,76 +13,52 @@
 			</h1>
 
 			<p class="hero-description">
-				Um grande repositório de questões de vestibulares, concursos
-				públicos e OAB. Encontre provas, disciplinas e assuntos para
-				praticar exatamente o que você precisa.
+				Um grande repositório de questões de vestibulares, concursos públicos e OAB. Encontre
+				provas, disciplinas e assuntos para praticar exatamente o que você precisa.
 			</p>
 
-			<div class="search-box">
-
-				<div class="search-input">
-
-					<span>⌕</span>
-
-					<input
-						type="text"
-						placeholder="Busque por questão, assunto, prova ou instituição..."
-					/>
-
-				</div>
-
-				<button type="button" onclick={() => window.location.href = resolve('/questions')}>
-					Buscar
-				</button>
-
-			</div>
+			<a href={resolve('/questions')} class="hero-cta">
+				Explorar questões
+				<ArrowRightOutline />
+			</a>
 		</div>
 
 		<div class="hero-repository">
-            <div class="repository-window">
+			<div class="repository-window">
+				<div class="window-header">
+					<span>Repositório de questões</span>
+					<span class="result-count">1.248 questões</span>
+				</div>
 
-                <div class="window-header">
-                    <span>Repositório de questões</span>
-                    <span class="result-count">1.248 questões</span>
-                </div>
+				<div class="repository-content">
+					<div class="question-meta">
+						<span>FGV</span>
+						<span>2025</span>
+						<span>Direito Constitucional</span>
+					</div>
 
-                <div class="repository-content">
+					<h3>Direitos e garantias fundamentais previstos na Constituição Federal.</h3>
 
-                    <div class="question-meta">
-                        <span>FGV</span>
-                        <span>2025</span>
-                        <span>Direito Constitucional</span>
-                    </div>
+					<div class="question-lines">
+						<div></div>
+						<div></div>
+						<div></div>
+					</div>
+				</div>
 
-                    <h3>
-                        Direitos e garantias fundamentais previstos
-                        na Constituição Federal.
-                    </h3>
+				<div class="repository-footer">
+					<span>+ milhares de questões</span>
 
-                    <div class="question-lines">
-                        <div></div>
-                        <div></div>
-                        <div></div>
-                    </div>
-
-                </div>
-
-                <div class="repository-footer">
-                    <span>+ milhares de questões</span>
-
-                    <a href={resolve('/questions')} class="text-link">
-                        Explorar →
-                    </a>
-                </div>
-
-            </div>
-        </div>
+					<a href={resolve('/questions')} class="text-link"> Explorar → </a>
+				</div>
+			</div>
+		</div>
 	</div>
 </section>
 
 <style>
 	:global(body) {
-		overflow-x: hidden;     
+		overflow-x: hidden;
 	}
 
 	h1 {
@@ -94,7 +70,7 @@
 		font-weight: 800;
 	}
 
-    .hero {
+	.hero {
 		position: relative;
 		overflow: hidden;
 		min-height: 680px;
@@ -111,7 +87,7 @@
 				transparent 30%
 			),
 			var(--background);
-	}	
+	}
 
 	.hero-content {
 		position: relative;
@@ -127,10 +103,10 @@
 		align-items: center;
 		gap: 90px;
 	}
-	
-    h1 span {
-		display: flex;        
-        letter-spacing: normal;
+
+	h1 span {
+		display: flex;
+		letter-spacing: normal;
 		color: var(--tertiary);
 	}
 
@@ -146,82 +122,15 @@
 	}
 
 	/* =========================
-	   SEARCH
+	   CTA
 	========================= */
 
-	.search-box {
-		display: flex;
-		align-items: stretch;
-
-		max-width: 680px;
-
-		padding: 6px;
-
-		border: 1px solid var(--border);
-		border-radius: 16px;
-
-		background: var(--surface-elevated);
-
-		box-shadow:
-			0 15px 40px
-			color-mix(in srgb, var(--text) 7%, transparent);
-
-		transition:
-			border-color 0.2s ease,
-			box-shadow 0.2s ease;
-	}
-
-	.search-box:focus-within {
-		border-color: var(--primary);
-
-		box-shadow:
-			0 0 0 4px
-			color-mix(in srgb, var(--primary) 12%, transparent);
-	}
-
-	.search-input {
-		flex: 1;
-
-		display: flex;
+	.hero-cta {
+		display: inline-flex;
 		align-items: center;
-
-		min-width: 0;
-
-		padding: 0 16px;
-
 		gap: 10px;
-	}
 
-	.search-input > span {
-		flex-shrink: 0;
-
-		color: var(--text-muted);
-
-		font-size: 1.5rem;
-		line-height: 1;
-	}
-
-	.search-input input {
-		width: 100%;
-
-		border: none;
-		outline: none;
-
-		background: transparent;
-
-		color: var(--text);
-
-		font-family: inherit;
-		font-size: 0.9rem;
-	}
-
-	.search-input input::placeholder {
-		color: var(--text-muted);
-		opacity: 0.8;
-	}
-
-	.search-box button {
-		padding: 13px 23px;
+		padding: 16px 28px;
 
 		border: none;
 		border-radius: 11px;
@@ -231,8 +140,9 @@
 		color: white;
 
 		font-family: inherit;
-		font-size: 0.9rem;
+		font-size: 0.95rem;
 		font-weight: 700;
+		text-decoration: none;
 
 		cursor: pointer;
 
@@ -241,161 +151,155 @@
 			transform 0.2s ease;
 	}
 
-	.search-box button:hover {
+	.hero-cta:hover {
 		background: var(--secondary-hover);
 		transform: translateY(-1px);
 	}
 
-	.search-box button:active {
+	.hero-cta:active {
 		background: var(--primary-active);
 
 		transform: translateY(0);
-	}	
+	}
 
 	/* =========================
 	   REPOSITORY PREVIEW
 	========================= */
 
 	.hero-repository {
-        display: flex;
-        align-items: center;
-        justify-content: center;
-    }
+		display: flex;
+		align-items: center;
+		justify-content: center;
+	}
 
-    .repository-window {
-        width: min(100%, 420px);
+	.repository-window {
+		width: min(100%, 420px);
 
-        border: 1px solid var(--border);
-        border-radius: 20px;
+		border: 1px solid var(--border);
+		border-radius: 20px;
 
-        background: var(--surface-elevated);
+		background: var(--surface-elevated);
 
-        box-shadow:
-            0 25px 60px
-            color-mix(in srgb, var(--text) 10%, transparent);
+		box-shadow: 0 25px 60px color-mix(in srgb, var(--text) 10%, transparent);
 
-        overflow: hidden;
+		overflow: hidden;
 
-        transform: rotate(1deg);
-    }
+		transform: rotate(1deg);
+	}
 
-    .window-header {
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
+	.window-header {
+		display: flex;
+		align-items: center;
+		justify-content: space-between;
 
-        padding: 14px 18px;
+		padding: 14px 18px;
 
-        border-bottom: 1px solid var(--border);
+		border-bottom: 1px solid var(--border);
 
-        background: var(--surface);
+		background: var(--surface);
 
-        color: var(--text-muted);
+		color: var(--text-muted);
 
-        font-size: 0.7rem;
-        font-weight: 600;
-    }
+		font-size: 0.7rem;
+		font-weight: 600;
+	}
 
-    .result-count {
-        color: var(--primary);
-        font-weight: 800;
-    }
+	.result-count {
+		color: var(--primary);
+		font-weight: 800;
+	}
 
-    .repository-content {
-        padding: 24px;
-    }
+	.repository-content {
+		padding: 24px;
+	}
 
-    .question-meta {
-        display: flex;
-        flex-wrap: wrap;
-        gap: 6px;
+	.question-meta {
+		display: flex;
+		flex-wrap: wrap;
+		gap: 6px;
 
-        margin-bottom: 16px;
-    }
+		margin-bottom: 16px;
+	}
 
-    .question-meta span {
-        padding: 4px 8px;
+	.question-meta span {
+		padding: 4px 8px;
 
-        border-radius: 6px;
+		border-radius: 6px;
 
-        background: var(--surface);
+		background: var(--surface);
 
-        color: var(--text-muted);
+		color: var(--text-muted);
 
-        font-size: 0.6rem;
-        font-weight: 700;
-    }
+		font-size: 0.6rem;
+		font-weight: 700;
+	}
 
-    .question-meta span:first-child {
-        background: color-mix(
-            in srgb,
-            var(--primary) 12%,
-            transparent
-        );
+	.question-meta span:first-child {
+		background: color-mix(in srgb, var(--primary) 12%, transparent);
 
-        color: var(--primary);
-    }
+		color: var(--primary);
+	}
 
-    .repository-content h3 {
-        margin: 0;
+	.repository-content h3 {
+		margin: 0;
 
-        color: var(--text);
+		color: var(--text);
 
-        font-size: 0.95rem;
-        line-height: 1.55;
-    }
+		font-size: 0.95rem;
+		line-height: 1.55;
+	}
 
-    .question-lines {
-        display: flex;
-        flex-direction: column;
-        gap: 8px;
+	.question-lines {
+		display: flex;
+		flex-direction: column;
+		gap: 8px;
 
-        margin-top: 22px;
-    }
+		margin-top: 22px;
+	}
 
-    .question-lines div {
-        height: 7px;
+	.question-lines div {
+		height: 7px;
 
-        border-radius: 999px;
+		border-radius: 999px;
 
-        background: var(--border);
-    }
+		background: var(--border);
+	}
 
-    .question-lines div:nth-child(1) {
-        width: 90%;
-    }
+	.question-lines div:nth-child(1) {
+		width: 90%;
+	}
 
-    .question-lines div:nth-child(2) {
-        width: 75%;
-    }
+	.question-lines div:nth-child(2) {
+		width: 75%;
+	}
 
-    .question-lines div:nth-child(3) {
-        width: 55%;
-    }
+	.question-lines div:nth-child(3) {
+		width: 55%;
+	}
 
-    .repository-footer {
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
+	.repository-footer {
+		display: flex;
+		align-items: center;
+		justify-content: space-between;
 
-        padding: 14px 18px;
+		padding: 14px 18px;
 
-        border-top: 1px solid var(--border);
+		border-top: 1px solid var(--border);
 
-        background: var(--surface);
+		background: var(--surface);
 
-        color: var(--text-muted);
+		color: var(--text-muted);
 
-        font-size: 0.65rem;
-    }
+		font-size: 0.65rem;
+	}
 
-    .repository-footer a {
-        color: var(--primary);
+	.repository-footer a {
+		color: var(--primary);
 
-        font-weight: 800;
-        text-decoration: none;
-    }	
-	
+		font-weight: 800;
+		text-decoration: none;
+	}
+
 	/* =========================
 	   FOOTER
 	========================= */
@@ -431,7 +335,7 @@
 	.text-link {
 		display: inline-flex;
 		align-items: center;
-		letter-spacing: 0.10em;
+		letter-spacing: 0.1em;
 		color: var(--secondary) !important;
 	}
 
@@ -448,18 +352,11 @@
 			gap: 60px;
 
 			text-align: center;
-		}		
+		}
 
 		.hero-description {
 			margin-left: auto;
 			margin-right: auto;
-		}
-
-		.search-box {
-			margin-left: auto;
-			margin-right: auto;
-
-			text-align: left;
 		}
 
 		.hero-repository {
@@ -484,18 +381,9 @@
 			font-size: 1rem;
 		}
 
-		.search-box {
-			flex-direction: column;
-
-			gap: 6px;
-		}
-
-		.search-input {
-			min-height: 48px;
-		}
-
-		.search-box button {
+		.hero-cta {
 			width: 100%;
+			justify-content: center;
 		}
 
 		.hero-repository {
@@ -516,8 +404,8 @@
 
 			gap: 8px;
 		}
-	}	
-	
+	}
+
 	@media (max-width: 1000px) {
 		.hero-content {
 			grid-template-columns: 1fr;
@@ -527,7 +415,7 @@
 		.hero-description {
 			margin-left: auto;
 			margin-right: auto;
-		}				
+		}
 	}
 
 	@media (max-width: 640px) {

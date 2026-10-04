@@ -1,6 +1,7 @@
 import { API_URL } from '$env/static/private';
 import type { Question, } from '$lib/questions/types/question';
 import type { QuestionFilters } from '$lib/questions/types/questionFilters';
+import type { CreateQuestionIssueRequest } from '$lib/questions/types/question-issue';
 import type { PaginatedResponse } from '$lib/shared/types/PaginatedResponse';
 
 function buildQuestionsQuery(filters: QuestionFilters): string {
@@ -104,4 +105,20 @@ export async function getQuestionById(
     }
 
     return await response.json();
+}
+
+export async function createQuestionIssue(
+    fetch: typeof globalThis.fetch,
+    questionId: string,
+    issue: CreateQuestionIssueRequest
+): Promise<void> {
+    const response = await fetch(`${API_URL}/api/questions/${questionId}/issues`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(issue)
+    });
+
+    if (!response.ok) {
+        throw new Error(`Erro ao sinalizar questão: ${response.status}`);
+    }
 }
