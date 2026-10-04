@@ -1,6 +1,5 @@
 ﻿using Estudaki.Commons.Core.CQRS;
 using FluentValidation;
-using FluentValidation.Results;
 
 namespace Estudaki.Modules.Comunications.Application.Commands.CreateContactMessage
 {

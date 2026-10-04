@@ -5,7 +5,7 @@ var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddInfrastructure(builder.Configuration);
-builder.Services.AddIdentityModule(builder.Configuration);  
+builder.Services.AddIdentityModule(builder.Configuration);
 builder.Services.AddControllers();
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
 builder.Services.AddOpenApi();
@@ -18,8 +18,8 @@ if (app.Environment.IsDevelopment())
     app.MapOpenApi();
 }
 
-app.UseHttpsRedirection();
-
+// The API is only reached over plain HTTP, on the container's internal network
+// (frontend calls it via loopback, and TLS termination happens at Traefik).
 app.UseAuthorization();
 
 app.MapControllers();

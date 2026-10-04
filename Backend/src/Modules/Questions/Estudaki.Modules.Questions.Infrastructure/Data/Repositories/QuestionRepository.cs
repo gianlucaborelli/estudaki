@@ -290,5 +290,3 @@ public class QuestionRepository : BaseRepository<Question>, IQuestionRepository
         return sitemapdatas;
     }
 }
-
-

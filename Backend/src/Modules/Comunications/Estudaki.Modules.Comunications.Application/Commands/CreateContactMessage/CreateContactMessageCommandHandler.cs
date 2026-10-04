@@ -2,7 +2,6 @@
 using Estudaki.Modules.Comunications.Domain.Entities;
 using Estudaki.Modules.Comunications.Domain.Repositories;
 using FluentValidation;
-using FluentValidation.Results;
 
 namespace Estudaki.Modules.Comunications.Application.Commands.CreateContactMessage;
 

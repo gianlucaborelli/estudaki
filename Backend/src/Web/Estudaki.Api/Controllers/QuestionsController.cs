@@ -1,4 +1,5 @@
 using Estudaki.Commons.Core.CQRS;
+using Estudaki.Modules.Questions.Application.Commands.CreateQuestionIssue;
 using Estudaki.Modules.Questions.Application.DTOs;
 using Estudaki.Modules.Questions.Application.Queries.GetFilterParameters;
 using Estudaki.Modules.Questions.Application.Queries.GetQuestionById;
@@ -48,7 +49,15 @@ public class QuestionsController (ICommandDispatcher commandDispatcher, IQueryDi
         return result is null ? NotFound() : Ok(result);
     }
 
-    [HttpPost]
+    [HttpPost("{id}/issues")]
+    public async Task<IActionResult> CreateIssue([FromRoute] string id, [FromBody] CreateQuestionIssueCommand command)
+    {
+        command.QuestionId = id;
+        var result = await CommandDispatcher.DispatchAsync<CreateQuestionIssueCommand, CommandResult>(command);
+        return result.Success ? Ok(result.Data) : BadRequest(result.ValidationResult.Errors);
+    }
+
+        [HttpPost]
     public async Task<IActionResult> CreateQuestion()
     {
         var questions = await _questionRepository.GetAll();

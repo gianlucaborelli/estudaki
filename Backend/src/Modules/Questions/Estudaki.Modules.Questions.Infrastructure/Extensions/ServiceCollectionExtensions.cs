@@ -1,6 +1,7 @@
 using Estudaki.Commons.Core.CQRS.Extensions;
 using Estudaki.Modules.Questions.Application.Commands;
-using Estudaki.Modules.Questions.Application.Services;
+using Estudaki.Modules.Questions.Application.Commands.CreateQuestionIssue;
+using Estudaki.Modules.Questions.Application.Queries.GetAllQuestions;
 using Estudaki.Modules.Questions.Application.Queries.GetAreasPaginated;
 using Estudaki.Modules.Questions.Application.Queries.GetFilterParameters;
 using Estudaki.Modules.Questions.Application.Queries.GetImageListByPublicNoticeId;
@@ -11,6 +12,7 @@ using Estudaki.Modules.Questions.Application.Queries.GetQuestionsByExamId;
 using Estudaki.Modules.Questions.Application.Queries.GetQuestionsByPublicNoticeId;
 using Estudaki.Modules.Questions.Application.Queries.GetQuestionSupportsByPublicNoticeId;
 using Estudaki.Modules.Questions.Application.Queries.SearchQuestions;
+using Estudaki.Modules.Questions.Application.Services;
 using Estudaki.Modules.Questions.Domain.Repositories;
 using Estudaki.Modules.Questions.Infrastructure.Data;
 using Estudaki.Modules.Questions.Infrastructure.Data.Mappings;
@@ -19,7 +21,6 @@ using FluentValidation;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Estudaki.Modules.Questions.Application.Queries.GetAllQuestions;
 
 namespace Estudaki.Modules.Questions.Infrastructure.Extensions;
 
@@ -35,6 +36,7 @@ public static class ServiceCollectionExtensions
         services.AddScoped<IPublicNoticeRepository, PublicNoticeRepository>();
         services.AddScoped<IQuestionSupportRepository, QuestionSupportRepository>();
         services.AddScoped<IExamExtractionRepository, ExamExtractionRepository>();
+        services.AddScoped<IQuestionIssueRepository, QuestionIssueRepository>();
         services.AddScoped<ContentMigrationService>();
 
         var postgresConnectionString = configuration.GetConnectionString("PostgresConnection")
@@ -45,7 +47,7 @@ public static class ServiceCollectionExtensions
 
         services.AddValidatorsFromAssembly(typeof(UploadPublicNoticeFilesCommandValidator).Assembly);
 
-        services.AddCQRSHandlers(typeof(GetQuestionByIdQueryHandler).Assembly);        
+        services.AddCQRSHandlers(typeof(GetQuestionByIdQueryHandler).Assembly);
         services.AddCQRSHandlers(typeof(GetFilterParametersQueryHandler).Assembly);
         services.AddCQRSHandlers(typeof(SearchQuestionsPaginatedQueryHandler).Assembly);
         services.AddCQRSHandlers(typeof(GetPublicNoticeListQueryHandler).Assembly);
@@ -57,22 +59,23 @@ public static class ServiceCollectionExtensions
         services.AddCQRSHandlers(typeof(GetAreasPaginatedQueryHandler).Assembly);
         services.AddCQRSHandlers(typeof(GetAllQuestionsQueryHandler).Assembly);
 
-        services.AddCQRSHandlers(typeof(CreateQuestionCommandHandler).Assembly);
         services.AddCQRSHandlers(typeof(AddExistingQuestionIntoExamCommandHandler).Assembly);
+        services.AddCQRSHandlers(typeof(CreateQuestionCommandHandler).Assembly);
+        services.AddCQRSHandlers(typeof(CreatePublicNoticeCommandHandler).Assembly);
+        services.AddCQRSHandlers(typeof(CreateQuestionSupportCommandHandler).Assembly);
+        services.AddCQRSHandlers(typeof(CreateAreaCommandHandler).Assembly);
+        services.AddCQRSHandlers(typeof(CreateQuestionIssueCommandHandler).Assembly);        
         services.AddCQRSHandlers(typeof(UploadExamFilesCommandHandler).Assembly);
         services.AddCQRSHandlers(typeof(UploadQuestionImagesCommandHandler).Assembly);
         services.AddCQRSHandlers(typeof(UnifyPublicNoticeCommandHandler).Assembly);
         services.AddCQRSHandlers(typeof(UnifyQuestionCommandHandler).Assembly);
         services.AddCQRSHandlers(typeof(UpdateQuestionCommandHandler).Assembly);
+        services.AddCQRSHandlers(typeof(UpdateAreaCommandHandler).Assembly);
         services.AddCQRSHandlers(typeof(UpdatePublicNoticeCommandHandler).Assembly);
         services.AddCQRSHandlers(typeof(UpdateQuestionSupportCommandHandler).Assembly);
         services.AddCQRSHandlers(typeof(UpdateExamCommandHandler).Assembly);
-        services.AddCQRSHandlers(typeof(CreatePublicNoticeCommandHandler).Assembly);
-        services.AddCQRSHandlers(typeof(CreateQuestionSupportCommandHandler).Assembly);
         services.AddCQRSHandlers(typeof(DeleteQuestionCommandHandler).Assembly);
-        services.AddCQRSHandlers(typeof(DeleteQuestionSupportCommandHandler).Assembly);
-        services.AddCQRSHandlers(typeof(CreateAreaCommandHandler).Assembly);
-        services.AddCQRSHandlers(typeof(UpdateAreaCommandHandler).Assembly);
+        services.AddCQRSHandlers(typeof(DeleteQuestionSupportCommandHandler).Assembly);        
 
         return services;
     }

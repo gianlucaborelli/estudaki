@@ -2,7 +2,6 @@
 using Estudaki.Modules.Questions.Domain.Repositories;
 using Estudaki.Modules.Questions.Domain.ValueObjects;
 using FluentValidation;
-using FluentValidation.Results;
 
 namespace Estudaki.Modules.Questions.Application.Commands;
 
