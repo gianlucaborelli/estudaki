@@ -22,17 +22,17 @@ RUN dotnet restore "src/EstudaKi.slnx"
 COPY . .
 
 # Build do projeto principal Web
-WORKDIR "/src/src/Web/EstudaKi.Web"
-RUN dotnet build "EstudaKi.Web.csproj" -c $BUILD_CONFIGURATION -o /app/build
+WORKDIR "/src/src/Web/Estudaki.Api"
+RUN dotnet build "Estudaki.Api.csproj" -c $BUILD_CONFIGURATION -o /app/build
 
 # Esta fase é usada para publicar o projeto de serviço a ser copiado para a fase final
 FROM build AS publish
 ARG BUILD_CONFIGURATION=Release
-WORKDIR "/src/src/Web/EstudaKi.Web"
-RUN dotnet publish "EstudaKi.Web.csproj" -c $BUILD_CONFIGURATION -o /app/publish /p:UseAppHost=false
+WORKDIR "/src/src/Web/Estudaki.Api"
+RUN dotnet publish "Estudaki.Api.csproj" -c $BUILD_CONFIGURATION -o /app/publish /p:UseAppHost=false
 
 # Esta fase é usada na produção ou quando executada no VS no modo normal (padrão quando não está usando a configuração de Depuração)
 FROM base AS final
 WORKDIR /app
 COPY --from=publish /app/publish .
-ENTRYPOINT ["dotnet", "EstudaKi.Web.dll"]
+ENTRYPOINT ["dotnet", "Estudaki.Api.dll"]
