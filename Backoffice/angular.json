@@ -32,7 +32,9 @@
             "server": "src/main.server.ts",
             "outputMode": "server",
             "security": {
-              "allowedHosts": []
+              "allowedHosts": [
+                "backoffice.estudaki.com.br"
+              ]
             },
             "ssr": {
               "entry": "src/server.ts"
