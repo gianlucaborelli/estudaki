@@ -6,7 +6,7 @@ using MongoDB.Driver;
 
 namespace Estudaki.Modules.Ai.Infrastructure.Repository;
 
-public class AIRepository : BaseRepository<AIPrompt>, IAiRepository
+public class AIRepository : MongoRepositoryBase<AIPrompt>, IAiRepository
 {
     public AIRepository(IMongoContext context) : base(context)
     {

@@ -1,11 +1,12 @@
+using Estudaki.Commons.Core.Data.Context;
 using Estudaki.Modules.Questions.Domain.Entities;
 using Microsoft.EntityFrameworkCore;
 
 namespace Estudaki.Modules.Questions.Infrastructure.Data;
 
-public class QuestionsDbContext : DbContext
+public class QuestionsDbContext : EfContext
 {
-    public QuestionsDbContext(DbContextOptions<QuestionsDbContext> options)
+    public QuestionsDbContext(DbContextOptions<EfContext> options)
         : base(options)
     {
     }

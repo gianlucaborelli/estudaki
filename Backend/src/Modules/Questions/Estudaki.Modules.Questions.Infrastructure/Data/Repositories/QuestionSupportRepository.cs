@@ -6,7 +6,7 @@ using MongoDB.Driver;
 
 namespace Estudaki.Modules.Questions.Infrastructure.Data.Repositories
 {
-    public class QuestionSupportRepository : BaseRepository<QuestionSupport>, IQuestionSupportRepository
+    public class QuestionSupportRepository : MongoRepositoryBase<QuestionSupport>, IQuestionSupportRepository
     {
         public QuestionSupportRepository(IMongoContext context) : base(context)
         {

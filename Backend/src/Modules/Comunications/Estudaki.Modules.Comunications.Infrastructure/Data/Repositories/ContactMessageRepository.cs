@@ -5,7 +5,7 @@ using Estudaki.Modules.Comunications.Domain.Repositories;
 
 namespace Estudaki.Modules.Comunications.Infrastructure.Data.Repositories;
 
-public class ContactMessageRepository : BaseRepository<ContactMessage>, IContactMessageRepository
+public class ContactMessageRepository : MongoRepositoryBase<ContactMessage>, IContactMessageRepository
 {
     public ContactMessageRepository(IMongoContext context) : base(context)
     {

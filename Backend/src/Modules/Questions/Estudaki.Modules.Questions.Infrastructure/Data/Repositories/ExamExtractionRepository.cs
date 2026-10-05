@@ -5,7 +5,7 @@ using Estudaki.Modules.Questions.Domain.Repositories;
 
 namespace Estudaki.Modules.Questions.Infrastructure.Data.Repositories;
 
-public class ExamExtractionRepository : BaseRepository<ExamExtraction>, IExamExtractionRepository
+public class ExamExtractionRepository : MongoRepositoryBase<ExamExtraction>, IExamExtractionRepository
 {
     public ExamExtractionRepository(IMongoContext context) : base(context)
     {

@@ -1,3 +1,6 @@
+using Estudaki.Commons.Core.Data.Context;
+using Estudaki.Commons.Core.Data.Repository;
+using Estudaki.Commons.Core.Models;
 using Estudaki.Modules.Questions.Domain.Common;
 using Estudaki.Modules.Questions.Domain.Entities;
 using Estudaki.Modules.Questions.Domain.Repositories;
@@ -6,42 +9,34 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Estudaki.Modules.Questions.Infrastructure.Data.Repositories;
 
-public class AreaRepository : IAreaRepository
+public class AreaRepository :EfRepositoryBase<Area>, IAreaRepository
 {
-    private readonly IDbContextFactory<QuestionsDbContext> _contextFactory;
-
-    public AreaRepository(IDbContextFactory<QuestionsDbContext> contextFactory)
-    {
-        _contextFactory = contextFactory;
+    public AreaRepository(QuestionsDbContext context) : base(context)
+    {       
     }
 
     public async Task AddAsync(Area area)
     {
-        await using var context = await _contextFactory.CreateDbContextAsync();
-        await context.Areas.AddAsync(area);
-        await context.SaveChangesAsync();
+        await _dbSet.AddAsync(area);
+        await _context.SaveChangesAsync();
     }
 
     public async Task UpdateAsync(Area area)
     {
-        await using var context = await _contextFactory.CreateDbContextAsync();
-        context.Areas.Update(area);
-        await context.SaveChangesAsync();
+        _dbSet.Update(area);
+        await _context.SaveChangesAsync();
     }
 
     public async Task<Area?> GetByIdAsync(string id)
     {
-        await using var context = await _contextFactory.CreateDbContextAsync();
-        return await context.Areas.FirstOrDefaultAsync(a => a.Id == id);
+        return await _dbSet.FirstOrDefaultAsync(a => a.Id == id);
     }
 
     public async Task<PagedResult<Area>> GetPaginatedAsync(AreaType type, string? name, int pageNumber, int pageSize)
     {
-        await using var context = await _contextFactory.CreateDbContextAsync();
-
         var typeValue = type.ToString();
 
-        var query = context.Areas
+        var query = _dbSet
             .Where(a => a.Type == typeValue);
 
         if (!string.IsNullOrWhiteSpace(name))

@@ -8,7 +8,7 @@ using MongoDB.Driver;
 
 namespace Estudaki.Modules.Questions.Infrastructure.Data.Repositories;
 
-public class PublicNoticeRepository : BaseRepository<PublicNotice>, IPublicNoticeRepository
+public class PublicNoticeRepository : MongoRepositoryBase<PublicNotice>, IPublicNoticeRepository
 {
     public PublicNoticeRepository(IMongoContext context) : base(context)
     {

@@ -1,10 +1,11 @@
+using Estudaki.Commons.Core.Data.Repository;
 using Estudaki.Modules.Questions.Domain.Common;
 using Estudaki.Modules.Questions.Domain.Entities;
 using Estudaki.Modules.Questions.Domain.ValueObjects;
 
 namespace Estudaki.Modules.Questions.Domain.Repositories;
 
-public interface IAreaRepository
+public interface IAreaRepository : IRepository<Area>
 {
     Task AddAsync(Area area);
     Task UpdateAsync(Area area);
