@@ -7,7 +7,8 @@ using Estudaki.Modules.Identity.Domain.Entities;
 using Estudaki.Modules.Identity.Domain.Interfaces;
 using Estudaki.Modules.Identity.Infrastructure.Data;
 using Estudaki.Modules.Identity.Infrastructure.Data.Seeds;
-using FluentValidation.Results;
+using Estudaki.Modules.Identity.Infrastructure.Middleware;
+using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
@@ -17,6 +18,10 @@ namespace Estudaki.Modules.Identity.Infrastructure;
 
 public static class IdentityExtensions
 {
+    /// <summary>
+    /// Registra os serviços de identidade do módulo, incluindo autenticação com cookies
+    /// e otimizações de performance para endpoints públicos.
+    /// </summary>
     public static IServiceCollection AddIdentityModule(this IServiceCollection services, IConfiguration configuration)
     {
         services.AddAuthentication(options =>
@@ -51,5 +56,14 @@ public static class IdentityExtensions
         services.AddScoped<ICommandHandler<RegisterUserCommand, CommandResult>, RegisterUserCommandHandler>();
 
         return services;
+    }
+
+    /// <summary>
+    /// Registra o middleware que otimiza a validação de autenticação para endpoints públicos.
+    /// Deve ser chamado ANTES de app.UseAuthentication() no pipeline.
+    /// </summary>
+    public static IApplicationBuilder UseOptimizedAuthentication(this IApplicationBuilder app)
+    {
+        return app.UseMiddleware<SkipAuthenticationCookieMiddleware>();
     }
 }

@@ -18,8 +18,13 @@ if (app.Environment.IsDevelopment())
     app.MapOpenApi();
 }
 
+// Otimização de autenticação: remove cookies para endpoints públicos
+// Deve estar ANTES de UseAuthentication para interceptar a requisição
+app.UseOptimizedAuthentication();
+
 // The API is only reached over plain HTTP, on the container's internal network
 // (frontend calls it via loopback, and TLS termination happens at Traefik).
+app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();
