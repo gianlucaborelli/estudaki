@@ -1,0 +1,95 @@
+<header class="question-header">
+  <div class="question-identity">
+    <span>Questão</span>
+    <strong>{{ question().questionNumber }}</strong>
+  </div>
+
+  <dl class="question-metadata">
+    <div>
+      <dt>Ano</dt>
+      <dd>{{ question().year }}</dd>
+    </div>
+
+    <div>
+      <dt>Categoria</dt>
+      <dd>{{ question().examCategory | examCategory }}</dd>
+    </div>
+
+    <div>
+      <dt>Banca</dt>
+      <dd>{{ question().examinerOrganization }}</dd>
+    </div>
+
+    <div>
+      <dt>Instituição</dt>
+      <dd>{{ question().contractingOrganization }}</dd>
+    </div>
+
+    <div>
+      <dt>Edital</dt>
+      <dd>{{ question().publicNoticeNumber }}</dd>
+    </div>
+
+    <div>
+      <dt>Fase</dt>
+      <dd>{{ question().phase }}</dd>
+    </div>
+
+    <div>
+      <dt>Área</dt>
+      <dd>{{ question().mainArea }}</dd>
+    </div>
+
+    <div class="subareas-metadata">
+      <dt>Subáreas</dt>
+
+      <dd>
+        {{ question().subAreas.join(', ') }}
+      </dd>
+    </div>
+  </dl>
+
+  @if (question().positions.length > 0) {
+    <div class="question-context">
+      <p>
+        {{ question().positions.join(', ') }}
+      </p>
+    </div>
+  }
+
+  <div class="header-actions">
+    <button mat-icon-button type="button" aria-label="Copiar questão" title="Copiar questão">
+      <mat-icon>content_copy</mat-icon>
+    </button>
+
+    <button mat-icon-button type="button" aria-label="Sinalizar questão" title="Sinalizar questão">
+      <mat-icon>flag</mat-icon>
+    </button>
+
+    <button
+      mat-icon-button
+      type="button"
+      [matMenuTriggerFor]="downloadMenu"
+      aria-label="Baixar questão"
+      title="Baixar questão"
+    >
+      <mat-icon>download</mat-icon>
+    </button>
+
+    <mat-menu #downloadMenu="matMenu">
+      <button
+        mat-menu-item
+        [disabled]="!question().examBookletUrl"
+        (click)="downloadQuestionBooklet()"
+      >
+        <mat-icon>description</mat-icon>
+        <span>Caderno de questões</span>
+      </button>
+
+      <button mat-menu-item [disabled]="!question().answerKeyUrl" (click)="downloadAnswerKey()">
+        <mat-icon>fact_check</mat-icon>
+        <span>Gabarito</span>
+      </button>
+    </mat-menu>
+  </div>
+</header>

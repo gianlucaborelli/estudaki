@@ -1,0 +1,34 @@
+<mat-card>
+  <mat-card-content>
+    <h1>Login</h1>
+
+    <div class="align-vertical-itens content">
+      <mat-form-field appearance="outline">
+        <mat-label>Email</mat-label>
+        <mat-icon matPrefix>mail</mat-icon>
+        <input matInput type="email" #userName required />
+      </mat-form-field>
+
+      <mat-form-field appearance="outline">
+        <mat-label>Senha</mat-label>
+        <mat-icon matPrefix>key</mat-icon>
+        <input
+          matInput
+          type="password"
+          #userPassword
+          required
+          (keyup.enter)="login(userName.value, userPassword.value)"
+        />
+      </mat-form-field>
+
+      <button
+        style="margin-top: 20px"
+        (click)="login(userName.value, userPassword.value)"
+        mat-raised-button
+        color="accent"
+      >
+        Login
+      </button>
+    </div>
+  </mat-card-content>
+</mat-card>

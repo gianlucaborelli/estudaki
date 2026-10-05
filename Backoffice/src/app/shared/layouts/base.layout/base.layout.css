@@ -1,0 +1,22 @@
+mat-sidenav {
+  width: 200px;
+  background: rgb(202, 215, 210);
+  color: white;
+  text-align: center;
+}
+mat-toolbar {
+  background: #91beb2;
+}
+
+mat-sidenav-container {
+  height: calc(100vh - 65px);
+}
+
+.content {
+  height: calc(100vh - 130px);
+  border-radius: 10px;
+  margin: 16px;
+  margin-left: 32px;
+  padding: 16px;
+  overflow: auto;
+}

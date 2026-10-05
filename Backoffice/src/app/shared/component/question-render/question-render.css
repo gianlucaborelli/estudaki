@@ -1,0 +1,120 @@
+:host {
+  --question-accent: var(--mat-sys-primary, #386a20);
+  --question-accent-container: var(--mat-sys-primary-container, #d4ebc5);
+  --question-surface: var(--mat-sys-surface-container-low, #f7f8f3);
+  --question-border: var(--mat-sys-outline-variant, #c2c8bc);
+  --question-text: var(--mat-sys-on-surface, #1a1c18);
+}
+
+.question-card {
+  margin-top: 1.25rem;
+  overflow: hidden;
+  border: 1px solid var(--question-border);
+  border-radius: 0.5rem;
+  background: var(--question-surface);
+  box-shadow: 0 1px 2px rgb(25 28 23 / 8%);
+}
+
+.question-card-head {
+  border-bottom: 1px solid var(--question-border);
+  background: var(--mat-sys-surface, #fcfdf8);
+}
+
+.content {
+  min-width: 0;
+  padding: 1.5rem;
+}
+
+.question-support {
+  margin-bottom: 1.5rem;
+  padding: 1rem 1.125rem;
+  border-left: 3px solid var(--question-accent);
+  background: var(--question-accent-container);
+  color: var(--question-text);
+  font-size: 0.9375rem;
+  line-height: 1.6;
+}
+
+.statement {
+  color: var(--question-text);
+  font-size: 1.0625rem;
+  line-height: 1.75;
+}
+
+.choices {
+  display: grid;
+  gap: 0.625rem;
+  min-width: 0;
+  margin: 0;
+  padding: 0 1.5rem 1.5rem;
+  border: 0;
+}
+
+.choice {
+  display: flex;
+  align-items: flex-start;
+  width: 100%;
+  box-sizing: border-box;
+  padding: 0.875rem 1rem;
+
+  border: 1px solid var(--question-border);
+  border-radius: 0.375rem;
+  background: var(--mat-sys-surface, #fefff9);
+
+  color: var(--question-text);
+  cursor: pointer;
+
+  transition:
+    border-color 0.18s ease,
+    background-color 0.18s ease,
+    box-shadow 0.18s ease;
+}
+
+.choice:hover {
+  border-color: var(--question-accent);
+  box-shadow: 0 2px 6px rgb(25 28 23 / 10%);
+}
+
+.choice.choice-selected {
+  border-color: var(--question-accent);
+  background: var(--question-accent-container);
+}
+
+.choice-option {
+  display: inline-grid;
+  flex: 0 0 1.5rem;
+  width: 1.5rem;
+  height: 1.5rem;
+  margin-right: 0.875rem;
+
+  border: 1px solid var(--question-accent);
+  border-radius: 0.25rem;
+
+  color: var(--question-accent);
+  font-size: 0.75rem;
+  font-weight: 700;
+  line-height: 1;
+
+  place-items: center;
+}
+
+.choice-selected .choice-option {
+  background: var(--question-accent);
+  color: var(--mat-sys-on-primary, #ffffff);
+}
+
+@media (max-width: 600px) {
+  .content,
+  .choices {
+    padding-right: 1rem;
+    padding-left: 1rem;
+  }
+
+  .question-support {
+    padding: 0.875rem;
+  }
+
+  .statement {
+    font-size: 1rem;
+  }
+}

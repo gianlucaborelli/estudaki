@@ -1,0 +1,107 @@
+<mat-card class="exam-card" appearance="outlined">
+  <!-- Toolbar -->
+  <mat-toolbar class="toolbar-actions">
+    <button
+      mat-icon-button
+      matTooltip="Editar Exame"
+      matTooltipPosition="above"
+      (click)="openEditExamDialog()"
+    >
+      <mat-icon>edit</mat-icon>
+    </button>
+
+    <button
+      mat-icon-button
+      matTooltip="Anexar Arquivos"
+      matTooltipPosition="above"
+      (click)="openUploadFileDialog()"
+    >
+      <mat-icon>attach_file</mat-icon>
+    </button>
+
+    <button
+      mat-icon-button
+      matTooltip="Unificar Questões"
+      matTooltipPosition="above"
+      (click)="openQuestionUnifyDialog()"
+    >
+      <mat-icon>merge_type</mat-icon>
+    </button>
+  </mat-toolbar>
+
+  <div class="exam-details">
+    <!-- Título + nível de ensino -->
+    <div class="header-row">
+      <span class="spacer"></span>
+
+      <mat-chip-set>
+        <mat-chip class="education-chip">
+          Ensino {{ exam?.educationLevel | educationLevel }}
+        </mat-chip>
+      </mat-chip-set>
+    </div>
+
+    <!-- Informações do exame -->
+    <div class="info-grid">
+      <div class="info-item">
+        <span class="label"> Fase </span>
+
+        <span class="value">
+          {{ exam?.phase || 'Não definido' }}
+        </span>
+      </div>
+
+      <div class="info-item">
+        <span class="label"> Cargo </span>
+
+        <span class="value">
+          {{ exam?.position || 'Não definido' }}
+        </span>
+      </div>
+    </div>
+
+    <mat-divider></mat-divider>
+
+    <!-- Estatísticas + documentos -->
+    <div class="statistics-row">
+      <mat-chip-set>
+        <!-- Total -->
+        <mat-chip class="total-chip"> Total: ?? </mat-chip>
+
+        <!-- Múltipla escolha -->
+        <mat-chip class="multiple-choice-chip"> Múltipla: ?? </mat-chip>
+
+        <!-- Aberta -->
+        <mat-chip class="open-ended-chip"> Aberta: ?? </mat-chip>
+
+        <!-- Redação -->
+        <mat-chip class="redaction-chip"> Redação: ?? </mat-chip>
+      </mat-chip-set>
+
+      <span class="spacer"></span>
+
+      <!-- Caderno -->
+      @if (exam?.examBookletUrl) {
+        <a
+          mat-stroked-button
+          [href]="exam.examBookletUrl"
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          <mat-icon>description</mat-icon>
+
+          Caderno
+        </a>
+      }
+
+      <!-- Gabarito -->
+      @if (exam?.answerKeyUrl) {
+        <a mat-stroked-button [href]="exam.answerKeyUrl" target="_blank" rel="noopener noreferrer">
+          <mat-icon>task_alt</mat-icon>
+
+          Gabarito
+        </a>
+      }
+    </div>
+  </div>
+</mat-card>

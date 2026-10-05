@@ -1,0 +1,68 @@
+:host {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  min-height: 0;
+  width: 100%;
+}
+
+.editor-content {
+  display: flex;
+  flex: 1;
+  min-height: 0;
+  flex-direction: column;
+  width: 100%;
+}
+
+:host ::ng-deep .ql-container {
+  display: flex;
+  min-height: 0;
+  flex: 1;
+  flex-direction: column;
+  border-color: #d1d5db;
+  font-family: inherit;
+  font-size: 0.95rem;
+}
+
+:host ::ng-deep .ql-toolbar.ql-snow {
+  border-color: #d1d5db;
+  background: #f9fafb;
+}
+
+:host ::ng-deep .ql-editor {
+  min-height: 220px;
+  padding: 1rem;
+  color: #111827;
+  line-height: 1.4;
+  overflow-y: auto;
+}
+
+:host ::ng-deep .ql-editor p,
+:host ::ng-deep .ql-editor ol,
+:host ::ng-deep .ql-editor ul,
+:host ::ng-deep .ql-editor pre,
+:host ::ng-deep .ql-editor blockquote,
+:host ::ng-deep .ql-editor h1,
+:host ::ng-deep .ql-editor h2,
+:host ::ng-deep .ql-editor h3,
+:host ::ng-deep .ql-editor h4,
+:host ::ng-deep .ql-editor h5,
+:host ::ng-deep .ql-editor h6 {
+  margin: 0 0 0.5rem;
+}
+
+:host ::ng-deep .ql-editor table {
+  width: 100%;
+  margin: 1rem 0;
+  border-collapse: collapse;
+}
+
+:host ::ng-deep .ql-editor td {
+  min-width: 5rem;
+  padding: 0.5rem;
+  border: 1px solid #9ca3af;
+}
+
+:host ::ng-deep .ql-editor .ql-formula {
+  padding: 0 0.15rem;
+}

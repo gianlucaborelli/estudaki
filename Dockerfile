@@ -1,38 +1,63 @@
-# Acesse https://aka.ms/customizecontainer para saber como personalizar seu contêiner de depuração e como o Visual Studio usa este Dockerfile para criar suas imagens para uma depuração mais rápida.
+# Combined image: runs the .NET API, the SvelteKit frontend and the Angular backoffice
+# in a single container. The API is internal-only, reached over loopback (127.0.0.1:8080).
 
-# Esta fase é usada durante a execução no VS no modo rápido (Padrão para a configuração de Depuração)
-FROM mcr.microsoft.com/dotnet/aspnet:10.0 AS base
-USER $APP_UID
-WORKDIR /app
-EXPOSE 8080
-EXPOSE 8081
-
-# Esta fase é usada para compilar o projeto de serviço
-FROM mcr.microsoft.com/dotnet/sdk:10.0 AS build
-ARG BUILD_CONFIGURATION=Release
+# ---------- Backend build ----------
+FROM mcr.microsoft.com/dotnet/sdk:10.0 AS backend-build
 WORKDIR /src
-
-# Copiar toda a estrutura src/ - incluirá automaticamente qualquer novo módulo
-COPY ["src/", "src/"]
-
-# Restore de toda a solução (descobrirá automaticamente todos os projetos)
+COPY Backend/src/ src/
 RUN dotnet restore "src/EstudaKi.slnx"
+WORKDIR /src/src/Web/Estudaki.Api
+RUN dotnet publish "Estudaki.Api.csproj" -c Release -o /app/backend --no-restore
 
-# Copiar arquivos restantes (se houver algum fora de src/)
-COPY . .
-
-# Build do projeto principal Web
-WORKDIR "/src/src/Web/EstudaKi.Web"
-RUN dotnet build "EstudaKi.Web.csproj" -c $BUILD_CONFIGURATION -o /app/build
-
-# Esta fase é usada para publicar o projeto de serviço a ser copiado para a fase final
-FROM build AS publish
-ARG BUILD_CONFIGURATION=Release
-WORKDIR "/src/src/Web/EstudaKi.Web"
-RUN dotnet publish "EstudaKi.Web.csproj" -c $BUILD_CONFIGURATION -o /app/publish /p:UseAppHost=false
-
-# Esta fase é usada na produção ou quando executada no VS no modo normal (padrão quando não está usando a configuração de Depuração)
-FROM base AS final
+# ---------- Frontend build ----------
+FROM node:22-bookworm-slim AS frontend-build
 WORKDIR /app
-COPY --from=publish /app/publish .
-ENTRYPOINT ["dotnet", "EstudaKi.Web.dll"]
+COPY Frontend/package.json Frontend/package-lock.json ./
+RUN npm ci
+COPY Frontend/ .
+# Baked in at build time: $env/static/private is inlined by Vite, not readable at runtime.
+ENV API_URL=http://127.0.0.1:8080
+RUN npm run build && npm prune --omit=dev
+
+# ---------- Backoffice build ----------
+FROM node:22-bookworm-slim AS backoffice-build
+WORKDIR /app
+COPY Backoffice/package.json Backoffice/package-lock.json ./
+# npm ci: Angular's Vite/Rolldown toolchain pulls in OS-specific optional native
+# bindings that aren't always fully captured in a lockfile generated on Windows.
+RUN npm install
+COPY Backoffice/ .
+RUN npm run build && npm prune --omit=dev
+
+# ---------- Final ----------
+FROM mcr.microsoft.com/dotnet/aspnet:10.0 AS final
+# Node.js runtime, needed to run the SvelteKit frontend alongside the API.
+RUN apt-get update \
+    && apt-get install -y --no-install-recommends ca-certificates curl gnupg \
+    && mkdir -p /etc/apt/keyrings \
+    && curl -fsSL https://deb.nodesource.com/gpgkey/nodesource-repo.gpg.key | gpg --dearmor -o /etc/apt/keyrings/nodesource.gpg \
+    && echo "deb [signed-by=/etc/apt/keyrings/nodesource.gpg] https://deb.nodesource.com/node_22.x nodistro main" > /etc/apt/sources.list.d/nodesource.list \
+    && apt-get update \
+    && apt-get install -y --no-install-recommends nodejs \
+    && apt-get purge -y gnupg && apt-get autoremove -y \
+    && rm -rf /var/lib/apt/lists/*
+
+WORKDIR /app
+COPY --from=backend-build /app/backend ./backend
+COPY --from=frontend-build /app/build ./frontend/build
+COPY --from=frontend-build /app/node_modules ./frontend/node_modules
+COPY --from=backoffice-build /app/dist/estudaki-backoffice ./backoffice
+COPY --from=backoffice-build /app/node_modules ./backoffice/node_modules
+COPY entrypoint.sh ./entrypoint.sh
+RUN chmod +x ./entrypoint.sh && chown -R $APP_UID:$APP_UID /app
+
+USER $APP_UID
+ENV ASPNETCORE_URLS=http://+:8080 \
+    ASPNETCORE_ENVIRONMENT=Production \
+    NODE_ENV=production \
+    API_URL=http://127.0.0.1:8080
+
+# Only the frontend (3000) and backoffice (4000) ports are published;
+# the API is only reachable via loopback inside the container.
+EXPOSE 3000 4000
+ENTRYPOINT ["./entrypoint.sh"]

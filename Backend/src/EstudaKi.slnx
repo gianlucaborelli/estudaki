@@ -1,0 +1,38 @@
+<Solution>
+  <Folder Name="/Core/">
+    <Project Path="Core/Estudaki.Commons.Core/Estudaki.Commons.Core.csproj" />
+  </Folder>
+  <Folder Name="/Infrastructure/">
+    <Project Path="Infrastructure/Estudaki.Infrastructure.Crosscutting/Estudaki.Infrastructure.Crosscutting.csproj" />
+    <Project Path="Infrastructure/Estudaki.Infrastructure.Observability/Estudaki.Infrastructure.Observability.csproj" />
+  </Folder>
+  <Folder Name="/Modules/" />
+  <Folder Name="/Modules/Ai/">
+    <Project Path="Modules/AI/Estudaki.Modules.Ai.Adapter/Estudaki.Modules.Ai.Adapter.csproj" />
+    <Project Path="Modules/AI/Estudaki.Modules.Ai.Application/Estudaki.Modules.Ai.Application.csproj" />
+    <Project Path="Modules/AI/Estudaki.Modules.Ai.Domain/Estudaki.Modules.Ai.Domain.csproj" />
+    <Project Path="Modules/AI/Estudaki.Modules.Ai.Infrastructure/Estudaki.Modules.Ai.Infrastructure.csproj" />
+  </Folder>
+  <Folder Name="/Modules/Comunications/">
+    <Project Path="Modules/Comunications/Estudaki.Modules.Comunications.Application/Estudaki.Modules.Comunications.Application.csproj" />
+    <Project Path="Modules/Comunications/Estudaki.Modules.Comunications.Domain/Estudaki.Modules.Comunications.Domain.csproj" />
+    <Project Path="Modules/Comunications/Estudaki.Modules.Comunications.Infrastructure/Estudaki.Modules.Comunications.Infrastructure.csproj" />
+  </Folder>
+  <Folder Name="/Modules/Identity/">
+    <Project Path="Modules/Identity/Estudaki.Modules.Identity.Adapter/Estudaki.Modules.Identity.Adapter.csproj" />
+    <Project Path="Modules/Identity/Estudaki.Modules.Identity.Application/Estudaki.Modules.Identity.Application.csproj" />
+    <Project Path="Modules/Identity/Estudaki.Modules.Identity.Domain/Estudaki.Modules.Identity.Domain.csproj" />
+    <Project Path="Modules/Identity/Estudaki.Modules.Identity.Infrastructure/Estudaki.Modules.Identity.Infrastructure.csproj" />
+  </Folder>
+  <Folder Name="/Modules/Questions/">
+    <Project Path="Modules/Questions/Estudaki.Modules.Questions.Application/Estudaki.Modules.Questions.Application.csproj" />
+    <Project Path="Modules/Questions/Estudaki.Modules.Questions.Domain/Estudaki.Modules.Questions.Domain.csproj" />
+    <Project Path="Modules/Questions/Estudaki.Modules.Questions.Infrastructure/Estudaki.Modules.Questions.Infrastructure.csproj" />
+  </Folder>
+  <Folder Name="/Solution Items/">
+    <File Path=".editorconfig" />
+  </Folder>
+  <Folder Name="/Web/">
+    <Project Path="Web/Estudaki.Api/Estudaki.Api.csproj" Id="4cc8b8e3-1578-4e47-99e7-37946a739093" />
+  </Folder>
+</Solution>

@@ -1,0 +1,114 @@
+.exam-card {
+  overflow: hidden;
+  margin-top: 1rem;
+  border-color: var(--mat-sys-outline-variant);
+  border-radius: 0.5rem;
+  background: var(--mat-sys-surface-container-low);
+  box-shadow: 0 1px 2px rgb(25 28 23 / 8%);
+}
+
+.toolbar-actions {
+  min-height: 48px;
+  height: 48px;
+  padding: 0 0.5rem;
+  gap: 0.25rem;
+  border-bottom: 1px solid var(--mat-sys-outline-variant);
+  background: var(--mat-sys-surface-container);
+}
+
+.exam-details {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  padding: 1.25rem 1.5rem 1.5rem;
+}
+
+.header-row {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.spacer {
+  flex: 1;
+}
+
+.info-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.75rem;
+}
+
+.info-item {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  padding: 0.875rem 1rem;
+  border-left: 3px solid var(--mat-sys-primary);
+  background: var(--mat-sys-surface);
+}
+
+.label {
+  color: var(--mat-sys-on-surface-variant);
+  font-size: 0.6875rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.value {
+  color: var(--mat-sys-on-surface);
+  font-size: 1rem;
+  line-height: 1.4;
+}
+
+.statistics-row {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+}
+
+.education-chip {
+  background: var(--mat-sys-primary);
+  color: var(--mat-sys-on-primary);
+}
+
+.total-chip {
+  background: var(--mat-sys-tertiary);
+  color: var(--mat-sys-on-tertiary);
+}
+
+.multiple-choice-chip {
+  background: transparent;
+  border: 1px solid var(--mat-sys-primary);
+  color: var(--mat-sys-primary);
+}
+
+.open-ended-chip {
+  background: transparent;
+  border: 1px solid var(--mat-sys-secondary);
+  color: var(--mat-sys-secondary);
+}
+
+.redaction-chip {
+  background: transparent;
+  border: 1px solid var(--mat-sys-tertiary);
+  color: var(--mat-sys-tertiary);
+}
+
+@media (max-width: 768px) {
+  .spacer {
+    display: none;
+  }
+
+  .info-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 600px) {
+  .exam-details {
+    padding: 1rem;
+  }
+}

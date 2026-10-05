@@ -1,0 +1,108 @@
+<mat-card class="publicnotice-card" appearance="outlined">
+  <!-- Toolbar -->
+  <mat-toolbar class="px-0 toolbar-actions">
+    <button
+      mat-icon-button
+      matTooltip="Editar Prova"
+      matTooltipPosition="above"
+      (click)="openEditPublicNoticeDialog()"
+    >
+      <mat-icon>edit</mat-icon>
+    </button>
+
+    <button
+      mat-icon-button
+      matTooltip="Adicionar Imagens"
+      matTooltipPosition="above"
+      (click)="openUploadImagesDialog()"
+    >
+      <mat-icon>add_photo_alternate</mat-icon>
+    </button>
+
+    <button
+      mat-icon-button
+      matTooltip="Anexar Edital"
+      matTooltipPosition="above"
+      (click)="attachNotice()"
+    >
+      <mat-icon>attach_file</mat-icon>
+    </button>
+
+    <button
+      mat-icon-button
+      matTooltip="Revisar Questões com IA"
+      matTooltipPosition="above"
+      (click)="reviewQuestionsWithAI()"
+    >
+      <mat-icon>fact_check</mat-icon>
+    </button>
+  </mat-toolbar>
+
+  <!-- Informações -->
+  <div class="public-notice-content">
+    <!-- Título + chips -->
+    <div class="header-row">
+      <h2 class="title">
+        {{ publicNotice?.examCategory | examCategory }}
+      </h2>
+
+      <span class="spacer"></span>
+
+      <mat-chip-set>
+        <mat-chip highlighted> Nº {{ publicNotice?.number }} </mat-chip>
+
+        <mat-chip>
+          {{ publicNotice?.year }}
+        </mat-chip>
+      </mat-chip-set>
+    </div>
+
+    <div class="info-grid">
+      <div class="info-item">
+        <span class="label">Banca</span>
+        <span class="value">
+          {{ publicNotice?.examinerOrganization || 'Não definido' }}
+        </span>
+      </div>
+
+      <div class="info-item">
+        <span class="label">Contratante</span>
+        <span class="value">
+          {{ publicNotice?.contractingOrganization || 'Não definido' }}
+        </span>
+      </div>
+
+      <div class="info-item">
+        <span class="label">Categoria</span>
+        <span class="value">
+          {{ publicNotice?.examCategory | examCategory }}
+        </span>
+      </div>
+    </div>
+
+    <mat-divider></mat-divider>
+
+    <div class="exam-selection">
+      <mat-form-field appearance="outline">
+        <mat-label>Exames</mat-label>
+
+        <mat-select
+          [(value)]="examSelected"
+          (selectionChange)="onSelectedExamChanged($event.value)"
+        >
+          @for (exam of publicNotice?.exams; track exam.id) {
+            <mat-option [value]="exam">
+              {{ exam.phase }}
+              -
+              {{ exam.educationLevel | educationLevel }}
+              -
+              {{ exam.position }}
+              -
+              {{ exam.area }}
+            </mat-option>
+          }
+        </mat-select>
+      </mat-form-field>
+    </div>
+  </div>
+</mat-card>

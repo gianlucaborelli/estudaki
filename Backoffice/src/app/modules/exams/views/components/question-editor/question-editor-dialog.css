@@ -1,0 +1,237 @@
+:host {
+  display: block;
+}
+
+.dialog-header {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin: 0;
+}
+
+.dialog-header mat-icon {
+  color: var(--mat-sys-primary, #3f51b5);
+}
+
+.question-editor {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+  padding-top: 0.5rem;
+}
+
+.section {
+  border-radius: 0.75rem;
+}
+
+.info-section {
+  padding: 1rem 1.25rem;
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  background: rgba(0, 0, 0, 0.015);
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.info-section h3 {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  margin: 0;
+  font-size: 1rem;
+  font-weight: 600;
+  color: rgba(0, 0, 0, 0.75);
+}
+
+.info-section h3 mat-icon {
+  font-size: 1.15rem;
+  height: 1.15rem;
+  width: 1.15rem;
+}
+
+.form-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+
+.form-grid mat-form-field {
+  flex: 1 1 200px;
+}
+
+.form-grid .full-width {
+  flex: 1 1 100%;
+}
+
+.subareas {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.subareas-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.subareas-header h4 {
+  margin: 0;
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: rgba(0, 0, 0, 0.6);
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+}
+
+.subarea-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+}
+
+.subarea-chip mat-form-field {
+  width: 200px;
+}
+
+.nullified-checkbox {
+  align-self: flex-start;
+}
+
+.nullified-checkbox mat-icon {
+  font-size: 1.1rem;
+  height: 1.1rem;
+  width: 1.1rem;
+  vertical-align: middle;
+  margin-right: 0.15rem;
+  color: #f9a825;
+}
+
+.content-tabs {
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  border-radius: 0.75rem;
+  overflow: visible;
+}
+
+/* Let the dialog content be the single scroll area instead of each tab body */
+:host ::ng-deep .content-tabs .mat-mdc-tab-body-wrapper,
+:host ::ng-deep .content-tabs .mat-mdc-tab-body,
+:host ::ng-deep .content-tabs .mat-mdc-tab-body-content {
+  overflow: visible !important;
+  height: auto !important;
+}
+
+.tab-section {
+  padding: 1.25rem;
+}
+
+.section-header {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  margin-bottom: 1rem;
+}
+
+.choice {
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+  padding: 1rem;
+  margin-bottom: 1.25rem;
+  border: 1px solid rgba(0, 0, 0, 0.1);
+  border-radius: 0.6rem;
+  background: #fff;
+  transition:
+    border-color 0.15s,
+    background-color 0.15s;
+}
+
+.choice:last-child {
+  margin-bottom: 0;
+}
+
+.choice-correct {
+  border-color: #4caf50;
+  background: rgba(76, 175, 80, 0.05);
+}
+
+.choice-header {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.choice-option {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  min-width: 28px;
+  border-radius: 50%;
+  background: rgba(0, 0, 0, 0.08);
+  font-weight: 700;
+  font-size: 0.85rem;
+}
+
+.choice-correct .choice-option {
+  background: #4caf50;
+  color: #fff;
+}
+
+.choice-actions {
+  margin-left: auto;
+  display: flex;
+}
+
+.support-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.support-item {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 0.75rem;
+  border: 1px solid rgba(0, 0, 0, 0.1);
+  border-radius: 0.5rem;
+  cursor: pointer;
+  transition:
+    border-color 0.15s,
+    background-color 0.15s;
+}
+
+.support-item:hover {
+  background: rgba(0, 0, 0, 0.03);
+}
+
+.support-item-selected {
+  border-color: #3f51b5;
+  background: rgba(63, 81, 181, 0.06);
+}
+
+.support-item mat-icon {
+  color: rgba(0, 0, 0, 0.5);
+}
+
+.empty-support {
+  padding: 1rem;
+  color: rgba(0, 0, 0, 0.5);
+  font-style: italic;
+  text-align: center;
+}
+
+/* Compact action bar: MDC buttons add an invisible 48px touch target that
+   otherwise makes the actions row look oversized. Target the actual Material
+   class (higher specificity than the `mat-dialog-actions` tag/directive selector). */
+:host ::ng-deep .mat-mdc-dialog-actions {
+  min-height: unset !important;
+  padding: 0.75rem 0 !important;
+  gap: 0.5rem !important;
+}
+
+:host ::ng-deep .mat-mdc-dialog-actions .mat-mdc-button-touch-target {
+  display: none !important;
+}

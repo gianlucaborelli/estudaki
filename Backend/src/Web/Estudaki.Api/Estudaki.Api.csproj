@@ -1,0 +1,26 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <UserSecretsId>4ba02657-0ba6-4251-adee-56e9872cd116</UserSecretsId>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="10.0.11" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="10.0.11">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\Core\Estudaki.Commons.Core\Estudaki.Commons.Core.csproj" />
+    <ProjectReference Include="..\..\Infrastructure\Estudaki.Infrastructure.Crosscutting\Estudaki.Infrastructure.Crosscutting.csproj" />
+    <ProjectReference Include="..\..\Modules\Identity\Estudaki.Modules.Identity.Infrastructure\Estudaki.Modules.Identity.Infrastructure.csproj" />
+    <ProjectReference Include="..\..\Modules\Questions\Estudaki.Modules.Questions.Application\Estudaki.Modules.Questions.Application.csproj" />
+    <ProjectReference Include="..\..\Modules\Questions\Estudaki.Modules.Questions.Domain\Estudaki.Modules.Questions.Domain.csproj" />
+  </ItemGroup>
+
+</Project>

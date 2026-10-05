@@ -1,0 +1,76 @@
+.image-picker {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  min-width: 480px;
+}
+
+.drop-area {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 1.5rem;
+  border: 2px dashed rgba(0, 0, 0, 0.2);
+  border-radius: 0.75rem;
+  text-align: center;
+  color: rgba(0, 0, 0, 0.6);
+}
+
+.drop-area:focus-visible {
+  outline: 2px solid #3f51b5;
+  outline-offset: 2px;
+}
+
+.drop-area p {
+  margin: 0;
+}
+
+.upload-status {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.875rem;
+  color: rgba(0, 0, 0, 0.6);
+}
+
+.error-message {
+  margin: 0;
+  color: #c62828;
+  font-size: 0.875rem;
+}
+
+.image-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(96px, 1fr));
+  gap: 0.75rem;
+}
+
+.image-thumb {
+  padding: 0;
+  border: 2px solid transparent;
+  border-radius: 0.5rem;
+  background: none;
+  cursor: pointer;
+  overflow: hidden;
+  aspect-ratio: 1;
+}
+
+.image-thumb img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.image-thumb-selected {
+  border-color: #3f51b5;
+}
+
+.empty-images {
+  grid-column: 1 / -1;
+  padding: 1rem;
+  color: rgba(0, 0, 0, 0.5);
+  font-style: italic;
+  text-align: center;
+}

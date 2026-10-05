@@ -1,0 +1,124 @@
+import { API_URL } from '$env/static/private';
+import type { Question, } from '$lib/questions/types/question';
+import type { QuestionFilters } from '$lib/questions/types/questionFilters';
+import type { CreateQuestionIssueRequest } from '$lib/questions/types/question-issue';
+import type { PaginatedResponse } from '$lib/shared/types/PaginatedResponse';
+
+function buildQuestionsQuery(filters: QuestionFilters): string {
+    const params = new URLSearchParams();
+
+    if (filters.isPublished !== undefined) {
+        params.set('isPublished', String(filters.isPublished));
+    }
+
+    if (filters.wordKey) {
+        params.set('wordKey', filters.wordKey);
+    }
+
+    if (filters.pageIndex !== undefined) {
+        params.set('page', String(filters.pageIndex));
+    }
+
+    if (filters.pageSize !== undefined) {
+        params.set('pageSize', String(filters.pageSize));
+    }
+
+    for (const value of filters.typeQuestions ?? []) {
+        params.append('typeQuestions', value);
+    }
+
+    for (const value of filters.examCategories ?? []) {
+        params.append('examCategories', value);
+    }
+
+    for (const value of filters.contractingOrganization ?? []) {
+        params.append('contractingOrganization', value);
+    }
+
+    for (const value of filters.examinerOrganization ?? []) {
+        params.append('examinerOrganization', value);
+    }
+
+    for (const value of filters.year ?? []) {
+        params.append('year', value.toString());
+    }
+
+    for (const value of filters.mainAreas ?? []) {
+        params.append('mainAreas', value);
+    }
+
+    for (const value of filters.subAreas ?? []) {
+        params.append('subAreas', value);
+    }
+
+    return params.toString();
+}
+
+export async function getQuestions(
+    fetch: typeof globalThis.fetch,
+    filters: QuestionFilters = {}
+): Promise<PaginatedResponse<Question>> {
+    try {
+        const query = buildQuestionsQuery(filters);
+        const response = await fetch(`${API_URL}/api/questions?${query}`);
+
+        if (!response.ok) {
+            throw new Error(`Erro ao buscar questões: ${response.status}`);
+        }
+
+        return await response.json();
+    } catch (error) {
+        console.error('Erro ao buscar questões:', error);
+        throw error;
+    }
+}
+
+export async function getFilterParameters(
+    fetch: typeof globalThis.fetch
+): Promise<QuestionFilters> {
+    try {
+        const response = await fetch(`${API_URL}/api/questions/parameters`);
+
+        if (!response.ok) {
+            throw new Error(`Erro ao buscar questões: ${response.status}`);
+        }
+
+        return await response.json();
+    } catch (error) {
+        console.error('Erro ao buscar questões:', error);
+        throw error;
+    }
+}
+
+export async function getQuestionById(
+    fetch: typeof globalThis.fetch,
+    id: string
+): Promise<Question | undefined> {
+    const response = await fetch(`${API_URL}/api/questions/${id}`);
+
+    if (response.status === 404) {
+        return undefined;
+    }
+
+    if (!response.ok) {
+        throw new Error(`Erro ao buscar questão: ${response.status}`);
+    }
+
+    return await response.json();
+}
+
+export async function createQuestionIssue(
+    fetch: typeof globalThis.fetch,
+    questionId: string,
+    issue: CreateQuestionIssueRequest
+): Promise<void> {
+    const response = await fetch(`${API_URL}/api/questions/${questionId}/issues`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(issue)
+    });
+
+    if (!response.ok) {
+        throw new Error(`Erro ao sinalizar questão: ${response.status}`);
+    }
+}

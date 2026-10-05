@@ -1,0 +1,44 @@
+﻿using Estudaki.Commons.Core.Data.Context;
+using Estudaki.Commons.Core.Models;
+using MongoDB.Driver;
+
+namespace Estudaki.Commons.Core.Data.Repository;
+
+public abstract class MongoRepositoryBase<TEntity> : MongoDbHelper, IRepository<TEntity> where TEntity : Entity
+{
+    protected readonly IMongoContext Context;
+    protected IMongoCollection<TEntity> DbSet;
+
+    protected MongoRepositoryBase(IMongoContext context)
+    {
+        Context = context;
+        DbSet = Context.GetCollection<TEntity>();
+    }
+
+    public virtual void Add(TEntity obj)
+    {
+        DbSet.InsertOne(obj);
+    }
+
+    public virtual async Task<TEntity> GetById(string id)
+    {
+        var data = await DbSet.FindAsync(Builders<TEntity>.Filter.Eq(x => x.Id, id));
+        return data.SingleOrDefault();
+    }
+
+    public virtual async Task<IEnumerable<TEntity>> GetAll()
+    {
+        var all = await DbSet.FindAsync(Builders<TEntity>.Filter.Empty);
+        return all.ToList();
+    }
+
+    public virtual async Task Update(TEntity obj)
+    {
+        await DbSet.ReplaceOneAsync(Builders<TEntity>.Filter.Eq(x => x.Id, obj.Id), obj);
+    }
+
+    public virtual async Task Remove(string id)
+    {
+        await DbSet.DeleteOneAsync(Builders<TEntity>.Filter.Eq(x => x.Id, id));
+    }
+}
