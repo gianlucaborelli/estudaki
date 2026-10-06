@@ -33,10 +33,6 @@
 		background-color: var(--primary);
 	}
 
-	:global(span) {
-		font-size: 1.5rem;
-	}
-
 	:global(.nav-item) {
 		color: var(--text);
 		font-size: 1rem;

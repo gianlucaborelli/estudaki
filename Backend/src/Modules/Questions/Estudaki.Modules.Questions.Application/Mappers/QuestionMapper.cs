@@ -108,7 +108,7 @@ public static class QuestionMapper
                     .Where(qs => question.QuestionSupports?.Contains(qs.Id) == true)
                     .Select(qs => qs.ToDto())
                     .ToList() ?? [],
-            Choices = question.Choices,
+            Choices = question.Choices?.ToList() ?? [],
             CreatedAt = question.CreatedAt
         };
     }
