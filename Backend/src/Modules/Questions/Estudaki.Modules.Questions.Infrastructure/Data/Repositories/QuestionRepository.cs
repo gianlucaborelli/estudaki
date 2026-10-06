@@ -109,7 +109,7 @@ public class QuestionRepository : MongoRepositoryBase<Question>, IQuestionReposi
         var filters = new List<FilterDefinition<Question>>();
 
         // Filtro de publicação        
-        filterBuilder.Eq(q => q.IsPublished, true);        
+        filters.Add(filterBuilder.Eq(q => q.IsPublished, true));
 
         // Filtro de texto (busca no conteúdo)
         if (!string.IsNullOrWhiteSpace(searchParameter.WordKey))
