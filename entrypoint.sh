@@ -4,7 +4,8 @@ set -e
 dotnet /app/backend/Estudaki.Api.dll &
 BACKEND_PID=$!
 
-PORT=3000 HOST=0.0.0.0 node /app/frontend/build/index.js &
+PORT=3000 HOST=0.0.0.0 HOST_HEADER=x-forwarded-host PROTOCOL_HEADER=x-forwarded-proto \
+    node /app/frontend/build/index.js &
 FRONTEND_PID=$!
 
 PORT=4000 node /app/backoffice/server/server.mjs &
