@@ -13,7 +13,14 @@ export default defineConfig({
 			},
 
 			// adapter-node: standalone Node server, used to run the frontend inside the Docker image.
-			adapter: adapter()
+			adapter: adapter(),
+
+			// Behind the reverse proxy, the Host/X-Forwarded-* headers aren't reliable enough for
+			// SvelteKit to resolve the correct origin, so legitimate origins are allow-listed explicitly
+			// instead of relying on header-based origin detection for the CSRF check.
+			csrf: {
+				trustedOrigins: ['https://estudaki.com.br', 'https://www.estudaki.com.br']
+			}
 		})
 	]
 });
