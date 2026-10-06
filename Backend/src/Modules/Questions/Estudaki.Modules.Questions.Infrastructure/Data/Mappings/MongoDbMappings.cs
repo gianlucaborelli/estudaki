@@ -25,61 +25,7 @@ public static class MongoDbMappings
         {
             cm.AutoMap();            
             cm.SetIgnoreExtraElements(true);
-        });
-
-        BsonClassMap.RegisterClassMap<ContentBlock>(cm =>
-        {
-            cm.AutoMap();
-            cm.SetIsRootClass(true);
-            cm.AddKnownType(typeof(ParagraphBlock));
-            cm.AddKnownType(typeof(ImageBlock));
-        });
-
-        BsonClassMap.RegisterClassMap<ParagraphBlock>(cm =>
-        {
-            cm.AutoMap();
-            cm.SetDiscriminator("ParagraphBlock");
-        });
-
-        BsonClassMap.RegisterClassMap<ImageBlock>(cm =>
-        {
-            cm.AutoMap();
-            cm.SetDiscriminator("ImageBlock");
-        });
-
-        BsonClassMap.RegisterClassMap<InlineContent>(cm =>
-        {
-            cm.AutoMap();
-            cm.SetIsRootClass(true);
-            cm.AddKnownType(typeof(TextInline));
-            cm.AddKnownType(typeof(ImageInline));
-            cm.AddKnownType(typeof(MathInline));
-            cm.AddKnownType(typeof(ChemicalFormulaInline));
-        });
-
-        BsonClassMap.RegisterClassMap<TextInline>(cm =>
-        {
-            cm.AutoMap();
-            cm.SetDiscriminator("TextInline");
-        });
-
-        BsonClassMap.RegisterClassMap<ImageInline>(cm =>
-        {
-            cm.AutoMap();
-            cm.SetDiscriminator("ImageInline");
-        });
-
-        BsonClassMap.RegisterClassMap<MathInline>(cm =>
-        {
-            cm.AutoMap();
-            cm.SetDiscriminator("MathInline");
-        });
-
-        BsonClassMap.RegisterClassMap<ChemicalFormulaInline>(cm =>
-        {
-            cm.AutoMap();
-            cm.SetDiscriminator("ChemicalFormulaInline");
-        });
+        });                
 
         BsonClassMap.RegisterClassMap<Choice>(cm =>
         {

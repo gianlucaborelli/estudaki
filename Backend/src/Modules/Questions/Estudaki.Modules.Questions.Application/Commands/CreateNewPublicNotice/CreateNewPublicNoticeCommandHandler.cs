@@ -49,29 +49,10 @@ public class CreateNewPublicNoticeCommandHandler : CommandHandler, ICommandHandl
                     string.Empty,
                     Array.Empty<string>(),
                     new List<string> { },
-                    new List<ContentBlock>
-                    { 
-                        new ParagraphBlock
-                        {
-                            Order = 1,
-                            Inlines = new List<InlineContent>
-                            {
-                                new TextInline
-                                {
-                                    Text = questionDto.Content,                                    
-                                }
-                            }
-                        }
-                    },
+                    questionDto.Content,
                     questionDto.SingleChoices.Select(c => new Choice
                     {
-                        Content = new List<InlineContent>
-                        {
-                            new TextInline
-                            {
-                                Text = c.Content,
-                            }
-                        },
+                        Explanation = c.Content,
                         Option = c.Option,
                         IsCorrect = false
                     }).ToList(),

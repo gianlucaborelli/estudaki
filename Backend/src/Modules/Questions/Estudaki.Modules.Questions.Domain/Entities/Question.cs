@@ -13,7 +13,6 @@ public class Question : Entity
     public string MainArea { get; set; } = string.Empty;
     public string[] SubAreas { get; set; } = [];
     public List<string>? QuestionSupports { get; set; }
-    public List<ContentBlock> QuestionContents { get; set; } = [];
     public string? Statement { get; set; }
     public List<Choice>? Choices { get; set; }
 
@@ -34,7 +33,7 @@ public class Question : Entity
         string mainArea, 
         string[] subAreas, 
         List<string> questionSupports, 
-        List<ContentBlock> questionContents, 
+        string statement, 
         List<Choice> choices,
         QuestionExam questionExam)
     {
@@ -45,7 +44,7 @@ public class Question : Entity
             MainArea = mainArea,
             SubAreas = subAreas,
             QuestionSupports = questionSupports,
-            QuestionContents = questionContents,
+            Statement = statement,
             Choices = choices,
             Exams = new List<QuestionExam> { questionExam }
         };

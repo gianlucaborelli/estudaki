@@ -38,8 +38,7 @@ public class UpdateQuestionCommandHandler : CommandHandler, ICommandHandler<Upda
         question.Type = command.Question.QuestionType;
         question.MainArea = command.Question.MainArea;
         question.SubAreas = command.Question.SubAreas;
-        question.QuestionSupports = command.Question.QuestionSupports.Select(s => s.Id).ToList();  
-        question.QuestionContents = command.Question.QuestionContents;
+        question.QuestionSupports = command.Question.QuestionSupports.Select(s => s.Id).ToList(); 
         question.Statement = command.Question.Statement;
         question.Choices = command.Question.Choices;        
 

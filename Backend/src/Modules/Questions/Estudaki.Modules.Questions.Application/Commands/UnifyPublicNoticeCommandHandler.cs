@@ -95,7 +95,6 @@ public class UnifyPublicNoticeCommandHandler : CommandHandler, ICommandHandler<U
         foreach (var support in questionSupports)
         {
             support.PublicNoticeId = publicNoticeToUnify.Id;
-            await UpdateImages(support.Contents);
         }            
 
         foreach (var question in questions)
@@ -110,8 +109,6 @@ public class UnifyPublicNoticeCommandHandler : CommandHandler, ICommandHandler<U
                 exam.ExaminerOrganization = publicNoticeToUnify.ExaminerOrganization;
                 exam.ContractingOrganization = publicNoticeToUnify.ContractingOrganization;
             }
-
-            await UpdateImages(question.QuestionContents);
         }
 
         await _publicNoticeRepository.Update(publicNoticeToUnify);
@@ -133,57 +130,5 @@ public class UnifyPublicNoticeCommandHandler : CommandHandler, ICommandHandler<U
     {
         if (string.IsNullOrEmpty(url)) return "";
         return new Uri(url).AbsolutePath.TrimStart('/');
-    }
-
-    public async Task UpdateImages(List<ContentBlock> contentBlocks)
-    {
-        foreach (var content in contentBlocks)
-        {
-            if (content is ImageBlock imageBlock)
-            {
-                var oldImagePath = ExtractPathKey(imageBlock.Key);
-                
-                if (!string.IsNullOrEmpty(oldImagePath))
-                {
-                    var fileName = Path.GetFileName(new Uri(imageBlock.Key).AbsolutePath);
-                    var newImagePath = publicNoticeToUnify.GetImagesFolder();
-                    newImagePath = newImagePath + fileName;
-
-                    var fileExists = await _storageService.FileExistsAsync(oldImagePath);
-
-                    if (fileExists && (newImagePath != oldImagePath))
-                    {
-                        newImagePath = await _storageService.MoveFileAsync(oldImagePath, newImagePath);
-                        imageBlock.Key = newImagePath;
-                    }
-                }
-            }
-            else if (content is ParagraphBlock paragraphBlock)
-            {
-                foreach (var inlineContent in paragraphBlock.Inlines)
-                {
-                    if (inlineContent is ImageInline imageInInline)
-                    {
-                        var oldImagePath = ExtractPathKey(imageInInline.Key);
-                        var newImagePath = publicNoticeToUnify.GetImagesFolder();
-
-                        if (!string.IsNullOrEmpty(oldImagePath))
-                        {
-                            var fileExists = await _storageService.FileExistsAsync(oldImagePath);
-
-                            if (fileExists)
-                            {
-                                var fileName = Path.GetFileName(new Uri(oldImagePath).AbsolutePath);
-                                newImagePath = newImagePath + fileName;
-
-                                newImagePath = await _storageService.MoveFileAsync(oldImagePath, newImagePath);
-
-                                imageInInline.Key = newImagePath;
-                            }
-                        }
-                    }
-                }
-            }
-        }
-    }
+    }    
 }

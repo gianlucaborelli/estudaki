@@ -105,38 +105,14 @@ public class ReviewQuestionsByPublicNoticeIdCommandHandler
 
 public static class QuestionExtensions
 {
-    private static string GetInlineText(InlineContent inline)
-        => inline switch
-        {
-            TextInline t => t.Text,
-            ImageInline img => img.Alt ?? string.Empty,
-            _ => string.Empty
-        };
-
-    private static SimpleContent ToSimpleContent(ContentBlock block)
-        => block switch
-        {
-            ParagraphBlock p => new SimpleContent
-            {
-                Text = string.Join(" ", p.Inlines.Select(GetInlineText)),
-                Order = p.Order,
-                Type = ContentType.Text.ToString(),
-            },
-            ImageBlock img => new SimpleContent
-            {
-                Text = img.Description ?? string.Empty,
-                Order = img.Order,
-                Type = ContentType.Image.ToString(),
-            },
-            _ => throw new NotSupportedException()
-        };
-
     public static IAQuestion ToIaQuestion(this Question question, List<QuestionSupport> availableSupports)
     {
         var questionSupports = availableSupports
             .Where(s => question.QuestionSupports.Contains(s.Id))
-            .SelectMany(s => s.Contents)
-            .Select(ToSimpleContent)
+            .Select(c => new SimpleContent
+            {
+                Text = string.Join(" ", c.Content),
+            })
             .ToList();
 
         return new IAQuestion
@@ -144,9 +120,7 @@ public static class QuestionExtensions
             Id = question.Id,
             MainArea = question.MainArea,
             SubAreas = question.SubAreas.ToList(),
-            QuestionContents = question.QuestionContents
-                .Select(ToSimpleContent)
-                .ToList(),
+            Statement = question.Statement,
 
             QuestionSupports = questionSupports,
 
@@ -155,10 +129,7 @@ public static class QuestionExtensions
                 {
                     Letter = c.Option,
                     IsCorrect = c.IsCorrect,
-                    Text = string.Join(" ", c.Content.Select(GetInlineText)),
-                    Type = c.Content.Any(i => i is ImageInline)
-                        ? ContentType.Image.ToString()
-                        : ContentType.Text.ToString(),
+                    Text = string.Join(" ", c.Explanation)
                 }).ToList(),
         };
     }
@@ -175,7 +146,7 @@ public class IAQuestion
     /// <summary>
     /// Enunciado da questão.
     /// </summary>
-    public List<SimpleContent> QuestionContents { get; set; } = [];
+    public string Statement { get; set; } = string.Empty;
 
     /// <summary>
     /// Suportes da questão, como imagens, gráficos ou tabelas.
@@ -191,34 +162,7 @@ public class IAQuestion
 public class SimpleContent
 {
     public string Text { get; set; } = string.Empty;
-    public string Type {  get; set; } = string.Empty;
-    public int Order { get; set; }
-
-    public static string GetContentType(string type)
-    {
-        return type.ToLower() switch
-        {
-            "text" => ContentType.Text.ToString(),
-            "image" => ContentType.Image.ToString(),
-            _ => throw new ArgumentException($"Tipo de conteúdo inválido: {type}")
-        };
-    }
-
-    public static ContentType GetContentTypeEnum(string type)
-    {
-        return type.ToLower() switch
-        {
-            "text" => ContentType.Text,
-            "image" => ContentType.Image,
-            _ => throw new ArgumentException($"Tipo de conteúdo inválido: {type}")
-        };
-    }    
-}
-
-public enum ContentType
-{
-    Text,
-    Image
+    public int Order { get; set; }    
 }
 
 public class SimpleAlternative : SimpleContent

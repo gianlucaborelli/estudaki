@@ -46,7 +46,6 @@ public class CreateQuestionCommandHandler : CommandHandler, ICommandHandler<Crea
         question.MainArea = command.Question.MainArea;
         question.SubAreas = command.Question.SubAreas;
         question.QuestionSupports = command.Question.QuestionSupports.Select(s => s.Id).ToList();
-        question.QuestionContents = command.Question.QuestionContents;
         question.Statement = command.Question.Statement;
         question.Choices = command.Question.Choices;
 

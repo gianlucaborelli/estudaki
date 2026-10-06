@@ -12,7 +12,6 @@ using Estudaki.Modules.Questions.Application.Queries.GetQuestionsByExamId;
 using Estudaki.Modules.Questions.Application.Queries.GetQuestionsByPublicNoticeId;
 using Estudaki.Modules.Questions.Application.Queries.GetQuestionSupportsByPublicNoticeId;
 using Estudaki.Modules.Questions.Application.Queries.SearchQuestions;
-using Estudaki.Modules.Questions.Application.Services;
 using Estudaki.Modules.Questions.Domain.Repositories;
 using Estudaki.Modules.Questions.Infrastructure.Data;
 using Estudaki.Modules.Questions.Infrastructure.Data.Mappings;
@@ -37,7 +36,6 @@ public static class ServiceCollectionExtensions
         services.AddScoped<IQuestionSupportRepository, QuestionSupportRepository>();
         services.AddScoped<IExamExtractionRepository, ExamExtractionRepository>();
         services.AddScoped<IQuestionIssueRepository, QuestionIssueRepository>();
-        services.AddScoped<ContentMigrationService>();
 
         var postgresConnectionString = configuration.GetConnectionString("PostgresConnection")
             ?? throw new InvalidOperationException("Connection string 'PostgresConnection' not found.");

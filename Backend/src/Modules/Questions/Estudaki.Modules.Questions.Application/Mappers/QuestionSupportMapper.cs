@@ -11,8 +11,7 @@ public static class QuestionSupportMapper
         {
             Id = questionSupport.Id,
             PublicNoticeId = questionSupport.PublicNoticeId,
-            Content = questionSupport.Content,
-            Contents = questionSupport.Contents
+            Content = questionSupport.Content
         };
     }
 
@@ -22,8 +21,7 @@ public static class QuestionSupportMapper
         {
             Id = questionSupportDto.Id,
             PublicNoticeId = questionSupportDto.PublicNoticeId,
-            Content = questionSupportDto.Content,
-            Contents = questionSupportDto.Contents
+            Content = questionSupportDto.Content
         };
     }
 
