@@ -11,7 +11,7 @@
       <div class="tab-content">
         <app-public-notice [publicNotice]="publicNotice" (selectedExam)="onExamSelected($event)" />
         @if (selectedExam) {
-          <app-exam-detail-component [exam]="selectedExam" />
+          <app-exam-detail-component [exam]="selectedExam" [publicNotice]="publicNotice" />
         }
       </div>
     </mat-tab>

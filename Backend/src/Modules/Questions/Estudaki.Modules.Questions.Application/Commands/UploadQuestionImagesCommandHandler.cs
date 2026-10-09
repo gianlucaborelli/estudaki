@@ -3,7 +3,6 @@ using Estudaki.Commons.Core.Storage;
 using Estudaki.Modules.Questions.Domain.Extensions;
 using Estudaki.Modules.Questions.Domain.Repositories;
 using FluentValidation;
-using FluentValidation.Results;
 
 namespace Estudaki.Modules.Questions.Application.Commands
 {

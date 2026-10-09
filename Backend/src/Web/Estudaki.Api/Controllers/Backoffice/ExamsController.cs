@@ -83,7 +83,7 @@ public class ExamsController(ICommandDispatcher commandDispatcher, IQueryDispatc
     public async Task<IActionResult> UpdateQuestionSupport(
         [FromRoute] string publicNoticeId,
         [FromBody] UpdateQuestionSupportCommand command)
-    {        
+    {       
         var result = await _commandDispatcher.DispatchAsync<UpdateQuestionSupportCommand, CommandResult>(command);
         return Ok(result);
     }
@@ -106,6 +106,22 @@ public class ExamsController(ICommandDispatcher commandDispatcher, IQueryDispatc
         [FromBody] CreateQuestionCommand command)
     {        
         var result = await _commandDispatcher.DispatchAsync<CreateQuestionCommand, CommandResult>(command);
+        return Ok(result);
+    }
+
+    [HttpPost("{publicNoticeId}/exams/{examId}/contents/exam-files")]
+    public async Task<IActionResult> UploadExamFiles(
+        [FromRoute] string publicNoticeId,
+        [FromRoute] string examId,
+        [FromForm] UploadExamFilesCommand command)
+    {
+        command = command with
+        {
+            publicNoticeId = publicNoticeId,
+            examId = examId
+        };
+
+        var result = await _commandDispatcher.DispatchAsync<UploadExamFilesCommand, CommandResult>(command);
         return Ok(result);
     }
 

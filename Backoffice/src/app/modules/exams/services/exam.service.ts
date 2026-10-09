@@ -66,6 +66,26 @@ export class ExamService {
     );
   }
 
+  uploadExamFiles(
+    publicNoticeId: string,
+    examId: string,
+    examFile: File,
+    answerKeyFile: File): Observable<void> {
+    const formData = new FormData();
+    formData.append('publicNoticeId', publicNoticeId);
+    formData.append('examId', examId);
+    formData.append('examFile', examFile);
+    formData.append('answerKeyFile', answerKeyFile);
+
+    return this.http.post<void>(
+      `/api/exams/${publicNoticeId}/exams/${examId}/contents/exam-files`,
+      formData,
+      {
+        withCredentials: true
+      }
+    );
+  }
+
   getQuestionSupportByPublicNoticeIdPaged(
     publicNotice: string,
     pageNumber: number,
@@ -98,7 +118,7 @@ export class ExamService {
     questionSupport: QuestionSupport): Observable<QuestionSupport> {
     return this.http.post<QuestionSupport>(
       `/api/exams/${publicNoticeId}/contents/questions-support`,
-      { questionSupport },
+      { questionSupportDto: questionSupport },
       {
         withCredentials: true
       }
@@ -108,8 +128,6 @@ export class ExamService {
   updateQuestionSupport(
     publicNoticeId: string,
     questionSupport: QuestionSupport): Observable<QuestionSupport> {
-
-    console.log(questionSupport)
     return this.http.patch<QuestionSupport>(
       `/api/exams/${publicNoticeId}/contents/questions-support`,
       { questionSupport },

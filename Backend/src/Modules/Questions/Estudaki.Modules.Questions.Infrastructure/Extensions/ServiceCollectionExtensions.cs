@@ -43,7 +43,7 @@ public static class ServiceCollectionExtensions
             options.UseNpgsql(postgresConnectionString));
         services.AddScoped<IAreaRepository, AreaRepository>();
 
-        services.AddValidatorsFromAssembly(typeof(UploadPublicNoticeFilesCommandValidator).Assembly);
+        services.AddValidatorsFromAssembly(typeof(UploadExamFilesCommandValidator).Assembly);
 
         services.AddCQRSHandlers(typeof(GetQuestionByIdQueryHandler).Assembly);
         services.AddCQRSHandlers(typeof(GetFilterParametersQueryHandler).Assembly);

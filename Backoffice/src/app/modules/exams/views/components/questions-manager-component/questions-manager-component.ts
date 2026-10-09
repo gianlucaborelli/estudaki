@@ -191,15 +191,14 @@ export class QuestionsManagerComponent implements OnChanges {
       });
   }
 
-
   deleteQuestionSupport() { }
 
-  openQuestionSupportEditorModal(): void {
+  openQuestionSupportEditorModal(isEditorMode: boolean): void {
     if (!this.publicNotice) {
       return;
     }
 
-    const questionSupport = this.selectedQuestionSupport
+    const questionSupport = isEditorMode
       ? this.selectedQuestionSupport
       : undefined;
 

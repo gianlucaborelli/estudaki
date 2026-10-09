@@ -211,7 +211,7 @@
               <button
                 mat-icon-button
                 matTooltip="Adicionar Suporte"
-                (click)="openQuestionSupportEditorModal()"
+                (click)="openQuestionSupportEditorModal(false)"
               >
                 <mat-icon>add</mat-icon>
               </button>
@@ -220,7 +220,7 @@
                 mat-icon-button
                 matTooltip="Editar Suporte"
                 [disabled]="!selectedQuestionSupport"
-                (click)="openQuestionSupportEditorModal()"
+                (click)="openQuestionSupportEditorModal(true)"
               >
                 <mat-icon>edit</mat-icon>
               </button>

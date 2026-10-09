@@ -52,7 +52,7 @@ export class QuestionSupportEditorDialog {
         this.questionSupport
       ).subscribe({
         next: () => {
-          // atualização concluída
+          this.dialogRef.close(this.questionSupport);
         },
         error: error => {
           console.error(error);
@@ -63,14 +63,12 @@ export class QuestionSupportEditorDialog {
         this.questionSupport
       ).subscribe({
         next: () => {
-          // criação concluída
+          this.dialogRef.close(this.questionSupport);
         },
         error: error => {
           console.error(error);
         }
       });
-
-    this.dialogRef.close(this.questionSupport);
   }
 
   cancel(): void {
@@ -81,12 +79,16 @@ export class QuestionSupportEditorDialog {
     questionSupport?: QuestionSupport
   ): QuestionSupport {
     if (questionSupport) {
-      return structuredClone(questionSupport);
+      return {
+        ...structuredClone(questionSupport),
+        publicNoticeId: this.data.publicNotice.id
+      };
     }
 
     return {
-      id: crypto.randomUUID(),
-      content: ''
+      id: '',
+      content: '',
+      publicNoticeId: this.data.publicNotice.id
     };
   }
 }

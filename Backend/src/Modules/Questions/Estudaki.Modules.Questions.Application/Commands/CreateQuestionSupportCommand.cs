@@ -1,7 +1,6 @@
 ﻿using Estudaki.Commons.Core.CQRS;
 using Estudaki.Modules.Questions.Application.DTOs;
 using FluentValidation;
-using FluentValidation.Results;
 
 namespace Estudaki.Modules.Questions.Application.Commands;
 

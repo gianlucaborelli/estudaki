@@ -40,6 +40,7 @@ export interface QuestionChoice {
 export interface QuestionSupport {
   id: string;
   content: string;
+  publicNoticeId: string;
 }
 
 export type BlockContent = ParagraphBlock | ImageBlock;
