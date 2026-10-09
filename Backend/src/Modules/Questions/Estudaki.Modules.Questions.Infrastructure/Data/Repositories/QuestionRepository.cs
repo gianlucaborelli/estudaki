@@ -21,32 +21,38 @@ public class QuestionRepository : MongoRepositoryBase<Question>, IQuestionReposi
         var filterBuilder = Builders<Question>.Filter;
         var baseFilter = filterBuilder.Eq(q => q.IsPublished, true);
 
-        // Buscar tipos de questões
-        var typeQuestions = await DbSet
+        // Executar todas as queries em paralelo
+        var typeQuestionsTask = DbSet
             .Distinct(x => x.Type, baseFilter)
             .ToListAsync();
 
-        // Buscar áreas principais
-        var mainAreas = await DbSet
+        var mainAreasTask = DbSet
             .Distinct(x => x.MainArea, baseFilter)
             .ToListAsync();
 
-        // Buscar sub-áreas
-        var allQuestions = await DbSet
+        var subAreasTask = DbSet
             .Find(baseFilter)
             .Project(q => q.SubAreas)
             .ToListAsync();
 
-        var subAreas = allQuestions
-            .SelectMany(sa => sa)
-            .Distinct()
-            .OrderBy(sa => sa)
-            .ToArray();
-                
-        var questionsWithExams = await DbSet
+        var examsTask = DbSet
             .Find(baseFilter)
             .Project(q => q.Exams)
             .ToListAsync();
+
+        await Task.WhenAll(typeQuestionsTask, mainAreasTask, subAreasTask, examsTask);
+
+        var typeQuestions = await typeQuestionsTask;
+        var mainAreas = await mainAreasTask;
+        var allSubAreas = await subAreasTask;
+        var questionsWithExams = await examsTask;
+
+        var subAreas = allSubAreas
+            .SelectMany(sa => sa)
+            .Distinct()
+            .Where(sa => !string.IsNullOrWhiteSpace(sa))
+            .OrderBy(sa => sa)
+            .ToArray();
 
         var examCategories = questionsWithExams
             .SelectMany(exams => exams)
@@ -81,7 +87,11 @@ public class QuestionRepository : MongoRepositoryBase<Question>, IQuestionReposi
 
         return new FilterParameters
         {
-            TypeQuestions = typeQuestions.Where(t => !string.IsNullOrWhiteSpace(t)).OrderBy(t => t).ToArray(),
+            TypeQuestions = typeQuestions
+                .Where(t => !string.IsNullOrWhiteSpace(t))
+                .Distinct()
+                .OrderBy(t => t)
+                .ToArray(),
             ExamCategories = examCategories,
             ContractingOrganization =
                 [
@@ -98,7 +108,11 @@ public class QuestionRepository : MongoRepositoryBase<Question>, IQuestionReposi
                         ?? []
                 ],
             Year = examYears,
-            MainAreas = mainAreas.Where(ma => !string.IsNullOrWhiteSpace(ma)).OrderBy(ma => ma).ToArray(),
+            MainAreas = mainAreas
+                .Where(ma => !string.IsNullOrWhiteSpace(ma))
+                .Distinct()
+                .OrderBy(ma => ma)
+                .ToArray(),
             SubAreas = subAreas
         };
     }
@@ -128,52 +142,100 @@ public class QuestionRepository : MongoRepositoryBase<Question>, IQuestionReposi
             filters.Add(filterBuilder.Or(wordFilters));
         }
 
-        // Filtro de tipo de questão
+        // Filtro de tipo de questão - CORRIGIDO: normaliza e valida os valores
         if (searchParameter.TypeQuestions is { Length: > 0 })
         {
-            filters.Add(filterBuilder.In(q => q.Type, searchParameter.TypeQuestions));
+            var validTypes = searchParameter.TypeQuestions
+                .Where(t => !string.IsNullOrWhiteSpace(t))
+                .Select(t => t.Trim())
+                .ToList();
+
+            if (validTypes.Count > 0)
+            {
+                filters.Add(filterBuilder.In(q => q.Type, validTypes));
+            }
         }
 
-        // Filtro de área principal
+        // Filtro de área principal - CORRIGIDO: normaliza e valida os valores
         if (searchParameter.MainAreas is { Length: > 0 })
         {
-            filters.Add(filterBuilder.In(q => q.MainArea, searchParameter.MainAreas));
+            var validAreas = searchParameter.MainAreas
+                .Where(ma => !string.IsNullOrWhiteSpace(ma))
+                .Select(ma => ma.Trim())
+                .ToList();
+
+            if (validAreas.Count > 0)
+            {
+                filters.Add(filterBuilder.In(q => q.MainArea, validAreas));
+            }
         }
 
         // Filtro de sub-áreas
         if (searchParameter.SubAreas is { Length: > 0 })
         {
-            filters.Add(filterBuilder.AnyIn(q => q.SubAreas, searchParameter.SubAreas));
+            var validSubAreas = searchParameter.SubAreas
+                .Where(sa => !string.IsNullOrWhiteSpace(sa))
+                .Select(sa => sa.Trim())
+                .ToList();
+
+            if (validSubAreas.Count > 0)
+            {
+                filters.Add(filterBuilder.AnyIn(q => q.SubAreas, validSubAreas));
+            }
         }
 
         // Filtro de categoria de exame
         if (searchParameter.ExamCategories is { Length: > 0 })
         {
-            var examFilter = filterBuilder.ElemMatch(
-                q => q.Exams,
-                Builders<QuestionExam>.Filter.In(qe => qe.ExamCategory, searchParameter.ExamCategories)
-            );
-            filters.Add(examFilter);
+            var validCategories = searchParameter.ExamCategories
+                .Where(ec => !string.IsNullOrWhiteSpace(ec))
+                .Select(ec => ec.Trim())
+                .ToList();
+
+            if (validCategories.Count > 0)
+            {
+                var examFilter = filterBuilder.ElemMatch(
+                    q => q.Exams,
+                    Builders<QuestionExam>.Filter.In(qe => qe.ExamCategory, validCategories)
+                );
+                filters.Add(examFilter);
+            }
         }
 
         // Filtro por contratante do exame
         if (searchParameter.ContractingOrganization is { Length: > 0 })
         {
-            var examFilter = filterBuilder.ElemMatch(
-                q => q.Exams,
-                Builders<QuestionExam>.Filter.In(qe => qe.ContractingOrganization, searchParameter.ContractingOrganization)
-            );
-            filters.Add(examFilter);
+            var validOrganizations = searchParameter.ContractingOrganization
+                .Where(org => !string.IsNullOrWhiteSpace(org))
+                .Select(org => org.Trim())
+                .ToList();
+
+            if (validOrganizations.Count > 0)
+            {
+                var examFilter = filterBuilder.ElemMatch(
+                    q => q.Exams,
+                    Builders<QuestionExam>.Filter.In(qe => qe.ContractingOrganization, validOrganizations)
+                );
+                filters.Add(examFilter);
+            }
         }
 
         // Filtro por organizador do exame
         if (searchParameter.ExaminerOrganization is { Length: > 0 })
         {
-            var examFilter = filterBuilder.ElemMatch(
-                q => q.Exams,
-                Builders<QuestionExam>.Filter.In(qe => qe.ExaminerOrganization, searchParameter.ExaminerOrganization)
-            );
-            filters.Add(examFilter);
+            var validOrganizations = searchParameter.ExaminerOrganization
+                .Where(org => !string.IsNullOrWhiteSpace(org))
+                .Select(org => org.Trim())
+                .ToList();
+
+            if (validOrganizations.Count > 0)
+            {
+                var examFilter = filterBuilder.ElemMatch(
+                    q => q.Exams,
+                    Builders<QuestionExam>.Filter.In(qe => qe.ExaminerOrganization, validOrganizations)
+                );
+                filters.Add(examFilter);
+            }
         }
 
         // Filtro por Ano do exame
