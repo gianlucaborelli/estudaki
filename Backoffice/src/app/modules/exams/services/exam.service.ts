@@ -170,9 +170,9 @@ export class ExamService {
     publicNoticeId: string,
     examId: string,
     question: Question): Observable<Question> {
-    return this.http.patch<Question>(
+    return this.http.post<Question>(
       `/api/exams/${publicNoticeId}/exams/${examId}/questions`,
-      { question },
+      { Question: question },
       {
         withCredentials: true
       }

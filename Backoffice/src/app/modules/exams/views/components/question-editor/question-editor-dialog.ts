@@ -38,6 +38,8 @@ export class QuestionEditorDialog {
     this.question = this.cloneQuestion(
       this.data.question ?? null
     );
+
+    console.log(this.data)
   }
 
   get isEditing(): boolean {
@@ -150,7 +152,7 @@ export class QuestionEditorDialog {
         this.question
       ).subscribe({
         next: () => {
-          // atualização concluída
+          this.dialogRef.close(this.question);
         },
         error: error => {
           console.error(error);
@@ -162,14 +164,12 @@ export class QuestionEditorDialog {
         this.question
       ).subscribe({
         next: () => {
-          // criação concluída
+          this.dialogRef.close(this.question);
         },
         error: error => {
           console.error(error);
         }
       });
-
-    this.dialogRef.close(this.question);
   }
 
   cancel(): void {

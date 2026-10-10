@@ -105,6 +105,9 @@ public class ExamsController(ICommandDispatcher commandDispatcher, IQueryDispatc
         [FromRoute] string examId, 
         [FromBody] CreateQuestionCommand command)
     {        
+        command.Question.PublicNoticeId = publicNoticeId;
+        command.Question.ExamId = examId;
+
         var result = await _commandDispatcher.DispatchAsync<CreateQuestionCommand, CommandResult>(command);
         return Ok(result);
     }
