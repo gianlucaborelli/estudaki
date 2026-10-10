@@ -279,23 +279,82 @@ public class QuestionRepository : MongoRepositoryBase<Question>, IQuestionReposi
         return questions;
     }
 
-    public async Task<(List<Question> Questions, long TotalCount)> GetByExamIdPaged(string examId, int page, int pageSize, string? sortLabel, string? sortDirection)
+    public async Task<(List<Question> Questions, long TotalCount)> GetByExamIdPaged(
+    string examId,
+    int page,
+    int pageSize,
+    string? sortLabel,
+    string? sortDirection)
     {
         var filterBuilder = Builders<Question>.Filter;
+
         var filter = filterBuilder.ElemMatch(
             q => q.Exams,
             Builders<QuestionExam>.Filter.Eq(qe => qe.ExamId, examId)
         );
-        var sort = GetSortDefinition<Question>(sortLabel, sortDirection);
 
-        var questions = await DbSet
-            .Find(filter)
-            .Sort(sort)
-            .Skip((page - 1) * pageSize)
+        var skip = (page - 1) * pageSize;
+
+        // Conta todas as questões que correspondem ao filtro.
+        var totalCount = await DbSet.CountDocumentsAsync(filter);
+
+        // Define a direção da ordenação.
+        var direction = string.Equals(
+            sortDirection,
+            "desc",
+            StringComparison.OrdinalIgnoreCase)
+            ? -1
+            : 1;
+
+        var questions = await DbSet.Aggregate()
+            .Match(filter)
+            .AppendStage<Question>(
+                new BsonDocument("$addFields",
+                    new BsonDocument("__questionNumber",
+                        new BsonDocument("$let",
+                            new BsonDocument
+                            {
+                            {
+                                "vars",
+                                new BsonDocument("matchingExam",
+                                    new BsonDocument("$arrayElemAt",
+                                        new BsonArray
+                                        {
+                                            new BsonDocument("$filter",
+                                                new BsonDocument
+                                                {
+                                                    {
+                                                        "input", "$Exams"
+                                                    },
+                                                    {
+                                                        "as", "exam"
+                                                    },
+                                                    {
+                                                        "cond",
+                                                        new BsonDocument("$eq",
+                                                            new BsonArray
+                                                            {
+                                                                "$$exam.ExamId",
+                                                                examId
+                                                            })
+                                                    }
+                                                }),
+                                            0
+                                        }))
+                            },
+                            {
+                                "in", "$$matchingExam.QuestionNumber"
+                            }
+                            })))
+            )
+            .Sort(new BsonDocument(
+                "__questionNumber",
+                direction))
+            .Skip(skip)
             .Limit(pageSize)
+            .As<Question>()
             .ToListAsync();
 
-        var totalCount = await DbSet.CountDocumentsAsync(filter);
         return (questions, totalCount);
     }
 

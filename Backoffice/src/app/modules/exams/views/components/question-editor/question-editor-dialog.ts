@@ -65,10 +65,6 @@ export class QuestionEditorDialog {
   }
 
   removeChoice(index: number): void {
-    if (this.question.choices.length <= 1) {
-      return;
-    }
-
     this.question.choices.splice(index, 1);
 
     this.reorganizeOptions();

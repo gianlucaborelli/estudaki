@@ -8,19 +8,26 @@ namespace Estudaki.Modules.Questions.Application.Queries.GetQuestionById;
 public class GetQuestionByIdQueryHandler : IQueryHandler<GetQuestionByIdQuery, QuestionDto?>
 {
     private readonly IQuestionRepository _questionRepository;
+    private readonly IPublicNoticeRepository _publicNoticeRepository;
     private readonly IQuestionSupportRepository _questionSupportRepository;
 
     public GetQuestionByIdQueryHandler(
         IQuestionRepository questionRepository,
+        IPublicNoticeRepository publicNoticeRepository,
         IQuestionSupportRepository questionSupportRepository)
     {
         _questionRepository = questionRepository;
+        _publicNoticeRepository = publicNoticeRepository;
         _questionSupportRepository = questionSupportRepository;
     }
 
     public async Task<QuestionDto?> HandleAsync(GetQuestionByIdQuery query, CancellationToken cancellationToken = default)
     {
         var question = await _questionRepository.GetById(query.Id);
+
+        var publicNotice = question?.Exams.FirstOrDefault()?.PublicNoticeId != null
+            ? await _publicNoticeRepository.GetById(question.Exams.First().PublicNoticeId)
+            : null;
 
         if (question == null)
             return null;
@@ -34,6 +41,6 @@ public class GetQuestionByIdQueryHandler : IQueryHandler<GetQuestionByIdQuery, Q
             ? await _questionSupportRepository.GetByIds(question.QuestionSupports)
             : null;
 
-        return question.ToDto(questionExam, questionSupports);
+        return question.ToDto(publicNotice, questionExam, questionSupports);
     }
 }

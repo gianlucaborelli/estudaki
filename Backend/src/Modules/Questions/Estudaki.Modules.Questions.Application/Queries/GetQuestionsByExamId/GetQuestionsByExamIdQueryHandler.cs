@@ -29,7 +29,7 @@ public class GetQuestionsByExamIdQueryHandler(
             var questionExam = question.Exams.FirstOrDefault(qe => qe.ExamId == query.ExamId);
             if (questionExam != null)
             {
-                questionsDto.Add(question.ToDto(questionExam, questionSupports));
+                questionsDto.Add(question.ToDto(publicNotice, questionExam, questionSupports));
             }
         }
 
