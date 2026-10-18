@@ -53,11 +53,11 @@ export class ExamService {
 
   uploadImage(
     publicNoticeId: string,
-    file: File): Observable<string> {
+    file: File): Observable<{ fileUrl: string }> {
     const formData = new FormData();
     formData.append('file', file);
 
-    return this.http.post<string>(
+    return this.http.post<{ fileUrl: string }>(
       `/api/exams/${publicNoticeId}/contents/images`,
       formData,
       {

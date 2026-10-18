@@ -13,6 +13,7 @@ import { MatDialog } from '@angular/material/dialog';
 import { ContentRender } from '../../../../../shared/component/content-render/content-render';
 import { MatPaginator } from '@angular/material/paginator';
 import { MatSort } from '@angular/material/sort';
+import { ImagePickerDialog } from '../image-picker-dialog/image-picker-dialog';
 
 @Component({
   imports: [
@@ -274,43 +275,20 @@ export class QuestionsManagerComponent implements OnChanges {
     this.selectedQuestion = question
   }
 
-  onFileSelected(event: Event) {
-    const input = event.target as HTMLInputElement;
-    const file = input.files?.[0];
+  async addImage() {
+    const dialogRef = this.dialog.open(ImagePickerDialog, {
+      width: '640px',
+      maxWidth: '95vw',
+      data: { publicNoticeId: this.publicNotice?.id }
+    });
 
-    if (file) {
-      this.uploadImage(file);
-    }
-
-    input.value = '';
-  }
-
-  async addImageFromClipboard() {
-    const clipboardItems = await navigator.clipboard.read();
-
-    for (const item of clipboardItems) {
-      const imageType = item.types.find(type => type.startsWith('image/'));
-
-      if (!imageType) {
-        continue;
+    dialogRef.afterClosed().subscribe((imageUrl?: string) => {
+      if (!imageUrl) {
+        return;
       }
 
-      const blob = await item.getType(imageType);
-      const file = new File([blob], `clipboard-image.${imageType.split('/')[1]}`, { type: imageType });
-
-      this.uploadImage(file);
-      break;
-    }
-  }
-
-  private uploadImage(file: File) {
-    if (this.publicNotice) {
-      this.examService.uploadImage(this.publicNotice.id, file).subscribe({
-        next: imageUrl => {
-          this.imageDataSource.update(images => [...images, imageUrl]);
-        }
-      });
-    }
+      this.loadImages(this.publicNotice!.id)
+    });
   }
 
   deleteImage() { }

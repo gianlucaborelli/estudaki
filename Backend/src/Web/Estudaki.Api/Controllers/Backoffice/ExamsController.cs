@@ -52,7 +52,7 @@ public class ExamsController(ICommandDispatcher commandDispatcher, IQueryDispatc
     {        
         var command = new UploadQuestionImagesCommand(file, publicNoticeId);
         var result = await _commandDispatcher.DispatchAsync<UploadQuestionImagesCommand, CommandResult>(command);        
-        return Ok(result);
+        return Ok(result.Data);
     }
 
     [HttpGet("{publicNoticeId}/contents/questions-support")]

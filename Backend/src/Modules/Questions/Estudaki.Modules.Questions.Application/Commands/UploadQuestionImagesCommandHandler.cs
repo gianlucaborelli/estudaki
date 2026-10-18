@@ -47,12 +47,12 @@ namespace Estudaki.Modules.Questions.Application.Commands
             var guid = Guid.NewGuid().ToString();
             var newFileName = $"{publicNotice.GetImagesFolder()}/{guid}{extension}";
 
-            await _storageService.UploadFileAsync(
+            var imageUrl = await _storageService.UploadFileAsync(
                 file.OpenReadStream(),
                 newFileName,
                 file.ContentType);
 
-            return Result();
+            return Result(new { fileUrl = imageUrl});
         }
     }
 }

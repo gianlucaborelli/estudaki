@@ -1,23 +1,4 @@
-<mat-card class="exam-selector-card" appearance="outlined">
-  <mat-form-field class="exam-selector-questions" appearance="outline">
-    <mat-label>Exames</mat-label>
-
-    <mat-select [(value)]="selectedExam" (selectionChange)="onExamSelected($event.value)">
-      @for (exam of publicNotice?.exams; track exam.id) {
-        <mat-option [value]="exam">
-          {{ exam.phase }}
-          -
-          {{ exam.educationLevel | educationLevel }}
-          -
-          {{ exam.position }}
-          -
-          {{ exam.area }}
-        </mat-option>
-      }
-    </mat-select>
-  </mat-form-field>
-
-  <mat-divider />
+<mat-card class="questions-manager-card" appearance="outlined">
   <div class="questions-list">
     <mat-tab-group>
       <!-- QUESTÕES -->
@@ -25,6 +6,26 @@
         <div class="questions-layout">
           <!-- Lista de questões -->
           <div class="questions-list">
+            <div class="exam-selector-toolbar">
+              <mat-form-field class="exam-selector-questions" appearance="outline">
+                <mat-label>Exames</mat-label>
+
+                <mat-select [(value)]="selectedExam" (selectionChange)="onExamSelected($event.value)">
+                  @for (exam of publicNotice?.exams; track exam.id) {
+                    <mat-option [value]="exam">
+                      {{ exam.phase }}
+                      -
+                      {{ exam.educationLevel | educationLevel }}
+                      -
+                      {{ exam.position }}
+                      -
+                      {{ exam.area }}
+                    </mat-option>
+                  }
+                </mat-select>
+              </mat-form-field>
+            </div>
+
             <table
               mat-table
               [dataSource]="questionDataSource()"
@@ -253,33 +254,10 @@
         <div class="images-panel">
           <mat-toolbar class="toolbar-actions">
             <!-- Adicionar -->
-            <button
-              mat-icon-button
-              [matMenuTriggerFor]="addImageMenu"
-              matTooltip="Adicionar Imagem"
-            >
+            <button mat-icon-button (click)="addImage()"
+            matTooltip="Adicionar Imagem">
               <mat-icon>add_photo_alternate</mat-icon>
             </button>
-
-            <mat-menu #addImageMenu="matMenu">
-              <button mat-menu-item (click)="fileInput.click()">
-                <mat-icon>folder_open</mat-icon>
-                <span>Selecionar arquivo</span>
-              </button>
-
-              <button mat-menu-item (click)="addImageFromClipboard()">
-                <mat-icon>content_paste</mat-icon>
-                <span>Colar da área de transferência</span>
-              </button>
-            </mat-menu>
-
-            <input
-              #fileInput
-              type="file"
-              accept="image/*"
-              hidden
-              (change)="onFileSelected($event)"
-            />
 
             <!-- Remover -->
             <button

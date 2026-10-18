@@ -112,14 +112,9 @@ export class ImagePickerDialog implements OnInit {
     this.isUploading.set(true);
 
     this.examService.uploadImage(this.data.publicNoticeId, file).subscribe({
-      next: uploadedUrl => {
+      next: response => {
         this.isUploading.set(false);
-
-        this.images.update(
-          list => [...list, uploadedUrl]
-        );
-
-        this.selectedUrl.set(uploadedUrl);
+        this.loadImages(response.fileUrl);
       },
       error: () => {
         this.isUploading.set(false);
@@ -131,22 +126,39 @@ export class ImagePickerDialog implements OnInit {
     });
   }
 
-  private loadImages(): void {
+  private loadImages(selectUrl?: string): void {
     this.isLoading.set(true);
     this.errorMessage.set(null);
 
-    this.examService.getImagesByPublicNoticeId(this.data.publicNoticeId).subscribe({
-      next: images => {
-        this.isLoading.set(false);
-        this.images.set(images);
-      },
-      error: () => {
-        this.isLoading.set(false);
+    this.examService
+      .getImagesByPublicNoticeId(this.data.publicNoticeId)
+      .subscribe({
+        next: images => {
+          this.isLoading.set(false);
+          this.images.set(images);
 
-        this.errorMessage.set(
-          'Não foi possível carregar as imagens.'
-        );
-      }
-    });
+          if (selectUrl) {
+            const fileName = this.getFileName(selectUrl);
+
+            const matchingImage = images.find(
+              image => this.getFileName(image) === fileName
+            );
+
+            if (matchingImage) {
+              this.selectedUrl.set(matchingImage);
+            }
+          }
+        },
+        error: () => {
+          this.isLoading.set(false);
+          this.errorMessage.set(
+            'Não foi possível carregar as imagens.'
+          );
+        }
+      });
+  }
+
+  private getFileName(url: string): string {
+    return new URL(url).pathname.split('/').pop() ?? '';
   }
 }
