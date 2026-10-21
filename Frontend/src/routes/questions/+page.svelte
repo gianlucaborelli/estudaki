@@ -2,7 +2,7 @@
 	import type { PageData } from './$types';
 	import { goto } from '$app/navigation';
 	import { resolve } from '$app/paths';
-	import { page } from '$app/state';
+	import { navigating, page } from '$app/state';
 	import { SvelteURLSearchParams } from 'svelte/reactivity';
 	import { QuestionType } from '$lib/questions/types/question-types';
 	import { ExamCategory } from '$lib/questions/types/exam-category';
@@ -10,8 +10,13 @@
 	import FilterSection from '$lib/questions/components/FilterSection.svelte';
 	import QuestionRender from '$lib/questions/components/QuestionRender.svelte';
 	import Pagination from '$lib/questions/components/Pagination.svelte';
+	import EmptyQuestionsState from '$lib/questions/components/EmptyQuestionsState.svelte';
 
 	let { data }: { data: PageData } = $props();
+
+	let moreFiltersOpen = $state(false);
+	let isLoadingResults = $derived(navigating.to !== null);
+	let hasResults = $derived(data.items.length > 0);
 
 	function handlePageChange(page: number) {
 		const params = new SvelteURLSearchParams(window.location.search);
@@ -46,6 +51,37 @@
 		for (const value of selectedSubAreas) params.append('subAreas', value);
 
 		goto(resolve(`/questions?${params.toString()}`));
+	}
+
+	function clearAllFilters() {
+		selectedQuestionTypes = [];
+		selectedYears = [];
+		selectedExamCategories = [];
+		selectedExaminerOrganizations = [];
+		selectedContractingOrganizations = [];
+		selectedAreas = [];
+	}
+
+	function handleClearFiltersFromEmptyState() {
+		clearAllFilters();
+		handleSearch();
+	}
+
+	function handleBackToFilters() {
+		const hasAdvancedSelection =
+			selectedQuestionTypes.length > 0 ||
+			selectedExaminerOrganizations.length > 0 ||
+			selectedContractingOrganizations.length > 0 ||
+			selectedAreas.length > 0;
+
+		if (hasAdvancedSelection) {
+			moreFiltersOpen = true;
+		}
+
+		const filterSection = document.getElementById('questions-filter-section');
+
+		filterSection?.focus();
+		filterSection?.scrollIntoView({ behavior: 'smooth', block: 'start' });
 	}
 
 	const questionTypes = Object.values(QuestionType).map((type) => ({
@@ -87,13 +123,6 @@
 		}))
 	);
 
-	const subAreas = $derived(
-		data.filterParameters.subAreas!.map((name) => ({
-			value: name,
-			name
-		}))
-	);
-
 	let selectedQuestionTypes = $state<string[]>(page.url.searchParams.getAll('typeQuestions'));
 	let selectedYears = $state<number[]>(
 		page.url.searchParams.getAll('year').map(Number).filter(Number.isInteger)
@@ -106,12 +135,20 @@
 		page.url.searchParams.getAll('contractingOrganization')
 	);
 	let selectedAreas = $state<string[]>(page.url.searchParams.getAll('mainAreas'));
+	// Subárea não é mais exposta nos filtros da interface, mas o valor é preservado
+	// para não descartar filtros já aplicados via URL (contrato da API inalterado).
 	let selectedSubAreas = $state<string[]>(page.url.searchParams.getAll('subAreas'));
 </script>
 
 <svelte:head>
 	<title>Estudaki - Questões</title>
 </svelte:head>
+
+<p class="sr-only" aria-live="polite">
+	{#if isLoadingResults}
+		Carregando questões...
+	{/if}
+</p>
 
 <FilterSection
 	{questionTypes}
@@ -120,38 +157,44 @@
 	{examinerOrganizations}
 	{contractingOrganizations}
 	{areas}
-	{subAreas}
 	bind:selectedQuestionTypes
 	bind:selectedYears
 	bind:selectedExamCategories
 	bind:selectedExaminerOrganizations
 	bind:selectedContractingOrganizations
 	bind:selectedAreas
-	bind:selectedSubAreas
+	bind:moreFiltersOpen
 	onSearch={handleSearch}
 />
 
-<box gap={4}>
-	<Pagination
-		pageNumber={data.pageNumber}
-		pageSize={data.pageSize}
-		totalPages={data.totalPages}
-		{handlePageChange}
-		{handlePageSizeChange}
-	/>
+{#if hasResults}
+	<box gap={4}>
+		<Pagination
+			pageNumber={data.pageNumber}
+			pageSize={data.pageSize}
+			totalPages={data.totalPages}
+			{handlePageChange}
+			{handlePageSizeChange}
+		/>
 
-	{#each data.items as question (question.questionId)}
-		<QuestionRender class="question" {question} />
-	{/each}
+		{#each data.items as question (question.questionId)}
+			<QuestionRender class="question" {question} />
+		{/each}
 
-	<Pagination
-		pageNumber={data.pageNumber}
-		pageSize={data.pageSize}
-		totalPages={data.totalPages}
-		{handlePageChange}
-		{handlePageSizeChange}
+		<Pagination
+			pageNumber={data.pageNumber}
+			pageSize={data.pageSize}
+			totalPages={data.totalPages}
+			{handlePageChange}
+			{handlePageSizeChange}
+		/>
+	</box>
+{:else}
+	<EmptyQuestionsState
+		onClearFilters={handleClearFiltersFromEmptyState}
+		onBackToFilters={handleBackToFilters}
 	/>
-</box>
+{/if}
 
 <style>
 	:global(.question) {
@@ -160,3 +203,4 @@
 		margin-bottom: 1rem;
 	}
 </style>
+

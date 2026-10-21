@@ -2,6 +2,7 @@
 	import CustomSelect from '$lib/components/shared/CustomSelect.svelte';
 	import SearchableSelect from '$lib/components/shared/SearchableSelect.svelte';
 	import { Badge, CloseButton, type SelectOptionType } from 'flowbite-svelte';
+	import { ChevronDownOutline } from 'flowbite-svelte-icons';
 
 	type SelectedFilter = {
 		label: string;
@@ -16,14 +17,13 @@
 		examinerOrganizations: SelectOptionType<string>[];
 		contractingOrganizations: SelectOptionType<string>[];
 		areas: SelectOptionType<string>[];
-		subAreas: SelectOptionType<string>[];
 		selectedQuestionTypes?: string[];
 		selectedYears?: number[];
 		selectedExamCategories?: string[];
 		selectedExaminerOrganizations?: string[];
 		selectedContractingOrganizations?: string[];
 		selectedAreas?: string[];
-		selectedSubAreas?: string[];
+		moreFiltersOpen?: boolean;
 		onSearch: () => void;
 	};
 
@@ -34,16 +34,28 @@
 		examinerOrganizations,
 		contractingOrganizations,
 		areas,
-		subAreas,
 		selectedQuestionTypes = $bindable<string[]>([]),
 		selectedYears = $bindable<number[]>([]),
 		selectedExamCategories = $bindable<string[]>([]),
 		selectedExaminerOrganizations = $bindable<string[]>([]),
 		selectedContractingOrganizations = $bindable<string[]>([]),
 		selectedAreas = $bindable<string[]>([]),
-		selectedSubAreas = $bindable<string[]>([]),
+		moreFiltersOpen = $bindable(false),
 		onSearch
 	}: Props = $props();
+
+	const moreFiltersPanelId = $props.id();
+
+	let advancedFilterCount = $derived(
+		selectedQuestionTypes.length +
+			selectedExaminerOrganizations.length +
+			selectedContractingOrganizations.length +
+			selectedAreas.length
+	);
+
+	function toggleMoreFilters() {
+		moreFiltersOpen = !moreFiltersOpen;
+	}
 
 	function getSelectedFilter<T>(
 		label: string,
@@ -108,28 +120,13 @@
 				contractingOrganizations,
 				(values) => (selectedContractingOrganizations = values)
 			),
-			getSelectedFilter('Área', selectedAreas, areas, (values) => (selectedAreas = values)),
-			getSelectedFilter(
-				'Subárea',
-				selectedSubAreas,
-				subAreas,
-				(values) => (selectedSubAreas = values)
-			)
+			getSelectedFilter('Área', selectedAreas, areas, (values) => (selectedAreas = values))
 		].filter((filter): filter is SelectedFilter => filter !== undefined)
 	);
 </script>
 
-<section class="filter-container" aria-label="Filtros de questões">
-	<div class="question-type-filter">
-		<CustomSelect
-			items={questionTypes}
-			bind:value={selectedQuestionTypes}
-			label="Tipo de questão"
-			placeholder="Selecione um tipo de questão ..."
-		/>
-	</div>
-
-	<div class="remaining-filters">
+<section id="questions-filter-section" tabindex="-1" class="filter-container" aria-label="Filtros de questões">
+	<div class="primary-filters">
 		<CustomSelect
 			items={years}
 			bind:value={selectedYears}
@@ -143,34 +140,56 @@
 			label="Categoria do exame"
 			placeholder="Selecione uma categoria de exame ..."
 		/>
+	</div>
 
-		<SearchableSelect
-			items={examinerOrganizations}
-			bind:value={selectedExaminerOrganizations}
-			label="Banca examinadora"
-			placeholder="Selecione uma banca ..."
-		/>
+	<div class="advanced-filters">
+		<button
+			type="button"
+			class="advanced-filters-toggle"
+			aria-expanded={moreFiltersOpen}
+			aria-controls={moreFiltersPanelId}
+			onclick={toggleMoreFilters}
+		>
+			<ChevronDownOutline class="advanced-filters-icon" />
+			<span>Mais filtros</span>
+			{#if advancedFilterCount > 0}
+				<span class="advanced-filters-count" aria-label={`${advancedFilterCount} filtros avançados selecionados`}>
+					{advancedFilterCount}
+				</span>
+			{/if}
+		</button>
 
-		<SearchableSelect
-			items={contractingOrganizations}
-			bind:value={selectedContractingOrganizations}
-			label="Instituição"
-			placeholder="Selecione uma instituição ..."
-		/>
+		{#if moreFiltersOpen}
+			<div id={moreFiltersPanelId} class="remaining-filters">
+				<CustomSelect
+					items={questionTypes}
+					bind:value={selectedQuestionTypes}
+					label="Tipo de questão"
+					placeholder="Selecione um tipo de questão ..."
+				/>
 
-		<SearchableSelect
-			items={areas}
-			bind:value={selectedAreas}
-			label="Área"
-			placeholder="Selecione uma área ..."
-		/>
+				<SearchableSelect
+					items={examinerOrganizations}
+					bind:value={selectedExaminerOrganizations}
+					label="Banca examinadora"
+					placeholder="Selecione uma banca ..."
+				/>
 
-		<SearchableSelect
-			items={subAreas}
-			bind:value={selectedSubAreas}
-			label="Subárea"
-			placeholder="Selecione uma subárea ..."
-		/>
+				<SearchableSelect
+					items={contractingOrganizations}
+					bind:value={selectedContractingOrganizations}
+					label="Instituição"
+					placeholder="Selecione uma instituição ..."
+				/>
+
+				<SearchableSelect
+					items={areas}
+					bind:value={selectedAreas}
+					label="Área"
+					placeholder="Selecione uma área ..."
+				/>
+			</div>
+		{/if}
 	</div>
 
 	<div class="filter-actions">
@@ -218,9 +237,70 @@
 		padding: 1rem 1.25rem;
 	}
 
-	.question-type-filter {
+	.primary-filters {
+		display: grid;
+		grid-template-columns: repeat(2, minmax(16rem, 20rem));
+		gap: 1rem;
+	}
+
+	.advanced-filters {
+		display: grid;
+		gap: 0.875rem;
+	}
+
+	.advanced-filters-toggle {
+		display: inline-flex;
 		width: fit-content;
-		max-width: 100%;
+		align-items: center;
+		gap: 0.5rem;
+		border: 1px solid transparent;
+		border-radius: 0.5rem;
+		background: transparent;
+		color: var(--tertiary);
+		cursor: pointer;
+		font-size: 0.875rem;
+		font-weight: 700;
+		padding: 0.4rem 0.6rem;
+		transition:
+			background-color 0.18s ease,
+			border-color 0.18s ease,
+			color 0.18s ease;
+	}
+
+	.advanced-filters-toggle:hover {
+		border-color: var(--border);
+		background-color: var(--surface-hover, rgba(0, 0, 0, 0.04));
+		color: var(--tertiary-hover);
+	}
+
+	.advanced-filters-toggle:focus-visible {
+		outline: 2px solid var(--tertiary);
+		outline-offset: 2px;
+	}
+
+	:global(.advanced-filters-icon) {
+		width: 1rem;
+		height: 1rem;
+		transition: transform 0.18s ease;
+	}
+
+	.advanced-filters-toggle[aria-expanded='true'] :global(.advanced-filters-icon) {
+		transform: rotate(180deg);
+	}
+
+	.advanced-filters-count {
+		display: inline-flex;
+		align-items: center;
+		justify-content: center;
+		min-width: 1.25rem;
+		height: 1.25rem;
+		border-radius: 999px;
+		background-color: var(--secondary);
+		color: var(--text);
+		font-size: 0.6875rem;
+		font-weight: 700;
+		line-height: 1;
+		padding: 0 0.3rem;
 	}
 
 	.remaining-filters {
@@ -332,12 +412,9 @@
 			padding: 1rem;
 		}
 
-		.question-type-filter,
+		.primary-filters,
 		.remaining-filters {
 			width: 100%;
-		}
-
-		.remaining-filters {
 			grid-template-columns: minmax(0, 1fr);
 		}
 

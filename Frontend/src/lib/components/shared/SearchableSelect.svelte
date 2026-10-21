@@ -1,3 +1,8 @@
+<script module lang="ts">
+	// Estado compartilhado entre todas as instâncias: apenas um select pode ficar aberto por vez.
+	let activeSelectId = $state<string | null>(null);
+</script>
+
 <script lang="ts" generics="T">
 	import type { SelectOptionType } from 'flowbite-svelte';
 
@@ -20,7 +25,7 @@
 	}: Props = $props();
 
 	const selectId = $props.id();
-	let isOpen = $state(false);
+	let isOpen = $derived(activeSelectId === selectId);
 	let search = $state('');
 
 	let filteredItems = $derived(
@@ -29,12 +34,14 @@
 
 	let selectedItems = $derived(items.filter((item) => value.includes(item.value)));
 
-	function toggleOpen() {
-		isOpen = !isOpen;
-
+	$effect(() => {
 		if (!isOpen) {
 			search = '';
 		}
+	});
+
+	function toggleOpen() {
+		activeSelectId = isOpen ? null : selectId;
 	}
 
 	function toggleItem(item: SelectOptionType<T>) {
@@ -46,8 +53,9 @@
 	}
 
 	function close() {
-		isOpen = false;
-		search = '';
+		if (activeSelectId === selectId) {
+			activeSelectId = null;
+		}
 	}
 </script>
 

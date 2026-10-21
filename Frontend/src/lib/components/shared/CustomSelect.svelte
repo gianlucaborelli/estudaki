@@ -42,7 +42,7 @@
 			{name}
 			{required}
 			class="select mt-1"
-			classes={{ dropdown: 'select-dropdown' }}
+			classes={{ dropdown: 'select-dropdown', placeholder: 'select-placeholder' }}
 		>
 			{#snippet children({ item })}
 				{#if multiple}
@@ -107,6 +107,12 @@
 
 	:global(.select > span:first-of-type) {
 		color: var(--text-muted);
+	}
+
+	:global(.select-placeholder) {
+		overflow: hidden;
+		white-space: nowrap;
+		text-overflow: ellipsis;
 	}
 
 	:global(.select svg) {

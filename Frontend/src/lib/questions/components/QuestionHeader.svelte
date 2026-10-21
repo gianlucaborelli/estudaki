@@ -153,43 +153,52 @@
 	{/if}
 
 	<div class="header-actions">
-		<Button
-			class="copy-question"
-			aria-label="Copiar questão"
-			title="Copiar questão"
-			onclick={copyQuestion}
-		>
-			<ClipboardCheckOutline class="h-6 w-6 shrink-0" />
-		</Button>
-		<Button
-			class="signalize-question"
-			aria-label="Sinalizar questão"
-			title="Sinalizar questão"
-			onclick={() => (issueModalOpen = true)}
-		>
-			<FlagOutline class="h-6 w-6 shrink-0" />
-		</Button>
-		<Button
-			id={downloadTriggerId}
-			class="download-question"
-			aria-label="Baixar questão"
-			title="Baixar questão"
-		>
-			<DownloadOutline class="h-6 w-6 shrink-0" />
-		</Button>
-		<Dropdown
-			simple
-			bind:isOpen={downloadDropdownOpen}
-			triggeredBy="#{downloadTriggerId}"
-			class="download-dropdown"
-		>
-			<DropdownItem disabled={!question.examBookletUrl} onclick={downloadQuestionBooklet}>
-				Caderno de questões
-			</DropdownItem>
-			<DropdownItem disabled={!question.answerKeyUrl} onclick={downloadAnswerKey}>
-				Gabarito
-			</DropdownItem>
-		</Dropdown>
+		<div class="header-actions-primary">
+			<Button
+				class="action-button copy-question"
+				aria-label="Copiar questão"
+				title="Copiar questão"
+				onclick={copyQuestion}
+			>
+				<ClipboardCheckOutline class="h-5 w-5 shrink-0" />
+				<span class="action-label action-label-full">Copiar questão</span>
+				<span class="action-label action-label-short">Copiar</span>
+			</Button>
+			<Button
+				id={downloadTriggerId}
+				class="action-button download-question"
+				aria-label="Documentos da questão"
+				title="Documentos da questão"
+			>
+				<DownloadOutline class="h-5 w-5 shrink-0" />
+				<span class="action-label action-label-full">Documentos</span>
+			</Button>
+			<Dropdown
+				simple
+				bind:isOpen={downloadDropdownOpen}
+				triggeredBy="#{downloadTriggerId}"
+				class="download-dropdown"
+			>
+				<DropdownItem disabled={!question.examBookletUrl} onclick={downloadQuestionBooklet}>
+					Caderno de questões
+				</DropdownItem>
+				<DropdownItem disabled={!question.answerKeyUrl} onclick={downloadAnswerKey}>
+					Gabarito
+				</DropdownItem>
+			</Dropdown>
+		</div>
+
+		<div class="header-actions-secondary">
+			<Button
+				class="action-button signalize-question"
+				aria-label="Sinalizar questão"
+				title="Sinalizar questão"
+				onclick={() => (issueModalOpen = true)}
+			>
+				<FlagOutline class="h-5 w-5 shrink-0" />
+				<span class="action-label action-label-full">Sinalizar</span>
+			</Button>
+		</div>
 	</div>
 </header>
 
@@ -209,12 +218,14 @@
 <style>
 	.question-header {
 		display: grid;
-		grid-template-columns: auto minmax(0, 1fr) auto;
+		grid-template-columns: auto minmax(0, 1fr);
 		grid-template-areas:
-			'identity metadata actions'
-			'identity context actions';
+			'identity metadata'
+			'identity context'
+			'actions actions';
 		gap: 0.75rem 1.25rem;
 		align-items: start;
+		padding-bottom: 1.25rem;
 		border-bottom: 1px solid var(--border);
 	}
 
@@ -338,23 +349,41 @@
 	.header-actions {
 		display: flex;
 		grid-area: actions;
-		gap: 0.375rem;
+		align-items: center;
+		justify-content: space-between;		
+		flex-wrap: nowrap;
 	}
 
-	:global(.signalize-question, .copy-question, .download-question) {
+	.header-actions-primary {
+		display: flex;
+		align-items: center;
+		gap: 0.5rem;
+		min-width: 0;
+	}
+
+	.header-actions-secondary {
+		display: flex;
+		align-items: center;
+	}
+
+	:global(.action-button) {
 		display: inline-flex;
 		align-items: center;
 		justify-content: center;
-		width: 2.25rem;
-		height: 2.25rem;
+		gap: 0.5rem;
+		min-width: 2rem;
+		min-height: 2rem;
 		border: 1px solid transparent;
 		border-radius: 0.5rem;
 		background-color: transparent;
 		color: var(--tertiary);
 		cursor: pointer;
-		padding: 0;
+		padding: 0 0.875rem;
 		outline: none;
 		box-shadow: none;
+		font-size: 0.8125rem;
+		font-weight: 700;
+		white-space: nowrap;
 
 		transition:
 			color 0.2s ease,
@@ -363,29 +392,29 @@
 			transform 0.15s ease-in-out;
 	}
 
-	:global(.signalize-question:active, .copy-question:active, .download-question:active) {
-		transform: scale(0.92);
+	:global(.action-button:active) {
+		transform: scale(0.96);
 	}
 
-	:global(.signalize-question:hover, .copy-question:hover, .download-question:hover) {
+	:global(.action-button:hover) {
 		border-color: var(--border);
 		background-color: var(--surface-hover, rgba(0, 0, 0, 0.04));
 		color: var(--tertiary-hover);
 	}
 
-	:global(.signalize-question:focus, .copy-question:focus, .download-question:focus) {
+	:global(.action-button:focus) {
 		outline: none;
 		box-shadow: none;
 		border-color: transparent;
 	}
 
-	:global(
-		.signalize-question:focus-visible,
-		.copy-question:focus-visible,
-		.download-question:focus-visible
-	) {
+	:global(.action-button:focus-visible) {
 		outline: 2px solid var(--tertiary);
 		outline-offset: 2px;
+	}
+
+	.action-label-short {
+		display: none;
 	}
 
 	:global(.download-dropdown) {
@@ -410,15 +439,44 @@
 
 	@media (max-width: 800px) {
 		.question-header {
-			grid-template-columns: auto minmax(0, 1fr);
+			grid-template-columns: minmax(0, 1fr);
 			grid-template-areas:
-				'identity actions'
-				'metadata metadata'
-				'context context';
+				'identity'
+				'metadata'
+				'context'
+				'actions';
 		}
 
-		.header-actions {
-			justify-self: end;
+		.question-identity {
+			padding-right: 0;
+			padding-bottom: 0.5rem;
+			border-right: none;
+			border-bottom: 2px solid var(--secondary);
+		}
+	}
+
+	@media (max-width: 640px) {
+		.action-label-full {
+			display: none;
+		}
+
+		.action-label-short {
+			display: inline;
+		}
+
+		:global(.action-button) {
+			padding: 0 0.625rem;
+		}
+	}
+
+	@media (max-width: 360px) {
+		.action-label-short {
+			display: none;
+		}
+
+		:global(.copy-question) {
+			min-width: 2.75rem;
+			padding: 0;
 		}
 	}
 
@@ -433,3 +491,4 @@
 		}
 	}
 </style>
+
