@@ -126,20 +126,24 @@
 </script>
 
 <section id="questions-filter-section" tabindex="-1" class="filter-container" aria-label="Filtros de questões">
-	<div class="primary-filters">
-		<CustomSelect
-			items={years}
-			bind:value={selectedYears}
-			label="Ano"
-			placeholder="Selecione um ano ..."
-		/>
+	<div class="search-row">
+		<div class="primary-filters">
+			<CustomSelect
+				items={years}
+				bind:value={selectedYears}
+				label="Ano"
+				placeholder="Selecione um ano ..."
+			/>
 
-		<CustomSelect
-			items={examCategories}
-			bind:value={selectedExamCategories}
-			label="Categoria do exame"
-			placeholder="Selecione uma categoria de exame ..."
-		/>
+			<CustomSelect
+				items={examCategories}
+				bind:value={selectedExamCategories}
+				label="Categoria do exame"
+				placeholder="Selecione uma categoria de exame ..."
+			/>
+		</div>
+
+		<button type="button" class="search-button" onclick={onSearch}>Pesquisar</button>
 	</div>
 
 	<div class="advanced-filters">
@@ -192,60 +196,77 @@
 		{/if}
 	</div>
 
-	<div class="filter-actions">
-		<div class="selected-filters" aria-live="polite">
-			{#if selectedFilters.length}
-				<ul aria-label="Filtros selecionados">
-					{#each selectedFilters as filter (filter)}
-						<li>
-							<Badge color="secondary" class="selected-filter-badge">
-								<span class="filter-label">
-									{filter.label}
+	<div class="selected-filters" aria-live="polite">
+		{#if selectedFilters.length}
+			<ul aria-label="Filtros selecionados">
+				{#each selectedFilters as filter (filter)}
+					<li>
+						<Badge color="secondary" class="selected-filter-badge">
+							<span class="filter-label">
+								{filter.label}
+								<CloseButton
+									size="xs"
+									color="none"
+									name={`Remover todos os filtros de ${filter.label}`}
+									onclick={filter.clear}
+								/>
+							</span>
+							{#each filter.items as item (item.key)}
+								<Badge color="primary" class="filter-value tertiary-filter-value">
+									{item.name}
 									<CloseButton
 										size="xs"
 										color="none"
-										name={`Remover todos os filtros de ${filter.label}`}
-										onclick={filter.clear}
+										name={`Remover ${item.name}`}
+										onclick={item.remove}
 									/>
-								</span>
-								{#each filter.items as item (item.key)}
-									<Badge color="primary" class="filter-value tertiary-filter-value">
-										{item.name}
-										<CloseButton
-											size="xs"
-											color="none"
-											name={`Remover ${item.name}`}
-											onclick={item.remove}
-										/>
-									</Badge>
-								{/each}
-							</Badge>
-						</li>
-					{/each}
-				</ul>
-			{/if}
-		</div>
-
-		<button type="button" class="search-button" onclick={onSearch}>Pesquisar</button>
+								</Badge>
+							{/each}
+						</Badge>
+					</li>
+				{/each}
+			</ul>
+		{/if}
 	</div>
 </section>
 
 <style>
 	.filter-container {
 		display: grid;
+		gap: 1.125rem;
+		margin: 1rem 20px;
+		border: 1px solid var(--border);
+		border-radius: 0.875rem;
+		background-color: var(--surface-elevated);
+		box-shadow: 0 1px 3px color-mix(in srgb, var(--text) 6%, transparent);
+		padding: 1.25rem 1.5rem;
+	}
+
+	.search-row {
+		display: flex;
+		flex-wrap: wrap;
+		align-items: flex-end;
 		gap: 1rem;
-		padding: 1rem 1.25rem;
 	}
 
 	.primary-filters {
-		display: grid;
-		grid-template-columns: repeat(2, minmax(16rem, 20rem));
+		display: flex;
+		flex: 1 1 auto;
+		flex-wrap: wrap;
 		gap: 1rem;
+	}
+
+	.primary-filters > :global(*) {
+		flex: 1 1 14rem;
+		min-width: 12rem;
+		max-width: 20rem;
 	}
 
 	.advanced-filters {
 		display: grid;
 		gap: 0.875rem;
+		padding-top: 0.25rem;
+		border-top: 1px solid var(--border);
 	}
 
 	.advanced-filters-toggle {
@@ -309,14 +330,6 @@
 		gap: 1rem;
 	}
 
-	.filter-actions {
-		display: flex;
-		align-items: center;
-		justify-content: space-between;
-		gap: 1rem;
-		padding-top: 1rem;
-	}
-
 	.selected-filters {
 		min-width: 0;
 		color: var(--text-muted);
@@ -373,6 +386,7 @@
 
 	.search-button {
 		flex: 0 0 auto;
+		min-height: 2.75rem;
 		border: 1px solid var(--secondary);
 		border-radius: 0.5rem;
 		background-color: var(--secondary);
@@ -380,7 +394,7 @@
 		cursor: pointer;
 		font-size: 0.875rem;
 		font-weight: 700;
-		padding: 0.65rem 1.15rem;
+		padding: 0.65rem 1.5rem;
 		transition:
 			background-color 0.2s ease,
 			box-shadow 0.2s ease,
@@ -409,18 +423,21 @@
 
 	@media (max-width: 560px) {
 		.filter-container {
+			margin: 1rem 12px;
 			padding: 1rem;
 		}
 
-		.primary-filters,
-		.remaining-filters {
-			width: 100%;
-			grid-template-columns: minmax(0, 1fr);
+		.search-row {
+			flex-direction: column;
+			align-items: stretch;
 		}
 
-		.filter-actions {
-			align-items: stretch;
-			flex-direction: column;
+		.primary-filters > :global(*) {
+			max-width: none;
+		}
+
+		.remaining-filters {
+			grid-template-columns: minmax(0, 1fr);
 		}
 
 		.search-button {
